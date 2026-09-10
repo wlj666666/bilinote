@@ -1,0 +1,4 @@
+# Optional Linux/WSL GPU runtime. Install after requirements.txt.
+ctranslate2==4.8.2
+nvidia-cublas-cu12==12.8.4.1
+nvidia-cudnn-cu12==9.8.0.87

@@ -153,13 +153,14 @@ export default function Monitor() {
                                                 <span className="font-medium">{status.cuda.gpu_name}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">CUDA 版本:</span>
-                                                <span className="font-mono">{status.cuda.version}</span>
+                                                <span className="text-muted-foreground">CUDA 运行库:</span>
+                                                <span className="font-mono">{status.cuda.version || '系统提供'}</span>
                                             </div>
                                         </>
                                     ) : (
                                         <div className="text-muted-foreground">
                                             CUDA 不可用，将使用 CPU 模式
+                                            {status.cuda.error && <p className="mt-1 break-all">{status.cuda.error}</p>}
                                         </div>
                                     )}
                                 </div>

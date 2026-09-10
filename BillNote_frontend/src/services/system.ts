@@ -31,8 +31,8 @@ export interface DeployStatus {
   }
   cuda: {
     available: boolean
-    /** 新增：torch 是否安装。轻量部署没装 torch 时为 false，避免误判为 CUDA 故障 */
-    torch_installed?: boolean
+    engine?: string
+    error?: string | null
     version: string | null
     gpu_name: string | null
   }
@@ -50,4 +50,3 @@ export interface DeployStatus {
 export const getDeployStatus = async (): Promise<DeployStatus> => {
   return await request.get('/deploy_status')
 }
-

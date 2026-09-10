@@ -456,28 +456,13 @@ async def deploy_status():
     """返回部署监控所需的所有状态信息。
 
     所有子项都用 try 包起来——监控页本身不应该被任何一个子项打死。
-    特别是 torch：它只在 fast-whisper 路径用得到，用 Groq / 必剪 / 快手在线
-    引擎的轻量部署完全可以不装，那种情况这个 endpoint 不应该 500。
+    CUDA 使用实际转写引擎 CTranslate2 检测，不要求安装 PyTorch。
     """
     import os
 
     # CUDA 状态
-    try:
-        import torch
-        cuda_available = torch.cuda.is_available()
-        cuda_info = {
-            "available": cuda_available,
-            "torch_installed": True,
-            "version": torch.version.cuda if cuda_available else None,
-            "gpu_name": torch.cuda.get_device_name(0) if cuda_available else None,
-        }
-    except Exception:
-        cuda_info = {
-            "available": False,
-            "torch_installed": False,
-            "version": None,
-            "gpu_name": None,
-        }
+    from app.utils.env_checker import get_cuda_status
+    cuda_info = get_cuda_status()
 
     # Whisper 模型 / 转写器配置 + 本地下载状态
     try:

@@ -8,7 +8,7 @@ from app.transcriber.whisper_models import (
     is_local_target,
     hf_cache_dirname,
 )
-from app.utils.env_checker import is_cuda_available, is_torch_installed
+from app.utils.env_checker import is_cuda_available
 from app.utils.logger import get_logger
 from app.utils.path_helper import get_model_dir
 
@@ -16,6 +16,7 @@ from events import transcription_finished
 from pathlib import Path
 import os
 import shutil
+import time
 
 
 '''
@@ -47,17 +48,21 @@ class WhisperTranscriber(Transcriber):
             if device == 'cuda' and self.device == 'cpu':
                 print('没有 cuda 使用 cpu进行计算')
 
-        self.compute_type = compute_type or ("float16" if self.device == "cuda" else "int8")
+        self.compute_type = compute_type or (
+            os.getenv("WHISPER_CUDA_COMPUTE_TYPE", "int8_float32")
+            if self.device == "cuda" else "int8"
+        )
         self.model_size = model_size
 
         model_dir = get_model_dir("whisper")
-        try:
-            self.model = self._build_model(model_size, model_dir)
-        except Exception as e:
-            # 自愈：损坏 / 截断 / 半成品 cache → 删掉对应 HF cache 重下一次
-            logger.warning(f"加载 whisper-{model_size} 失败：{e}；清理 cache 后重新下载")
-            self._purge_cache(model_dir, model_size)
-            self.model = self._build_model(model_size, model_dir)
+        # A runtime failure does not imply corrupt model files. Preserve cache.
+        started = time.perf_counter()
+        self.model = self._build_model(model_size, model_dir)
+        logger.info(
+            "Whisper loaded: model=%s device=%s compute_type=%s load_seconds=%.2f",
+            model_size, self.model.model.device, self.model.model.compute_type,
+            time.perf_counter() - started,
+        )
 
     def _build_model(self, model_size: str, model_dir: str) -> WhisperModel:
         # resolve 把模型名映射成可加载标识：内置 size→Systran repo_id、自定义映射、
@@ -96,31 +101,12 @@ class WhisperTranscriber(Transcriber):
                 logger.info(f"清理损坏 cache: {path}")
                 shutil.rmtree(path, ignore_errors=True)
     @staticmethod
-    def is_torch_installed() -> bool:
-        try:
-            import torch
-            return True
-        except ImportError:
-            return False
-
-    @staticmethod
     def is_cuda() -> bool:
-        try:
-            if is_cuda_available():
-                print(" CUDA 可用，使用 GPU")
-                return True
-            elif is_torch_installed():
-                print(" 只装了 torch，但没有 CUDA，用 CPU")
-                return False
-            else:
-                print(" 还没有安装 torch，请先安装")
-                return False
-
-        except ImportError:
-            return False
+        return is_cuda_available()
 
     @timeit
     def transcript(self, file_path: str) -> TranscriptResult:
+        started = time.perf_counter()
         try:
 
             segments_raw, info = self.model.transcribe(file_path)
@@ -143,10 +129,17 @@ class WhisperTranscriber(Transcriber):
                 segments=segments,
                 raw=info
             )
-            # self.on_finish(file_path, result)
+            logger.info(
+                "Whisper transcribed: device=%s compute_type=%s audio_seconds=%.2f "
+                "elapsed_seconds=%.2f segments=%d last_segment_end=%.2f",
+                self.device, self.compute_type, info.duration,
+                time.perf_counter() - started, len(segments),
+                segments[-1].end if segments else 0,
+            )
             return result
         except Exception as e:
-            print(f"转写失败：{e}")
+            logger.exception("Whisper 转写失败")
+            raise
 
 
     def on_finish(self,video_path:str,result: TranscriptResult)->None:
@@ -154,4 +147,3 @@ class WhisperTranscriber(Transcriber):
         transcription_finished.send({
             "file_path": video_path,
         })
-

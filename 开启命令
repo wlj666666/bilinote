@@ -1,0 +1,10 @@
+终端一：启动后端
+
+cd /home/unbekannter/bilinote/BiliNote/backend
+conda activate bilinote
+python main.py
+
+终端二：启动前端
+
+cd /home/unbekannter/bilinote/BiliNote/BillNote_frontend
+npm run dev

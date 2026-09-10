@@ -9,6 +9,8 @@ export const useTaskPolling = (interval = 3000) => {
   const updateTaskStatus = useTaskStore(state => state.updateTaskStatus)
   const removeTask = useTaskStore(state => state.removeTask)
 
+  // Reconcile persisted failures once after reload; backend retries may have completed.
+  const reconciledFailedTasks = useRef(new Set<string>())
   const tasksRef = useRef(tasks)
 
   // 每次 tasks 更新，把最新的 tasks 同步进去
@@ -19,13 +21,15 @@ export const useTaskPolling = (interval = 3000) => {
   useEffect(() => {
     const timer = setInterval(async () => {
       const pendingTasks = tasksRef.current.filter(
-        task => task.status != 'SUCCESS' && task.status != 'FAILED'
+        task => task.status != 'SUCCESS' &&
+          (task.status != 'FAILED' || !reconciledFailedTasks.current.has(task.id))
       )
 
       // 无活跃任务时跳过轮询
       if (pendingTasks.length === 0) return
 
       for (const task of pendingTasks) {
+        if (task.status === 'FAILED') reconciledFailedTasks.current.add(task.id)
         try {
           const res = await get_task_status(task.id)
           const { status } = res

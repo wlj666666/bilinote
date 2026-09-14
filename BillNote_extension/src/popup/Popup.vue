@@ -82,6 +82,7 @@ async function start() {
       link: formats.includes('link'),
       style: settings.value.style || undefined,
       extras: settings.value.extras || undefined,
+      text_extraction_method: settings.value.text_extraction_method || 'asr',
       video_understanding: settings.value.video_understanding || undefined,
       video_interval: settings.value.video_understanding ? settings.value.video_interval : undefined,
       grid_size: settings.value.video_understanding ? settings.value.grid_size : undefined,
@@ -230,6 +231,14 @@ onUnmounted(() => {
             rows="2"
             placeholder="例如：重点关注游戏开发部分；保留所有专业术语原文"
           />
+        </label>
+        <label class="flex flex-col gap-1 text-sm my-2">
+          <span>文字提取方式</span>
+          <select v-model="settings.text_extraction_method" class="input">
+            <option value="asr">语音转写</option>
+            <option value="ocr">画面字幕 OCR</option>
+          </select>
+          <span class="text-xs text-gray-500">优先使用平台字幕，不可用时使用所选方式；OCR 无需开启视频理解。</span>
         </label>
         <label class="flex items-center gap-2 mt-2">
           <input v-model="settings.video_understanding" type="checkbox">

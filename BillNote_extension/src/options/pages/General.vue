@@ -167,6 +167,14 @@ onMounted(async () => {
     </section>
 
     <section class="section-card">
+      <label class="flex flex-col gap-1 text-sm my-2">
+          <span>文字提取方式</span>
+          <select v-model="settings.text_extraction_method" class="input">
+            <option value="asr">语音转写</option>
+            <option value="ocr">画面字幕 OCR</option>
+          </select>
+          <span class="text-xs text-gray-500">优先使用平台字幕，不可用时使用所选方式；OCR 无需开启视频理解。</span>
+        </label>
       <h2 class="font-semibold">视频理解（多模态）</h2>
       <p class="text-xs text-gray-500">
         启用后会按抽帧间隔截取视频帧拼成网格图，连同字幕一起喂给视觉模型，提升画面相关问题的回答质量。

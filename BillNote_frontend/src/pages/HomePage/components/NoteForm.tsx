@@ -56,6 +56,7 @@ const formSchema = z
     format: z.array(z.string()).default([]),
     style: z.string().nonempty('请选择笔记生成风格'),
     extras: z.string().optional(),
+    text_extraction_method: z.enum(["asr", "ocr"]).default("asr"),
     video_understanding: z.boolean().optional(),
     video_interval: z.coerce.number().min(1).max(30).default(6).optional(),
     grid_size: z
@@ -141,9 +142,10 @@ const NoteForm = () => {
   const { loadEnabledModels, modelList, showFeatureHint, setShowFeatureHint } = useModelStore()
 
   /* ---- 表单 ---- */
-  const form = useForm<NoteFormValues>({
+  const form = useForm<z.input<typeof formSchema>, unknown, z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      text_extraction_method: localStorage.getItem('text-extraction-method') === 'ocr' ? 'ocr' : 'asr',
       platform: 'bilibili',
       quality: 'medium',
       model_name: modelList[0]?.model_name || '',
@@ -176,6 +178,7 @@ const NoteForm = () => {
     console.log('currentTask.formData.platform:', formData.platform)
 
     form.reset({
+      text_extraction_method: formData.text_extraction_method || 'asr',
       platform: formData.platform || 'bilibili',
       video_url: formData.video_url || '',
       model_name: formData.model_name || modelList[0]?.model_name || '',
@@ -221,11 +224,12 @@ const NoteForm = () => {
   }
 
   const onSubmit = async (values: NoteFormValues) => {
+    localStorage.setItem("text-extraction-method", values.text_extraction_method)
     console.log('Not even go here')
-    const payload: NoteFormValues = {
+    const payload = {
       ...values,
       video_url:
-        values.platform === 'local' ? values.video_url : withScheme(values.video_url || ''),
+        values.platform === 'local' ? values.video_url || '' : withScheme(values.video_url || ''),
       provider_id: modelList.find(m => m.model_name === values.model_name)!.provider_id,
       task_id: currentTaskId || '',
     }
@@ -474,6 +478,24 @@ const NoteForm = () => {
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="text_extraction_method"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>文字提取方式</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange} disabled={isGenerating()}>
+                  <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                  <SelectContent>
+                    <SelectItem value="asr">语音转写</SelectItem>
+                    <SelectItem value="ocr">画面字幕 OCR</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">优先使用平台字幕；不可用时使用所选方式。OCR 适合画面字幕清晰的视频，无需开启视频理解。</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {/* 视频理解 */}
           <SectionHeader title="视频理解" tip="将视频截图发给多模态模型辅助分析" />
           <div className="flex flex-col gap-2">

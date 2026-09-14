@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { delete_task, generateNote } from '@/services/note.ts'
+import { delete_task, generateNote, type GenerateNoteRequest } from '@/services/note.ts'
 import { v4 as uuidv4 } from 'uuid'
 import toast from 'react-hot-toast'
 import { get, set, del } from 'idb-keyval'
 
 
-export type TaskStatus = 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILD'
+export type TaskStatus = 'PENDING' | 'RUNNING' | 'PARSING' | 'DOWNLOADING' | 'DETECTING_SUBTITLES' | 'EXTRACTING_SUBTITLES' | 'TRANSCRIBING' | 'SUMMARIZING' | 'FORMATTING' | 'SAVING' | 'SUCCESS' | 'FAILED'
 
 export interface AudioMeta {
   cover_url: string
@@ -22,6 +22,7 @@ export interface Segment {
   start: number
   end: number
   text: string
+  speaker?: string
 }
 
 export interface Transcript {
@@ -43,29 +44,23 @@ export interface Task {
   markdown: string|Markdown [] //为了兼容之前的笔记
   transcript: Transcript
   status: TaskStatus
+  message?: string
   audioMeta: AudioMeta
   createdAt: string
-  formData: {
-    video_url: string
-    link: undefined | boolean
-    screenshot: undefined | boolean
-    platform: string
-    quality: string
-    model_name: string
-    provider_id: string
-  }
+  platform: string
+  formData: GenerateNoteRequest
 }
 
 interface TaskStore {
   tasks: Task[]
   currentTaskId: string | null
-  addPendingTask: (taskId: string, platform: string) => void
+  addPendingTask: (taskId: string, platform: string, formData: GenerateNoteRequest) => void
   updateTaskContent: (id: string, data: Partial<Omit<Task, 'id' | 'createdAt'>>) => void
   removeTask: (id: string) => void
   clearTasks: () => void
   setCurrentTask: (taskId: string | null) => void
   getCurrentTask: () => Task | null
-  retryTask: (id: string) => void
+  retryTask: (id: string, payload?: GenerateNoteRequest) => void
 }
 
 export const useTaskStore = create<TaskStore>()(
@@ -169,6 +164,15 @@ export const useTaskStore = create<TaskStore>()(
         if (!task) return
 
         const newFormData = payload || task.formData
+        if ((newFormData.text_extraction_method || 'asr') !== (task.formData.text_extraction_method || 'asr')) {
+          try {
+            const response = await generateNote({ ...newFormData, task_id: undefined })
+            get().addPendingTask(response.task_id, newFormData.platform, newFormData)
+          } catch (error) {
+            console.error('切换提取方式失败', error)
+          }
+          return
+        }
         try {
           await generateNote({
             ...newFormData,
@@ -196,6 +200,7 @@ export const useTaskStore = create<TaskStore>()(
                     ...t,
                     formData: newFormData, // ✅ 显式更新 formData
                     status: 'PENDING',
+                    message: '',
                   }
                   : t
           ),

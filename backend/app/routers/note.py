@@ -1,3 +1,6 @@
+from typing import Literal
+import hashlib
+import math
 # app/routers/note.py
 import json
 import os
@@ -47,6 +50,7 @@ class VideoRequest(BaseModel):
     format: Optional[list] = []
     style: str = None
     extras: Optional[str]=None
+    text_extraction_method: Literal["asr", "ocr"] = "asr"
     video_understanding: Optional[bool] = False
     video_interval: Optional[int] = 0
     grid_size: Optional[list] = []
@@ -87,7 +91,7 @@ def save_note_to_file(task_id: str, note):
         json.dump(asdict(note), f, ensure_ascii=False, indent=2)
 
 
-def _persist_prefetched_transcript(task_id: str, transcript: dict) -> None:
+def _persist_prefetched_transcript(task_id: str, transcript: dict, video_url: str = "", platform: str = "bilibili") -> None:
     """把客户端预取的字幕写到 NoteGenerator 期望的转写缓存文件里。
 
     NoteGenerator.generate 会优先读 <task_id>_transcript.json，命中即跳过 download_subtitles
@@ -99,9 +103,12 @@ def _persist_prefetched_transcript(task_id: str, transcript: dict) -> None:
         text = (s.get("text") or "").strip()
         if not text:
             continue
+        start, end = float(s.get("start", 0)), float(s.get("end", 0))
+        if not math.isfinite(start) or not math.isfinite(end) or start < 0 or end <= start:
+            raise ValueError("prefetched_transcript 时间戳无效")
         cleaned_segments.append({
-            "start": float(s.get("start", 0)),
-            "end": float(s.get("end", 0)),
+            "start": start,
+            "end": end,
             "text": text,
         })
     if not cleaned_segments:
@@ -112,19 +119,20 @@ def _persist_prefetched_transcript(task_id: str, transcript: dict) -> None:
         "language": transcript.get("language") or "zh",
         "full_text": full_text,
         "segments": cleaned_segments,
+        "raw": {"source": "client_prefetched", "input_key": hashlib.sha256(json.dumps({"url": str(video_url), "platform": platform}, sort_keys=True).encode()).hexdigest()},
     }
 
     os.makedirs(NOTE_OUTPUT_DIR, exist_ok=True)
     target = os.path.join(NOTE_OUTPUT_DIR, f"{task_id}_transcript.json")
-    with open(target, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+    from app.services.hard_subtitle_extractor import atomic_json
+    atomic_json(target, payload)
     logger.info(f"已写入客户端预取字幕缓存: {target} ({len(cleaned_segments)} 段)")
 
 
 def run_note_task(task_id: str, video_url: str, platform: str, quality: DownloadQuality,
                   link: bool = False, screenshot: bool = False, model_name: str = None, provider_id: str = None,
                   _format: list = None, style: str = None, extras: str = None, video_understanding: bool = False,
-                  video_interval=0, grid_size=[]
+                  video_interval=0, grid_size=[], text_extraction_method="asr"
                   ):
 
     if not model_name or not provider_id:
@@ -146,6 +154,7 @@ def run_note_task(task_id: str, video_url: str, platform: str, quality: Download
             video_understanding=video_understanding,
             video_interval=video_interval,
             grid_size=grid_size,
+            text_extraction_method=text_extraction_method,
         )
 
     logger.info(f"任务进入执行队列 (task_id={task_id})")
@@ -189,25 +198,6 @@ async def upload(file: UploadFile = File(...)):
 @router.post("/generate_note")
 def generate_note(data: VideoRequest, background_tasks: BackgroundTasks):
     try:
-        # 就绪门禁：本地转写引擎（fast-whisper / mlx-whisper）必须等模型下载完才能跑视频，
-        # 否则任务会卡在首次下载（慢 / OOM / 截断），用户只看到一个静默失败的任务。
-        # 客户端已抓好字幕（prefetched_transcript）则不需要转写，跳过检查。
-        if not data.prefetched_transcript:
-            from app.services.transcriber_config_manager import TranscriberConfigManager
-            readiness = TranscriberConfigManager().is_model_ready()
-            if not readiness["ready"]:
-                logger.warning(f"拒绝 generate_note：{readiness['reason']}")
-                return R.error(
-                    msg=readiness["reason"],
-                    code=300102,
-                    data={
-                        "reason": "transcriber_model_not_ready",
-                        "transcriber_type": readiness["transcriber_type"],
-                        "model_size": readiness["model_size"],
-                        "downloading": readiness["downloading"],
-                    },
-                )
-
         video_id = extract_video_id(data.video_url, data.platform)
         # if not video_id:
         #     raise HTTPException(status_code=400, detail="无法提取视频 ID")
@@ -231,13 +221,13 @@ def generate_note(data: VideoRequest, background_tasks: BackgroundTasks):
         # 客户端已经抓好字幕的话，写到转写缓存文件，NoteGenerator 的 cache-hit 逻辑会直接用上
         if data.prefetched_transcript:
             try:
-                _persist_prefetched_transcript(task_id, data.prefetched_transcript)
+                _persist_prefetched_transcript(task_id, data.prefetched_transcript, data.video_url, data.platform)
             except Exception as e:
                 logger.warning(f"写入预取字幕失败 (task_id={task_id}): {e}")
 
         background_tasks.add_task(run_note_task, task_id, data.video_url, data.platform, data.quality, data.link,
                                   data.screenshot, data.model_name, data.provider_id, data.format, data.style,
-                                  data.extras, data.video_understanding, data.video_interval, data.grid_size)
+                                  data.extras, data.video_understanding, data.video_interval, data.grid_size, data.text_extraction_method)
         return R.success({"task_id": task_id})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -276,7 +266,7 @@ def get_task_status(task_id: str):
                 })
 
         if status == TaskStatus.FAILED.value:
-            return R.error(message or "任务失败", code=500)
+            return R.success({"status": TaskStatus.FAILED.value, "message": message or "任务失败", "task_id": task_id})
 
         # 处理中状态
         return R.success({

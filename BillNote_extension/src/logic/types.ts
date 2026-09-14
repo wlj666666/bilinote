@@ -40,6 +40,7 @@ export interface GenerateRequest {
   format?: string[]
   style?: string
   extras?: string
+  text_extraction_method?: 'asr' | 'ocr'
   video_understanding?: boolean
   video_interval?: number
   grid_size?: [number, number]
@@ -112,6 +113,7 @@ export const NOTE_FORMATS: Array<{ value: NoteFormat, label: string }> = [
 ]
 
 export interface Settings {
+  text_extraction_method?: 'asr' | 'ocr'
   backendUrl: string
   providerId: string
   modelName: string

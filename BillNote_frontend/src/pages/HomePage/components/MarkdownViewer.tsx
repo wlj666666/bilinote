@@ -41,7 +41,9 @@ interface MarkdownViewerProps {
 
 const steps = [
   { label: '解析链接', key: 'PARSING' },
-  { label: '下载音频', key: 'DOWNLOADING' },
+  { label: '准备媒体', key: 'DOWNLOADING' },
+  { label: '定位字幕', key: 'DETECTING_SUBTITLES' },
+  { label: '提取字幕', key: 'EXTRACTING_SUBTITLES' },
   { label: '转写文字', key: 'TRANSCRIBING' },
   { label: '总结内容', key: 'SUMMARIZING' },
   { label: '保存完成', key: 'SUCCESS' },
@@ -418,11 +420,13 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
   if (status === 'loading') {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center space-y-4 text-neutral-500">
-        <StepBar steps={steps} currentStep={taskStatus} />
+        <StepBar steps={steps.filter(step => currentTask?.formData?.text_extraction_method === 'ocr'
+          ? step.key !== 'TRANSCRIBING'
+          : !['DETECTING_SUBTITLES', 'EXTRACTING_SUBTITLES'].includes(step.key))} currentStep={taskStatus} />
         <Loading className="h-5 w-5" />
         <div className="text-center text-sm">
           <p className="text-lg font-bold">正在生成笔记，请稍候…</p>
-          <p className="mt-2 text-xs text-neutral-500">这可能需要几秒钟时间，取决于视频长度</p>
+          <p className="mt-2 text-xs text-neutral-500">{currentTask?.message || "处理时间取决于视频长度和提取方式"}</p>
         </div>
       </div>
     )
@@ -446,11 +450,16 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
         <Error />
         <div className="text-center">
           <p className="text-lg font-bold text-red-500">笔记生成失败</p>
-          <p className="mt-2 mb-2 text-xs text-red-400">请检查后台或稍后再试</p>
+          <p className="mt-2 mb-2 text-xs text-red-400">{currentTask?.message || "请检查设置或稍后重试"}</p>
 
           <Button onClick={() => retryTask(currentTask.id)} size="lg">
             重试
           </Button>
+          {currentTask?.formData?.text_extraction_method === 'ocr' && (
+            <Button className="ml-2" variant="outline" onClick={() => retryTask(currentTask.id, { ...currentTask.formData, text_extraction_method: 'asr' })}>
+              改用语音转写
+            </Button>
+          )}
         </div>
       </div>
     )

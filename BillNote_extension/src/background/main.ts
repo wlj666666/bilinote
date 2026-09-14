@@ -89,6 +89,7 @@ async function startTask(url: string, title?: string): Promise<{ ok: boolean, ta
         link: formats.includes('link'),
         style: settings.style || undefined,
         extras: settings.extras || undefined,
+        text_extraction_method: settings.text_extraction_method || 'asr',
         video_understanding: settings.video_understanding || undefined,
         video_interval: settings.video_understanding ? settings.video_interval : undefined,
         grid_size: settings.video_understanding ? settings.grid_size : undefined,

@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: Settings = {
   link: false,
   style: 'minimal',
   extras: '',
+  text_extraction_method: 'asr',
   video_understanding: false,
   video_interval: 6,
   grid_size: [2, 2],

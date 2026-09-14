@@ -6,8 +6,6 @@ import toast from 'react-hot-toast'
 export const useTaskPolling = (interval = 3000) => {
   const tasks = useTaskStore(state => state.tasks)
   const updateTaskContent = useTaskStore(state => state.updateTaskContent)
-  const updateTaskStatus = useTaskStore(state => state.updateTaskStatus)
-  const removeTask = useTaskStore(state => state.removeTask)
 
   // Reconcile persisted failures once after reload; backend retries may have completed.
   const reconciledFailedTasks = useRef(new Set<string>())
@@ -30,11 +28,12 @@ export const useTaskPolling = (interval = 3000) => {
 
       for (const task of pendingTasks) {
         if (task.status === 'FAILED') reconciledFailedTasks.current.add(task.id)
+        else reconciledFailedTasks.current.delete(task.id)
         try {
           const res = await get_task_status(task.id)
           const { status } = res
 
-          if (status && status !== task.status) {
+          if (status && (status !== task.status || res.message !== task.message)) {
             if (status === 'SUCCESS') {
               const { markdown, transcript, audio_meta } = res.result
               toast.success('笔记生成成功')
@@ -45,10 +44,10 @@ export const useTaskPolling = (interval = 3000) => {
                 audioMeta: audio_meta,
               })
             } else if (status === 'FAILED') {
-              updateTaskContent(task.id, { status })
+              updateTaskContent(task.id, { status, message: res.message })
               console.warn(`⚠️ 任务 ${task.id} 失败`)
             } else {
-              updateTaskContent(task.id, { status })
+              updateTaskContent(task.id, { status, message: res.message })
             }
           }
         } catch (e) {

@@ -17,6 +17,7 @@ PY
 )"
 export LD_LIBRARY_PATH="$gpu_libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export WHISPER_CUDA_COMPUTE_TYPE="${WHISPER_CUDA_COMPUTE_TYPE:-int8_float32}"
+export OCR_DEVICE="${OCR_DEVICE:-cuda}"
 export TASK_MAX_WORKERS="${TASK_MAX_WORKERS:-1}"
 if (( $# )); then
     exec "$gpu_python" "$@"

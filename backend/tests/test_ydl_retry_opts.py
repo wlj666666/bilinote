@@ -23,6 +23,7 @@ import pathlib
 import sys
 import types
 import unittest
+from unittest.mock import patch
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DOWNLOADERS = ROOT / "app" / "downloaders"
@@ -31,6 +32,7 @@ DOWNLOADER_SOURCES = ["youtube_downloader.py", "bilibili_downloader.py"]
 
 def _load_base():
     """Load app/downloaders/base.py with its app-level imports stubbed out."""
+    stubs = {}
     for name, attrs in {
         "app": {},
         "app.enmus": {},
@@ -42,13 +44,14 @@ def _load_base():
         module = types.ModuleType(name)
         for key, value in attrs.items():
             setattr(module, key, value)
-        sys.modules.setdefault(name, module)
+        stubs[name] = module
 
     spec = importlib.util.spec_from_file_location("dl_base", DOWNLOADERS / "base.py")
     if spec is None or spec.loader is None:
         raise ImportError("base module spec not found")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    with patch.dict(sys.modules, stubs):
+        spec.loader.exec_module(module)
     return module
 
 

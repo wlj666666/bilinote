@@ -1,10 +1,19 @@
 终端一：启动后端
 
+原cpu：
 cd /home/unbekannter/bilinote/BiliNote/backend
 conda activate bilinote
 python main.py
+
+现gpu:
+conda activate bilinote
+cd /home/unbekannter/bilinote/BiliNote/backend
+bash start-gpu.sh
 
 终端二：启动前端
 
 cd /home/unbekannter/bilinote/BiliNote/BillNote_frontend
 npm run dev
+
+阿里云网址：
+https://bailian.console.aliyun.com/cn-beijing/costing-balance/free-quota

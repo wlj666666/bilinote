@@ -10,6 +10,9 @@ conda activate bilinote
 cd /home/unbekannter/bilinote/BiliNote/backend
 bash start-gpu.sh
 
+后端保持在此终端运行。停止时按 Ctrl+C，等退出后再重新启动。
+重复运行会提示“后端已运行”；修改代码后仍需先停止旧进程再启动。
+
 终端二：启动前端
 
 cd /home/unbekannter/bilinote/BiliNote/BillNote_frontend

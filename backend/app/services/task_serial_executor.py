@@ -1,4 +1,5 @@
 import os
+import threading
 from concurrent.futures import ThreadPoolExecutor, Future
 from typing import Any, Callable
 
@@ -9,10 +10,27 @@ class ConcurrentTaskExecutor:
     def __init__(self, max_workers: int | None = None):
         self._max_workers = max_workers or int(os.getenv("TASK_MAX_WORKERS", "3"))
         self._pool = ThreadPoolExecutor(max_workers=self._max_workers)
+        self._task_ids: set[str] = set()
+        self._lock = threading.Lock()
+
+    def reserve(self, task_id: str) -> bool:
+        """Reject duplicate submissions while the same task is queued or running."""
+        with self._lock:
+            if task_id in self._task_ids:
+                return False
+            self._task_ids.add(task_id)
+            return True
+
+    def release(self, task_id: str) -> None:
+        with self._lock:
+            self._task_ids.discard(task_id)
 
     def run(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
-        future: Future = self._pool.submit(fn, *args, **kwargs)
+        future = self.submit(fn, *args, **kwargs)
         return future.result()
+
+    def submit(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> Future:
+        return self._pool.submit(fn, *args, **kwargs)
 
     def shutdown(self, wait: bool = True):
         self._pool.shutdown(wait=wait)

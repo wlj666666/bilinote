@@ -112,6 +112,17 @@ def _make_fake_ffmpeg_runner(colors_by_second):
 
 
 class TestVideoReaderDeduplicateFrames(unittest.TestCase):
+    def test_limited_sampling_covers_entire_video(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            reader = VideoReader('dummy.mp4', frame_interval=2, frame_dir=tmp_dir)
+            colors = {i: str(i).encode() for i in range(0, 692, 2)}
+            with patch.object(video_reader_module.ffmpeg, 'probe', return_value={'format': {'duration': '692.837'}}), \
+                    patch.object(video_reader_module.subprocess, 'run', side_effect=_make_fake_ffmpeg_runner(colors)):
+                paths = reader.extract_frames(max_frames=96)
+            self.assertEqual(len(paths), 96)
+            self.assertEqual(pathlib.Path(paths[0]).name, 'frame_00_00.jpg')
+            self.assertEqual(pathlib.Path(paths[-1]).name, 'frame_11_30.jpg')
+
     def test_extract_frames_skips_adjacent_duplicates_when_enabled(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             frame_dir = pathlib.Path(tmp_dir) / "frames"

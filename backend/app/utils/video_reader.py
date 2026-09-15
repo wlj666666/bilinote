@@ -72,7 +72,11 @@ class VideoReader:
         try:
             os.makedirs(self.frame_dir, exist_ok=True)
             duration = float(ffmpeg.probe(self.video_path)["format"]["duration"])
-            timestamps = [i for i in range(0, int(duration), self.frame_interval)][:max_frames]
+            timestamps = list(range(0, max(1, int(duration)), self.frame_interval))
+            if len(timestamps) > max_frames:
+                # Cover the entire video rather than truncating its ending.
+                timestamps = [timestamps[round(i * (len(timestamps)-1) / max(1, max_frames-1))]
+                              for i in range(max_frames)]
 
             # 并行提取帧
             max_workers = min(os.cpu_count() or 4, 8, len(timestamps))
@@ -161,15 +165,13 @@ class VideoReader:
                 if file.startswith("grid_"):
                     os.remove(os.path.join(self.grid_dir, file))
             print(self.frame_dir,self.grid_dir)
-            self.extract_frames()
+            max_grids = max(1, min(100, int(os.getenv("VIDEO_MAX_GRIDS", "24"))))
+            self.extract_frames(max_frames=max_grids * self.grid_size[0] * self.grid_size[1])
             print("2#3",self.frame_dir,self.grid_dir)
             logger.info("开始拼接网格图...")
             image_paths = []
             groups = self.group_images()
             for idx, group in enumerate(groups, start=1):
-                if len(group) < self.grid_size[0] * self.grid_size[1]:
-                    logger.warning(f"⚠️ 跳过第 {idx} 组，图片不足 {self.grid_size[0] * self.grid_size[1]} 张")
-                    continue
                 out_path = self.concat_images(group, f"grid_{idx}")
                 image_paths.append(out_path)
 
@@ -179,5 +181,4 @@ class VideoReader:
         except Exception as e:
             logger.error(f"发生错误：{str(e)}")
             raise ValueError("视频处理失败")
-
 

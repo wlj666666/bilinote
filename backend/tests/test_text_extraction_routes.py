@@ -65,6 +65,26 @@ def test_platform_subtitle_skips_both_extractors(generator):
     generator._transcribe_audio.assert_not_called()
 
 
+def test_qwen_text_model_skips_visual_upload_for_old_saved_requests(generator):
+    generator._get_downloader.return_value.download_subtitles.return_value = transcript()
+    result = generator.generate('https://www.bilibili.com/video/BVtest', 'bilibili',
+                                task_id='test', model_name='qwen-plus',
+                                video_understanding=True, text_extraction_method='ocr')
+    assert result is not None
+    assert generator._download_media.call_args.kwargs['video_understanding'] is False
+    assert generator._download_media.call_args.kwargs['skip_download'] is True
+    assert '已跳过画面理解' in generator.summary_notice
+    generator._transcribe_audio.assert_not_called()
+
+
+def test_vision_model_keeps_requested_visual_summary(generator):
+    generator._get_downloader.return_value.download_subtitles.return_value = transcript()
+    result = generator.generate('https://www.bilibili.com/video/BVtest', 'bilibili',
+                                task_id='test', model_name='qwen-vl-plus', video_understanding=True)
+    assert result is not None
+    assert generator._download_media.call_args.kwargs['video_understanding'] is True
+
+
 def test_asr_route_keeps_existing_transcriber(generator):
     with patch.object(module, 'HardSubtitleExtractor') as engine:
         assert run(generator, 'asr').transcript.raw['source'] == 'asr'

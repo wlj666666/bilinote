@@ -160,6 +160,8 @@ const NoteForm = () => {
   /* ---- 派生状态（只 watch 一次，提高性能） ---- */
   const platform = useWatch({ control: form.control, name: 'platform' }) as string
   const videoUnderstandingEnabled = useWatch({ control: form.control, name: 'video_understanding' })
+  const selectedModel = useWatch({ control: form.control, name: 'model_name' })
+  const textOnlyModel = /^qwen-(plus|turbo|max)(-latest|-\d{4}-\d{2}-\d{2})?$/.test((selectedModel || '').trim().toLowerCase())
   const editing = currentTask && currentTask.id
 
   const goModelAdd = () => {
@@ -204,6 +206,11 @@ const NoteForm = () => {
   /* ---- 帮助函数 ---- */
   const isGenerating = () => !['SUCCESS', 'FAILED', undefined].includes(getCurrentTask()?.status)
   const generating = isGenerating()
+  useEffect(() => {
+    if (textOnlyModel && videoUnderstandingEnabled) {
+      form.setValue('video_understanding', false)
+    }
+  }, [textOnlyModel, videoUnderstandingEnabled, form])
   const handleFileUpload = async (file: File, cb: (url: string) => void) => {
     const formData = new FormData()
     formData.append('file', file)
@@ -228,6 +235,7 @@ const NoteForm = () => {
     console.log('Not even go here')
     const payload = {
       ...values,
+      video_understanding: Boolean(values.video_understanding && !textOnlyModel),
       video_url:
         values.platform === 'local' ? values.video_url || '' : withScheme(values.video_url || ''),
       provider_id: modelList.find(m => m.model_name === values.model_name)!.provider_id,
@@ -508,6 +516,7 @@ const NoteForm = () => {
                     <FormLabel>启用</FormLabel>
                     <Checkbox
                       checked={videoUnderstandingEnabled}
+                      disabled={textOnlyModel}
                       onCheckedChange={v => form.setValue('video_understanding', v)}
                     />
                   </div>
@@ -560,7 +569,9 @@ const NoteForm = () => {
             </div>
             <Alert variant="warning" className="text-sm">
               <AlertDescription>
-                <strong>提示：</strong>视频理解功能必须使用多模态模型。
+                <strong>提示：</strong>{textOnlyModel
+                  ? '当前模型使用字幕或转写文字生成总结；画面理解需要选择视觉模型。'
+                  : '视频理解功能必须使用多模态模型。长视频会在全片均匀采样，控制图片数量。'}
               </AlertDescription>
             </Alert>
           </div>

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel, validator, field_validator, model_validator
 from dataclasses import asdict
 
@@ -87,8 +87,8 @@ UPLOAD_DIR = "uploads"
 
 def save_note_to_file(task_id: str, note):
     os.makedirs(NOTE_OUTPUT_DIR, exist_ok=True)
-    with open(os.path.join(NOTE_OUTPUT_DIR, f"{task_id}.json"), "w", encoding="utf-8") as f:
-        json.dump(asdict(note), f, ensure_ascii=False, indent=2)
+    from app.services.hard_subtitle_extractor import atomic_json
+    atomic_json(Path(NOTE_OUTPUT_DIR) / f"{task_id}.json", asdict(note))
 
 
 def _persist_prefetched_transcript(task_id: str, transcript: dict, video_url: str = "", platform: str = "bilibili") -> None:
@@ -135,9 +135,6 @@ def run_note_task(task_id: str, video_url: str, platform: str, quality: Download
                   video_interval=0, grid_size=[], text_extraction_method="asr"
                   ):
 
-    if not model_name or not provider_id:
-        raise HTTPException(status_code=400, detail="请选择模型和提供者")
-
     def _execute_note_task():
         return NoteGenerator().generate(
             video_url=video_url,
@@ -158,12 +155,24 @@ def run_note_task(task_id: str, video_url: str, platform: str, quality: Download
         )
 
     logger.info(f"任务进入执行队列 (task_id={task_id})")
-    note = task_serial_executor.run(_execute_note_task)
-    logger.info(f"Note generated: {task_id}")
-    if not note or not note.markdown:
-        logger.warning(f"任务 {task_id} 执行失败，跳过保存")
+    try:
+        if not model_name or not provider_id:
+            raise ValueError("请选择模型和提供者")
+        # Already running inside our executor; never occupy a FastAPI thread
+        # waiting on another worker (or submit recursively to the same pool).
+        note = _execute_note_task()
+        if not note or not note.markdown:
+            logger.warning(f"任务 {task_id} 执行失败，跳过保存")
+            return
+        save_note_to_file(task_id, note)
+        NoteGenerator()._update_status(task_id, TaskStatus.SUCCESS)
+        logger.info(f"笔记已保存: {task_id}")
+    except Exception as exc:
+        logger.exception("任务执行或保存失败 task_id=%s", task_id)
+        NoteGenerator()._handle_exception(task_id, exc)
         return
-    save_note_to_file(task_id, note)
+    finally:
+        task_serial_executor.release(task_id)
 
     # 自动建立向量索引（用于 AI 问答），失败不影响笔记生成
     try:
@@ -196,7 +205,8 @@ async def upload(file: UploadFile = File(...)):
 
 
 @router.post("/generate_note")
-def generate_note(data: VideoRequest, background_tasks: BackgroundTasks):
+def generate_note(data: VideoRequest):
+    reserved = False
     try:
         video_id = extract_video_id(data.video_url, data.platform)
         # if not video_id:
@@ -215,8 +225,11 @@ def generate_note(data: VideoRequest, background_tasks: BackgroundTasks):
             # 正常新建任务
             task_id = str(uuid.uuid4())
 
-        # 统一先写入 PENDING，表示已进入队列等待串行执行
-        NoteGenerator()._update_status(task_id, TaskStatus.PENDING)
+        if not task_serial_executor.reserve(task_id):
+            return R.success({"task_id": task_id}, msg="任务已在队列中，无需重复提交")
+        reserved = True
+        NoteGenerator()._update_status(task_id, TaskStatus.PENDING,
+                                      "已进入队列，等待前面的任务结束后开始处理")
 
         # 客户端已经抓好字幕的话，写到转写缓存文件，NoteGenerator 的 cache-hit 逻辑会直接用上
         if data.prefetched_transcript:
@@ -225,11 +238,14 @@ def generate_note(data: VideoRequest, background_tasks: BackgroundTasks):
             except Exception as e:
                 logger.warning(f"写入预取字幕失败 (task_id={task_id}): {e}")
 
-        background_tasks.add_task(run_note_task, task_id, data.video_url, data.platform, data.quality, data.link,
+        task_serial_executor.submit(run_note_task, task_id, data.video_url, data.platform, data.quality, data.link,
                                   data.screenshot, data.model_name, data.provider_id, data.format, data.style,
                                   data.extras, data.video_understanding, data.video_interval, data.grid_size, data.text_extraction_method)
         return R.success({"task_id": task_id})
     except Exception as e:
+        if reserved:
+            task_serial_executor.release(task_id)
+            NoteGenerator()._handle_exception(task_id, e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -260,8 +276,8 @@ def get_task_status(task_id: str):
             else:
                 # 理论上不会出现，保险处理
                 return R.success({
-                    "status": TaskStatus.PENDING.value,
-                    "message": "任务完成，但结果文件未找到",
+                    "status": TaskStatus.FAILED.value,
+                    "message": "结果文件未找到，请重试生成",
                     "task_id": task_id
                 })
 
@@ -285,10 +301,10 @@ def get_task_status(task_id: str):
             "task_id": task_id
         })
 
-    # 什么都没有，默认PENDING
+    # A missing task is not queued; reporting PENDING here spins forever.
     return R.success({
-        "status": TaskStatus.PENDING.value,
-        "message": "任务排队中",
+        "status": TaskStatus.FAILED.value,
+        "message": "任务记录不存在，请重新生成",
         "task_id": task_id
     })
 

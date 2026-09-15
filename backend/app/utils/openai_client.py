@@ -8,6 +8,10 @@
     在入口挡掉，给用户「xxx 的 API Key 未配置」这种能看懂的提示。
 """
 from typing import Optional
+import os
+import httpx
+from urllib.parse import urlsplit
+from urllib.request import proxy_bypass_environment
 
 from openai import OpenAI
 
@@ -31,15 +35,25 @@ def build_openai_client(
     if not api_key or not str(api_key).strip():
         raise ValueError(f"{key_label} 未配置，请先在「设置」里填写后再使用")
 
-    kwargs = {"api_key": str(api_key).strip(), "base_url": base_url}
-    if timeout is not None:
-        kwargs["timeout"] = timeout
+    request_timeout = timeout if timeout is not None else httpx.Timeout(
+        connect=float(os.getenv("OPENAI_CONNECT_TIMEOUT", "10")),
+        write=float(os.getenv("OPENAI_WRITE_TIMEOUT", "30")),
+        read=float(os.getenv("OPENAI_READ_TIMEOUT", "180")),
+        pool=10.0,
+    )
+    # UniversalGPT owns retries. SDK retries here used to multiply 3 attempts into 9.
+    kwargs = {"api_key": str(api_key).strip(), "base_url": base_url,
+              "timeout": request_timeout, "max_retries": 0}
 
     proxy_url = ProxyConfigManager().get_proxy_url()
-    if proxy_url:
-        # 延迟 import httpx：仅在确实要走代理时才需要
-        import httpx
-        kwargs["http_client"] = httpx.Client(proxy=proxy_url, timeout=timeout or 600.0)
+    hostname = urlsplit(base_url or "https://api.openai.com/v1").hostname or ""
+    bypass_hosts = ",".join(os.getenv(key, "") for key in ("OPENAI_NO_PROXY", "NO_PROXY", "no_proxy"))
+    if proxy_bypass_environment(hostname, {"no": bypass_hosts}):
+        # Explicit proxy=... ignores NO_PROXY; also disable environment proxy discovery.
+        kwargs["http_client"] = httpx.Client(trust_env=False, timeout=request_timeout)
+        logger.info("模型客户端直连: %s", hostname)
+    elif proxy_url:
+        kwargs["http_client"] = httpx.Client(proxy=proxy_url, timeout=request_timeout)
         logger.info(f"OpenAI 客户端走代理: {proxy_url}")
 
     return OpenAI(**kwargs)

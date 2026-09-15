@@ -1,12 +1,26 @@
 import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Check before importing services: a duplicate launch must not initialize the
+# database or mark the running instance's tasks as interrupted.
+if __name__ == "__main__":
+    from server_startup import reserve_backend_socket
+
+    port = int(os.getenv("BACKEND_PORT", 8483))
+    host = os.getenv("BACKEND_HOST", "0.0.0.0")
+    listener = reserve_backend_socket(host, port)
+    if listener is None:
+        raise SystemExit(0)
+
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.staticfiles import StaticFiles
-from dotenv import load_dotenv
 
 from app.db.init_db import init_db
 from app.db.provider_dao import seed_default_providers
@@ -20,7 +34,6 @@ from events import register_handler
 from ffmpeg_helper import ensure_ffmpeg_or_raise
 
 logger = get_logger(__name__)
-load_dotenv()
 
 # 读取 .env 中的路径
 static_path = os.getenv('STATIC', '/static')
@@ -66,6 +79,10 @@ async def lifespan(app: FastAPI):
         _proxy = ProxyConfigManager().apply_to_env()
         if _proxy:
             logger.info(f"           已应用全局代理到环境变量: {_proxy}")
+
+        from app.services.task_recovery import recover_interrupted_tasks
+        recovered = recover_interrupted_tasks(os.getenv("NOTE_OUTPUT_DIR", "note_results"))
+        logger.info("已处理 %s 个服务中断遗留任务", recovered)
 
         logger.info("[startup 5/5] 启动完成，等待请求")
     except Exception:
@@ -113,7 +130,7 @@ app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("BACKEND_PORT", 8483))
-    host = os.getenv("BACKEND_HOST", "0.0.0.0")
     logger.info(f"Starting server on {host}:{port}")
-    uvicorn.run(app, host=host, port=port, reload=False)
+    with listener:
+        server = uvicorn.Server(uvicorn.Config(app, host=host, port=port, reload=False))
+        server.run(sockets=[listener])

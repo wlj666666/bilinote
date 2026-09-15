@@ -5,6 +5,7 @@ import os
 import hashlib
 import json
 import time
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,6 +16,8 @@ from app.models.transcriber_model import TranscriptSegment
 from datetime import timedelta
 from typing import List
 
+logger = logging.getLogger(__name__)
+
 
 class UniversalGPT(GPT):
     def __init__(self, client, model: str, temperature: float = 0.7):
@@ -23,11 +26,11 @@ class UniversalGPT(GPT):
         self.temperature = temperature
         self.screenshot = False
         self.link = False
-        self.max_request_bytes = int(os.getenv("OPENAI_MAX_REQUEST_BYTES", str(45 * 1024 * 1024)))
+        self.max_request_bytes = int(os.getenv("OPENAI_MAX_REQUEST_BYTES", str(8 * 1024 * 1024)))
         self.checkpoint_dir = Path(os.getenv("NOTE_OUTPUT_DIR", "note_results"))
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         # 初始化时缓存重试配置，避免每次请求重复读取环境变量
-        self._max_retry_attempts = max(1, int(os.getenv("OPENAI_RETRY_ATTEMPTS", "3")))
+        self._max_retry_attempts = max(1, int(os.getenv("OPENAI_RETRY_ATTEMPTS", "2")))
         self._retry_base_backoff = float(os.getenv("OPENAI_RETRY_BACKOFF_SECONDS", "1.5"))
 
     def _format_time(self, seconds: float) -> str:
@@ -217,10 +220,17 @@ class UniversalGPT(GPT):
     def _chat_completion_create(self, messages: list):
         last_exc = None
         for attempt in range(self._max_retry_attempts):
+            started = time.monotonic()
+            logger.info("模型请求 model=%s attempt=%s/%s bytes=%s", self.model,
+                        attempt + 1, self._max_retry_attempts, self._estimate_messages_bytes(messages))
             try:
-                return self._do_create(messages)
+                response = self._do_create(messages)
+                logger.info("模型请求完成 model=%s elapsed=%.1fs", self.model, time.monotonic() - started)
+                return response
             except Exception as exc:
                 last_exc = exc
+                logger.warning("模型请求失败 model=%s attempt=%s elapsed=%.1fs error=%s",
+                               self.model, attempt + 1, time.monotonic() - started, type(exc).__name__)
                 if attempt == self._max_retry_attempts - 1 or not self._is_retryable_error(exc):
                     raise
                 sleep_seconds = self._retry_base_backoff * (2 ** attempt)

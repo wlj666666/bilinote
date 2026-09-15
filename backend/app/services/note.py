@@ -2,7 +2,6 @@ import json
 import hashlib
 import inspect
 import subprocess
-import logging
 import os
 from dataclasses import asdict
 from pathlib import Path
@@ -41,6 +40,8 @@ from app.utils.video_helper import generate_screenshot
 from app.utils.video_reader import VideoReader
 from app.services.hard_subtitle_extractor import HardSubtitleExtractor, PIPELINE_VERSION, atomic_json
 from app.utils.path_helper import get_app_dir
+from app.utils.logger import get_logger
+from app.services.model_capabilities import is_text_only_model
 
 # ------------------ 环境变量与全局配置 ------------------
 
@@ -60,8 +61,7 @@ IMAGE_OUTPUT_DIR = os.getenv("OUT_DIR", "./static/screenshots")
 IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL", "/static/screenshots")
 
 # 日志配置
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
 
 
 class NoteGenerator:
@@ -79,6 +79,7 @@ class NoteGenerator:
         self.transcriber: Optional[Transcriber] = None
         self.video_path: Optional[Path] = None
         self.video_img_urls=[]
+        self.summary_notice = ""
         logger.info("NoteGenerator 初始化完成")
 
 
@@ -129,6 +130,12 @@ class NoteGenerator:
         try:
             logger.info(f"开始生成笔记 (task_id={task_id})")
             self._update_status(task_id, TaskStatus.PARSING)
+
+            self.summary_notice = ""
+            if video_understanding and is_text_only_model(model_name):
+                video_understanding = False
+                self.summary_notice = f"{model_name} 使用文字总结，已跳过画面理解"
+                logger.warning("task_id=%s %s", task_id, self.summary_notice)
 
             # 获取下载器与 GPT 实例
 
@@ -228,13 +235,13 @@ class NoteGenerator:
             self._save_metadata(video_id=audio_meta.video_id, platform=platform, task_id=task_id)
 
             # 6. 完成
-            self._update_status(task_id, TaskStatus.SUCCESS)
-            logger.info(f"笔记生成成功 (task_id={task_id})")
+            # The router publishes SUCCESS only after the result is durably saved.
+            logger.info(f"笔记内容生成完成 (task_id={task_id})")
             return NoteResult(markdown=markdown, transcript=transcript, audio_meta=audio_meta)
 
         except Exception as exc:
             logger.error(f"生成笔记流程异常 (task_id={task_id})：{exc}", exc_info=True)
-            self._update_status(task_id, TaskStatus.FAILED, message=str(exc))
+            self._handle_exception(task_id, exc)
             return None
 
     @staticmethod
@@ -351,6 +358,10 @@ class NoteGenerator:
     def _handle_exception(self, task_id, exc):
         logger.error(f"任务异常 (task_id={task_id})", exc_info=True)
         error_message = getattr(exc, 'detail', str(exc))
+        if type(exc).__name__ == "APITimeoutError":
+            error_message = "模型请求超时，已停止本次任务。请检查代理或模型服务后重试；已保留字幕缓存。"
+        elif type(exc).__name__ == "APIConnectionError":
+            error_message = "无法连接模型服务，已停止本次任务。请检查网络和代理设置后重试；已保留字幕缓存。"
         if isinstance(error_message, dict):
             try:
                 error_message = json.dumps(error_message, ensure_ascii=False)
@@ -391,11 +402,11 @@ class NoteGenerator:
             self.video_path = Path(downloader.download_video(video_url, output_dir=media_dir))
             if not self.video_path.is_file():
                 raise ValueError("无法获得可解码视频文件")
-            if screenshot or video_understanding:
+            if video_understanding:
                 self.video_img_urls = VideoReader(
                     video_path=str(self.video_path), grid_size=tuple(grid_size or [2, 2]),
                     frame_interval=video_interval if video_interval and video_interval > 0 else 6,
-                    unit_width=960, unit_height=540, save_quality=80,
+                    unit_width=480, unit_height=270, save_quality=75,
                     frame_dir=str(Path(media_dir)/task_id/"frames"),
                     grid_dir=str(Path(media_dir)/task_id/"grids"),
                 ).run()
@@ -503,8 +514,10 @@ class NoteGenerator:
         :param extras: GPT 额外参数
         :return: 生成的 Markdown 字符串
         """
-        task_id = markdown_cache_file.stem
-        self._update_status(task_id, TaskStatus.SUMMARIZING)
+        checkpoint_key = markdown_cache_file.stem
+        task_id = checkpoint_key.removesuffix("_markdown")
+        self._update_status(task_id, TaskStatus.SUMMARIZING,
+                            self.summary_notice or "正在请求模型总结，网络超时会自动结束并提示重试")
 
         source = GPTSource(
             title=audio_meta.title,
@@ -516,7 +529,7 @@ class NoteGenerator:
             _format=formats,
             style=style,
             extras=extras,
-            checkpoint_key=task_id,
+            checkpoint_key=checkpoint_key,
         )
 
         try:

@@ -221,8 +221,8 @@ const Onboarding = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-pink-50 p-6">
-      <div className="w-full max-w-xl rounded-xl border bg-white p-6 shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <div className="w-full max-w-xl rounded-xl border border-border bg-paper p-6">
         <div className="flex items-center gap-3 mb-4">
           <img src={logo} alt="logo" className="h-10 w-10" />
           <div>
@@ -236,9 +236,9 @@ const Onboarding = () => {
           {[1, 2, 3, 4].map(s => (
             <div key={s} className="flex items-center gap-2">
               <div
-                className={`flex h-6 w-6 items-center justify-center rounded-full border ${step >= s ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300 bg-white text-gray-400'}`}
+                className={`flex h-6 w-6 items-center justify-center rounded-full border ${step >= s ? 'border-primary bg-primary text-primary-foreground' : 'border-gray-300 bg-white text-gray-400'}`}
               >{s}</div>
-              {s < 4 && <div className={`h-px w-8 ${step > s ? 'bg-blue-600' : 'bg-gray-300'}`} />}
+              {s < 4 && <div className={`h-px w-8 ${step > s ? 'bg-primary' : 'bg-gray-300'}`} />}
             </div>
           ))}
         </div>
@@ -265,7 +265,7 @@ const Onboarding = () => {
                   {pinging ? '检测中…' : '重新检测'}
                 </button>
               )}
-              <button className="px-4 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50" disabled={!backendOk} onClick={next}>
+              <button className="px-4 py-1.5 text-sm rounded bg-primary text-white hover:bg-primary/90 disabled:opacity-50" disabled={!backendOk} onClick={next}>
                 下一步
               </button>
             </div>
@@ -295,7 +295,7 @@ const Onboarding = () => {
             {error && <div className="text-xs text-red-600">{error}</div>}
             <div className="flex gap-2 justify-between">
               <button className="text-sm text-gray-500 hover:text-gray-800" onClick={prev}>上一步</button>
-              <button className="px-4 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50" disabled={savingProvider} onClick={saveProvider}>
+              <button className="px-4 py-1.5 text-sm rounded bg-primary text-white hover:bg-primary/90 disabled:opacity-50" disabled={savingProvider} onClick={saveProvider}>
                 {savingProvider ? '保存中…' : '保存并下一步'}
               </button>
             </div>
@@ -313,7 +313,7 @@ const Onboarding = () => {
                 { value: 'kuaishou', title: '快手（在线，免登）', desc: '与必剪类似，备选。' },
                 { value: 'fast-whisper', title: 'Faster Whisper（本地）', desc: '完全离线但首次需下载 ~75MB（tiny）至 ~3GB（large-v3）的模型。CPU 慢。' },
               ].map(opt => (
-                <label key={opt.value} className={`flex gap-3 p-3 rounded border cursor-pointer ${transcriberType === opt.value ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <label key={opt.value} className={`flex gap-3 p-3 rounded border cursor-pointer ${transcriberType === opt.value ? 'border-primary bg-sage' : 'border-gray-200 hover:border-gray-300'}`}>
                   <input type="radio" name="transcriber" value={opt.value} checked={transcriberType === opt.value} onChange={e => setTranscriberType(e.target.value)} />
                   <div>
                     <div className="text-sm font-medium">{opt.title}</div>
@@ -325,7 +325,7 @@ const Onboarding = () => {
             {error && <div className="text-xs text-red-600">{error}</div>}
             <div className="flex gap-2 justify-between">
               <button className="text-sm text-gray-500 hover:text-gray-800" onClick={prev}>上一步</button>
-              <button className="px-4 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50" disabled={savingTranscriber} onClick={saveTranscriber}>
+              <button className="px-4 py-1.5 text-sm rounded bg-primary text-white hover:bg-primary/90 disabled:opacity-50" disabled={savingTranscriber} onClick={saveTranscriber}>
                 {savingTranscriber ? '保存中…' : '保存并下一步'}
               </button>
             </div>
@@ -341,11 +341,11 @@ const Onboarding = () => {
               YouTube 一般不需要 cookie。先跳过也没问题，到时再去配。
             </p>
             <div className="rounded bg-gray-50 p-3 text-xs text-gray-600">
-              提示：插件版（<a className="text-blue-600 underline" href="https://github.com/JefferyHcool/BiliNote/tree/develop/BillNote_extension" target="_blank" rel="noreferrer">BillNote_extension</a>）支持一键 cookie 同步；桌面版需手动复制。
+              提示：插件版（<a className="text-primary underline" href="https://github.com/JefferyHcool/BiliNote/tree/develop/BillNote_extension" target="_blank" rel="noreferrer">BillNote_extension</a>）支持一键 cookie 同步；桌面版需手动复制。
             </div>
             <div className="flex gap-2 justify-between">
               <button className="text-sm text-gray-500 hover:text-gray-800" onClick={prev}>上一步</button>
-              <button className="px-4 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700" onClick={finish}>
+              <button className="px-4 py-1.5 text-sm rounded bg-primary text-white hover:bg-primary/90" onClick={finish}>
                 完成，进入 BiliNote
               </button>
             </div>

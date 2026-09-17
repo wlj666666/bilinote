@@ -50,12 +50,12 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
             <input
                 type="text"
                 placeholder="搜索笔记标题..."
-                className="w-full rounded border border-neutral-300 px-3 py-1 text-sm outline-none focus:border-primary"
+                className="w-full rounded-md border border-border bg-paper px-3 py-1 text-sm outline-none focus:border-primary"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <div className="rounded-md border border-neutral-200 bg-neutral-50 py-6 text-center">
+          <div className="rounded-md border border-border bg-paper py-6 text-center">
             <p className="text-sm text-neutral-500">暂无记录</p>
           </div>
         </>
@@ -70,7 +70,7 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
         <input
             type="text"
             placeholder="搜索笔记标题..."
-            className="w-full rounded border border-neutral-300 px-3 py-1 text-sm outline-none focus:border-primary"
+            className="w-full rounded-md border border-border bg-paper px-3 py-1 text-sm outline-none focus:border-primary"
             value={search}
             onChange={e => setSearch(e.target.value)}
         />
@@ -81,8 +81,8 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
             key={task.id}
             onClick={() => onSelect(task.id)}
             className={cn(
-              'flex cursor-pointer flex-col rounded-md border border-neutral-200 p-3',
-              selectedId === task.id && 'border-primary bg-primary-light'
+              'flex cursor-pointer flex-col rounded-md border border-border bg-paper p-3',
+              selectedId === task.id && 'border-primary bg-sage'
             )}
           >
             <div
@@ -129,19 +129,19 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
             <div className={'mt-2 flex items-center justify-between text-[10px]'}>
               <div className="shrink-0">
                 {task.status === 'SUCCESS' && (
-                  <div className={'bg-primary w-10 rounded p-0.5 text-center text-white'}>
+                  <div className={'w-auto rounded-full border border-primary bg-sage px-2 py-0.5 text-center text-primary'}>
                     已完成
                   </div>
                 )}
                 {task.status !== 'SUCCESS' && task.status !== 'FAILED' ? (
-                  <div className={'w-10 rounded bg-green-500 p-0.5 text-center text-white'}>
+                  <div className={'w-auto rounded-full border border-oak bg-linen px-2 py-0.5 text-center text-muted-foreground'}>
                     等待中
                   </div>
                 ) : (
                   <></>
                 )}
                 {task.status === 'FAILED' && (
-                  <div className={'w-10 rounded bg-red-500 p-0.5 text-center text-white'}>失败</div>
+                  <div className={'w-auto rounded-full border border-red-300 bg-red-50 px-2 py-0.5 text-center text-red-700'}>失败</div>
                 )}
               </div>
 

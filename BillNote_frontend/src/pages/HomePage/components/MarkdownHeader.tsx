@@ -87,7 +87,7 @@ export function MarkdownHeader({
   }
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b bg-white/95 px-4 py-2 backdrop-blur-sm">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-paper/95 px-4 py-2 backdrop-blur-sm">
       {/* 左侧区域：版本 + 标签 + 创建时间 */}
       <div className="flex flex-wrap items-center gap-3">
         {isMultiVersion && (
@@ -114,10 +114,10 @@ export function MarkdownHeader({
           </Select>
         )}
 
-        <Badge variant="secondary" className="bg-pink-100 text-pink-700 hover:bg-pink-200">
+        <Badge variant="secondary" className="bg-sage text-primary hover:bg-sage/80">
           {modelName}
         </Badge>
-        <Badge variant="secondary" className="bg-cyan-100 text-cyan-700 hover:bg-cyan-200">
+        <Badge variant="secondary" className="bg-linen text-muted-foreground hover:bg-linen/80">
           {styleName}
         </Badge>
 

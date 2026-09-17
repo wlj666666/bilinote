@@ -71,7 +71,7 @@ const BackendHealthIndicator = () => {
   })()
 
   const colorMap: Record<Health, string> = {
-    green: 'bg-green-500',
+    green: 'bg-primary',
     yellow: 'bg-amber-500',
     red: 'bg-red-500',
     unknown: 'bg-gray-400',
@@ -87,7 +87,7 @@ const BackendHealthIndicator = () => {
   return (
     <>
       <button
-        className="fixed right-3 bottom-3 z-[9998] flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-xs shadow hover:shadow-md"
+        className="fixed right-3 bottom-3 z-[9998] flex items-center gap-2 rounded-full border border-border bg-paper px-3 py-1.5 text-xs shadow-none hover:bg-sage"
         title={labelMap[health]}
         onClick={() => setOpen(true)}
       >

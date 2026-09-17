@@ -167,12 +167,12 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
       user: {
         placement: 'end' as const,
         avatar: (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500 text-white">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <UserRound className="h-4 w-4" />
           </div>
         ),
         variant: 'filled' as const,
-        styles: { content: { background: '#3b82f6', color: '#fff' } },
+        styles: { content: { background: '#6e7f64', color: '#fbf8f2' } },
       },
       ai: {
         placement: 'start' as const,

@@ -554,7 +554,7 @@ export default function MarkmapEditor({
   // }
 
   return (
-    <div className="relative flex h-full flex-col bg-white">
+    <div className="relative flex h-full flex-col bg-paper">
       {/* 全屏/退出全屏 按钮 */}
       <div className="absolute top-2 right-2 z-20 flex space-x-2">
         <button
@@ -609,7 +609,7 @@ export default function MarkmapEditor({
         )}
       </div>
       {pngMessage && (
-        <div className="absolute top-11 right-2 z-20 rounded bg-white/95 px-2 py-1 text-xs text-gray-600 shadow">
+        <div className="absolute top-11 right-2 z-20 rounded bg-paper/95 px-2 py-1 text-xs text-muted-foreground shadow">
           {pngMessage}
         </div>
       )}

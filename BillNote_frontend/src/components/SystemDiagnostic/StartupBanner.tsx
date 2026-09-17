@@ -95,7 +95,7 @@ const StartupBanner = () => {
   if (!banner) return null
 
   const colorByLevel: Record<Severity, string> = {
-    info: 'bg-blue-50 border-blue-300 text-blue-900',
+    info: 'bg-sage border-primary/40 text-foreground',
     warning: 'bg-amber-50 border-amber-300 text-amber-900',
     error: 'bg-red-50 border-red-300 text-red-900',
   }

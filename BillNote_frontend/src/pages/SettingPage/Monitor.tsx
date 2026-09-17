@@ -46,7 +46,7 @@ export default function Monitor() {
     const StatusBadge = ({ ok, label }: { ok: boolean; label?: string }) => (
         <Badge
             variant={ok ? 'default' : 'destructive'}
-            className={ok ? 'bg-green-500 hover:bg-green-600' : ''}
+            className={ok ? 'bg-primary hover:bg-primary/90' : ''}
         >
             {ok ? (
                 <><CheckCircle2 className="mr-1 h-3 w-3" />{label || '正常'}</>
@@ -57,7 +57,7 @@ export default function Monitor() {
     )
 
     return (
-        <ScrollArea className="h-full overflow-y-auto bg-white">
+        <ScrollArea className="h-full overflow-y-auto bg-paper">
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8 flex items-center justify-between">
@@ -101,7 +101,7 @@ export default function Monitor() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-lg font-medium">
-                                <Server className="mr-2 inline h-5 w-5 text-blue-500" />
+                                <Server className="mr-2 inline h-5 w-5 text-primary" />
                                 后端 FastAPI
                             </CardTitle>
                             {status && <StatusBadge ok={status.backend.status === 'running'} label="运行中" />}

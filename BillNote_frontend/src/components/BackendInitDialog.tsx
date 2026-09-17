@@ -121,7 +121,7 @@ function BackendInitDialog({ open, failed = false, lastError = null, onRetry }: 
                 href="https://github.com/JefferyHcool/BiliNote/issues"
                 target="_blank"
                 rel="noreferrer"
-                className="text-blue-600 underline"
+                className="text-primary underline"
               >
                 GitHub Issues
               </a>

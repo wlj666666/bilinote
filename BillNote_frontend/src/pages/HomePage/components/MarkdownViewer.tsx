@@ -60,7 +60,7 @@ function createMarkdownComponents(baseURL: string) {
   return {
     h1: ({ children, ...props }: any) => (
       <h1
-        className="text-primary my-6 scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl"
+        className="text-foreground my-6 scroll-m-20 font-serif text-3xl font-semibold tracking-tight lg:text-4xl"
         {...props}
       >
         {children}
@@ -68,7 +68,7 @@ function createMarkdownComponents(baseURL: string) {
     ),
     h2: ({ children, ...props }: any) => (
       <h2
-        className="text-primary mt-10 mb-4 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0"
+        className="text-foreground mt-10 mb-4 scroll-m-20 border-b border-border pb-2 font-serif text-2xl font-semibold tracking-tight first:mt-0"
         {...props}
       >
         {children}
@@ -76,7 +76,7 @@ function createMarkdownComponents(baseURL: string) {
     ),
     h3: ({ children, ...props }: any) => (
       <h3
-        className="text-primary mt-8 mb-4 scroll-m-20 text-xl font-semibold tracking-tight"
+        className="text-foreground mt-8 mb-4 scroll-m-20 font-serif text-xl font-semibold tracking-tight"
         {...props}
       >
         {children}
@@ -84,7 +84,7 @@ function createMarkdownComponents(baseURL: string) {
     ),
     h4: ({ children, ...props }: any) => (
       <h4
-        className="text-primary mt-6 mb-2 scroll-m-20 text-lg font-semibold tracking-tight"
+        className="text-foreground mt-6 mb-2 scroll-m-20 font-serif text-lg font-semibold tracking-tight"
         {...props}
       >
         {children}
@@ -110,7 +110,7 @@ function createMarkdownComponents(baseURL: string) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100"
+              className="inline-flex items-center gap-1.5 rounded-full bg-sage px-3 py-1 text-sm font-medium text-primary transition-colors hover:bg-sage/80"
               {...props}
             >
               <Play className="h-3.5 w-3.5" />
@@ -200,7 +200,7 @@ function createMarkdownComponents(baseURL: string) {
       )
     },
     strong: ({ children, ...props }: any) => (
-      <strong className="text-primary font-bold" {...props}>
+      <strong className="text-foreground font-bold" {...props}>
         {children}
       </strong>
     ),
@@ -210,7 +210,7 @@ function createMarkdownComponents(baseURL: string) {
 
       if (isFakeHeading) {
         return (
-          <div className="text-primary my-4 text-lg font-bold">{children}</div>
+          <div className="text-foreground my-4 text-lg font-bold">{children}</div>
         )
       }
 
@@ -232,7 +232,7 @@ function createMarkdownComponents(baseURL: string) {
     ),
     blockquote: ({ children, ...props }: any) => (
       <blockquote
-        className="border-primary/20 text-muted-foreground mt-6 border-l-4 pl-4 italic"
+        className="border-border bg-sage text-foreground mt-6 rounded-md border px-4 py-3 not-italic"
         {...props}
       >
         {children}
@@ -487,7 +487,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
       />
 
       {viewMode === 'map' ? (
-        <div className="flex w-full flex-1 overflow-hidden bg-white">
+        <div className="flex w-full flex-1 overflow-hidden bg-paper">
           <div className={'w-full'}>
             <MarkmapEditor
               value={selectedContent}
@@ -498,7 +498,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 overflow-hidden bg-white py-2">
+        <div className="flex flex-1 overflow-hidden bg-paper py-2">
           {selectedContent && selectedContent !== 'loading' && selectedContent !== 'empty' ? (
             <>
               {showChat === 'full' && currentTask ? (

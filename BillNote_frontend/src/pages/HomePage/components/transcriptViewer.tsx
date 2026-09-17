@@ -22,7 +22,7 @@ const TranscriptViewer = () => {
   }
 
   return (
-      <div className="transcript-viewer flex h-full w-full flex-col  rounded-md border bg-white p-4 shadow-sm">
+      <div className="transcript-viewer flex h-full w-full flex-col  rounded-md border border-border bg-paper p-4">
         <h2 className="mb-2 text-lg font-medium">提取原文</h2>
         <p className="mb-4 text-xs text-muted-foreground">文本来源：{({ hard_subtitle_ocr: '画面字幕 OCR', asr: '语音转写', platform_subtitle: '平台字幕', client_prefetched: '平台字幕（浏览器预取）' } as Record<string, string>)[task?.transcript?.raw?.source || ''] || '历史记录（未标记来源）'}</p>
         {task?.transcript?.raw?.source === 'hard_subtitle_ocr' && task.transcript.raw.text_gap_seconds > 0 && (

@@ -283,7 +283,7 @@ const NoteForm = () => {
       <div className="flex gap-2">
         <Button
           type="submit"
-          className={!editing ? 'w-full' : 'w-2/3' + ' bg-primary'}
+          className={!editing ? 'w-full rounded-xl' : 'w-2/3 rounded-xl bg-primary'}
           disabled={generating}
         >
           {generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -393,7 +393,7 @@ const NoteForm = () => {
                       }}
                     >
                       {isUploading ? (
-                        <p className="text-center text-sm text-blue-500">上传中，请稍候…</p>
+                        <p className="text-center text-sm text-primary">上传中，请稍候…</p>
                       ) : uploadSuccess ? (
                         <p className="text-center text-sm text-green-500">上传成功！</p>
                       ) : (

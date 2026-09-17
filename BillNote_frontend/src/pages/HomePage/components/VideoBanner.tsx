@@ -40,7 +40,7 @@ export default function VideoBanner({ audioMeta, videoUrl }: VideoBannerProps) {
             className="h-full w-full object-cover blur-md brightness-[0.4] scale-110"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-r from-blue-600 to-indigo-700" />
+          <div className="h-full w-full bg-primary" />
         )}
       </div>
 

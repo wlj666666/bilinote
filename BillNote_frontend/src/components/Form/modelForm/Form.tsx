@@ -312,9 +312,9 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
             {
               models && models.map(model => {
                 return (
-                  <span key={model.id} className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-sm text-blue-700">
+                  <span key={model.id} className="inline-flex items-center gap-1 rounded-md bg-sage px-2 py-0.5 text-sm text-primary">
                     {model.model_name}
-                    <button type="button" onClick={() => handelDelete(model.id)} className="hover:text-blue-900">
+                    <button type="button" onClick={() => handelDelete(model.id)} className="hover:text-foreground">
                       <X className="h-3 w-3" />
                     </button>
                   </span>

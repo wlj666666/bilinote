@@ -5,7 +5,16 @@ import loadingJson from '@/assets/Lottie/loading.json'
 const Loading: FC = () => {
   return (
     <div className="flex items-center justify-center">
-      <Lottie animationData={loadingJson} loop autoplay style={{ width: 150, height: 150 }} />
+      <Lottie
+        animationData={loadingJson}
+        loop
+        autoplay
+        style={{
+          width: 150,
+          height: 150,
+          filter: 'grayscale(0.2) sepia(0.45) hue-rotate(48deg) saturate(0.55)',
+        }}
+      />
     </div>
   )
 }

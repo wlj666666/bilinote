@@ -40,7 +40,7 @@ const BackendLogPanel = ({ status, exitCode, logs, health, onRestart, onCopyLogs
       {/* 半透明遮罩 */}
       <div className="fixed inset-0 z-[9998] bg-black/20" onClick={onClose} />
 
-      <aside className="fixed right-0 bottom-0 top-0 z-[9999] flex w-[480px] max-w-[90vw] flex-col border-l bg-white shadow-2xl">
+      <aside className="fixed right-0 bottom-0 top-0 z-[9999] flex w-[480px] max-w-[90vw] flex-col border-l border-border bg-paper shadow-2xl">
         <header className="flex items-center justify-between border-b px-4 py-3">
           <div>
             <h2 className="text-base font-semibold">后端运行状态</h2>
@@ -59,7 +59,7 @@ const BackendLogPanel = ({ status, exitCode, logs, health, onRestart, onCopyLogs
 
         <div className="flex items-center gap-2 border-b px-4 py-2">
           <button
-            className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+            className="rounded bg-primary px-3 py-1 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             disabled={restarting}
             onClick={handleRestart}
           >

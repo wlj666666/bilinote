@@ -161,3 +161,11 @@ html, body, #root {
   background-color: transparent !important;
   color: var(--foreground) !important;
 }
+
+.markdown-body a {
+  color: #6f7f5f !important;
+}
+
+.markdown-body a:hover {
+  color: #6f7f5f !important;
+}

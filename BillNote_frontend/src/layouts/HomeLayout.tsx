@@ -81,6 +81,14 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
             <ScrollArea className="flex-1 overflow-auto">
               <div className="p-4">{NoteForm}</div>
             </ScrollArea>
+            <div
+              className="pointer-events-none h-[28.8px] shrink-0"
+              style={{
+                background:
+                  'repeating-linear-gradient(90deg, #c4a882 0px, #d4b896 7px, #b8956a 14px, #c4a882 22px)',
+              }}
+              aria-hidden
+            />
           </aside>
         </ResizablePanel>
 
@@ -164,16 +172,8 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
 
         {/* 右边预览 */}
         <ResizablePanel defaultSize={61} minSize={30}>
-          <main className="relative flex h-full flex-col overflow-hidden bg-paper p-6 pb-8">
+          <main className="flex h-full flex-col overflow-hidden bg-paper px-6 pt-6">
             <div className="min-h-0 flex-1 overflow-hidden">{Preview}</div>
-            <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-6"
-              style={{
-                background:
-                  'repeating-linear-gradient(90deg, #c4a882 0px, #d4b896 7px, #b8956a 14px, #c4a882 22px)',
-              }}
-              aria-hidden
-            />
           </main>
         </ResizablePanel>
       </ResizablePanelGroup>

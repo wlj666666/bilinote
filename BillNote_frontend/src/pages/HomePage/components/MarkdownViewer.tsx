@@ -8,7 +8,7 @@ import Loading from '@/components/Lottie/Loading.tsx'
 import Idle from '@/components/Lottie/Idle.tsx'
 import StepBar from '@/pages/HomePage/components/StepBar.tsx'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { atomDark as codeStyle } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { oneLight as lightCodeStyle } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
 import gfm from 'remark-gfm'
@@ -25,6 +25,16 @@ import TranscriptViewer from '@/pages/HomePage/components/transcriptViewer.tsx'
 import MarkmapEditor from '@/pages/HomePage/components/MarkmapComponent.tsx'
 import ChatPanel from '@/pages/HomePage/components/ChatPanel.tsx'
 import VideoBanner from '@/pages/HomePage/components/VideoBanner.tsx'
+
+// Keep syntax colors readable against the app's light code-block background.
+const codeStyle = {
+  ...lightCodeStyle,
+  property: { ...lightCodeStyle.property, color: '#245b7a' },
+  string: { ...lightCodeStyle.string, color: '#28643b' },
+  number: { ...lightCodeStyle.number, color: '#855015' },
+  boolean: { ...lightCodeStyle.boolean, color: '#855015' },
+  comment: { ...lightCodeStyle.comment, color: '#655d54' },
+}
 
 interface VersionNote {
   ver_id: string
@@ -262,11 +272,22 @@ function createMarkdownComponents(baseURL: string) {
               style={codeStyle}
               language={match[1]}
               PreTag="div"
+              codeTagProps={{
+                className: `language-${match[1]}`,
+                style: {
+                  ...codeStyle['code[class*="language-"]'],
+                  background: 'transparent',
+                  padding: 0,
+                  borderRadius: 0,
+                  fontSize: 'inherit',
+                },
+              }}
               className="!bg-muted !m-0 !p-0"
               customStyle={{
                 margin: 0,
                 padding: '1rem',
                 background: 'transparent',
+                color: '#2f2c28',
                 fontSize: '0.9rem',
               }}
               {...props}

@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import subprocess
 import tempfile
 from abc import ABC
 from typing import Union, Optional, List
@@ -103,6 +104,28 @@ class BilibiliDownloader(Downloader, ABC):
             video_path=None  # ❗音频下载不包含视频路径
         )
 
+    @staticmethod
+    def _video_decodes_completely(video_path: str) -> bool:
+        """Check all video packets outside the main process before OCR uses the file."""
+        try:
+            result = subprocess.run(
+                ["ffmpeg", "-nostdin", "-v", "error", "-xerror", "-i", video_path,
+                 "-map", "0:v:0", "-an", "-f", "null", "-"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
+                timeout=300, check=False,
+            )
+            # FFmpeg 6 reports harmless AV1 metadata it does not understand at error
+            # level. It can also exit successfully after real packet decode errors.
+            errors = [line for line in result.stderr.splitlines()
+                      if line.strip() and "Unknown Metadata OBU type 6" not in line
+                      and not line.strip().startswith("Last message repeated")]
+            if result.returncode == 0 and not errors:
+                return True
+            logger.warning("视频无法完整解码: %s (%s)", video_path, "\n".join(errors)[-500:])
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            logger.warning("视频解码校验失败: %s (%s)", video_path, exc)
+        return False
+
     def download_video(
         self,
         video_url: str,
@@ -119,16 +142,16 @@ class BilibiliDownloader(Downloader, ABC):
         video_id=extract_video_id(video_url, "bilibili")
         video_path = os.path.join(output_dir, f"{video_id}.mp4")
         if os.path.exists(video_path):
-            return video_path
-
-        # 检查是否已经存在
-
+            if self._video_decodes_completely(video_path):
+                return video_path
+            logger.warning("删除损坏的视频缓存并重新下载: %s", video_path)
+            os.remove(video_path)
 
         output_path = os.path.join(output_dir, "%(id)s.%(ext)s")
 
         ydl_opts = {
             **YDL_RETRY_OPTS,
-            'format': 'bv*[ext=mp4]/bestvideo+bestaudio/best',
+            'format': 'bv*[vcodec^=avc1][ext=mp4]/bv*[ext=mp4]/bestvideo+bestaudio/best',
             'outtmpl': output_path,
             'http_headers': {'Referer': 'https://www.bilibili.com'},
             'noplaylist': True,
@@ -138,15 +161,21 @@ class BilibiliDownloader(Downloader, ABC):
         if self._cookiefile:
             ydl_opts['cookiefile'] = self._cookiefile
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)
-            video_id = info.get("id")
-            video_path = os.path.join(output_dir, f"{video_id}.mp4")
+        for attempt in range(2):
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(video_url, download=True)
+                video_id = info.get("id")
+                video_path = os.path.join(output_dir, f"{video_id}.mp4")
 
-        if not os.path.exists(video_path):
-            raise FileNotFoundError(f"视频文件未找到: {video_path}")
+            if not os.path.exists(video_path):
+                raise FileNotFoundError(f"视频文件未找到: {video_path}")
+            if self._video_decodes_completely(video_path):
+                return video_path
+            os.remove(video_path)
+            if attempt == 0:
+                logger.warning("下载的视频解码失败，重新下载一次: %s", video_path)
 
-        return video_path
+        raise ValueError(f"两次下载的视频均无法完整解码: {video_path}")
 
     def delete_video(self, video_path: str) -> str:
         """

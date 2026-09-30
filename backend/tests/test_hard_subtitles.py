@@ -150,7 +150,7 @@ def test_static_closing_caption_continues_established_region(tmp_path, end_card)
     probes = [(float(i), np.zeros((100,100,3), dtype=np.uint8)) for i in range(0,30,2)]
     reads = [[] if end_card and i>=24 else [box(captions[(i//2)%4] if i<20 else '感谢观看')] for i in range(0,30,2)]
     recognition = [(i*.2, np.zeros((100,100,3), dtype=np.uint8)) for i in range(150)]
-    engine.read.side_effect = reads + [[] if end_card and ts>=24 else [box('字幕内容' if ts<20 else '感谢观看')] for ts,_ in recognition]
+    engine.read.side_effect = reads + [[] if end_card and ts>=24 else [TextBox((.3, .22, .7, .78), '字幕内容' if ts<20 else '感谢观看', .98)] for ts,_ in recognition]
     extractor = HardSubtitleExtractor(engine=engine)
     with patch.object(extractor, 'duration', return_value=30.), patch.object(extractor, 'frames', side_effect=[iter(probes),iter(recognition)]):
         result = extractor.extract('unused',tmp_path/'report.json')
@@ -159,3 +159,114 @@ def test_static_closing_caption_continues_established_region(tmp_path, end_card)
     assert result.status == ('uncertain' if end_card else 'success')
     assert result.transcript.segments[-1].text == '感谢观看'
     assert result.transcript.segments[-1].end == pytest.approx(24. if end_card else 30.)
+
+
+def test_stable_caption_band_recovers_editor_competition():
+    from app.ocr.subtitle_tracker import stabilize_ambiguous_blocks
+
+    def item(start, end, y, ambiguous=False, competitors=None):
+        candidate = {'score': .65, 'roi': (.3, y, .7, y+.055),
+                     'examples': ['讲话字幕', '下一句字幕'], 'times': [start, end]}
+        return {'start': start, 'end': end,
+                'roi': (0., y-.02, 1., y+.075), 'ambiguous': ambiguous,
+                'candidates': competitors if competitors is not None else [candidate]}
+
+    code = {'score': .67, 'roi': (.2, .35, .8, .38),
+            'examples': ['import module', 'export default'], 'times': [60, 62]}
+    caption = {'score': .65, 'roi': (.3, .89, .7, .945),
+               'examples': ['这里是真字幕', '下一句真字幕'], 'times': [60, 62]}
+    blocks = [item(i*20, (i+1)*20, .89) for i in range(3)]
+    blocks += [item(60, 80, .35, True, [code, caption])]
+    blocks += [item(i*20, (i+1)*20, .89) for i in range(4, 7)]
+    stabilize_ambiguous_blocks(blocks)
+    assert blocks[3]['anchored']
+    assert blocks[3]['roi'][1] > .85
+    assert blocks[3]['caption_candidate'] == caption['roi']
+
+
+def test_short_missing_probe_uses_stable_band_but_filters_editor_text():
+    from app.ocr.subtitle_tracker import matches_caption_region, stabilize_ambiguous_blocks
+
+    def stable(start):
+        return {'start': start, 'end': start+20, 'roi': (0., .86, 1., .97),
+                'ambiguous': False, 'candidates': [
+                    {'score': .7, 'roi': (.3, .89, .7, .945), 'examples': [], 'times': []}]}
+
+    blocks = [stable(i*20) for i in range(3)]
+    blocks.append({'start': 60, 'end': 65, 'roi': None, 'ambiguous': True,
+                   'candidates': [{'score': .7, 'roi': (.2, .35, .8, .38), 'examples': [], 'times': []}]})
+    blocks += [stable(65+i*20) for i in range(3)]
+    stabilize_ambiguous_blocks(blocks)
+    rescued = blocks[3]
+    assert rescued['anchor_fallback']
+    band, reference = rescued['roi'], rescued['caption_candidate']
+    assert matches_caption_region(TextBox((.436, .245, .562, .811), '就是一行', .99), band, reference)
+    assert not matches_caption_region(TextBox((.357, 0, .487, .208), '<h1 class', .99), band, reference)
+    assert not matches_caption_region(TextBox((.661, .377, .98, .792), 'Ln 65, Col 89', .93), band, reference)
+    assert not matches_caption_region(TextBox((.4, .45, .65, .759), 'libo (25 minutes ago)', .97), band, reference)
+
+
+def test_competing_global_caption_bands_remain_uncertain():
+    from app.ocr.subtitle_tracker import stabilize_ambiguous_blocks
+
+    def stable(start, y):
+        return {'start': start, 'end': start+20, 'roi': (0., y-.02, 1., y+.075),
+                'ambiguous': False, 'candidates': [
+                    {'score': .7, 'roi': (.3, y, .7, y+.055), 'examples': [], 'times': []}]}
+
+    blocks = [stable(i*20, .2 if i%2 else .89) for i in range(10)]
+    uncertain = {'start': 200, 'end': 205, 'roi': None, 'ambiguous': True,
+                 'candidates': [{'score': .6, 'roi': (.3, .89, .7, .945), 'examples': [], 'times': []}]}
+    blocks.append(uncertain)
+    stabilize_ambiguous_blocks(blocks)
+    assert uncertain['ambiguous']
+    assert uncertain['roi'] is None
+
+
+def test_false_reliable_status_bar_uses_neighboring_caption_profile():
+    from app.ocr.subtitle_tracker import matches_caption_region, stabilize_ambiguous_blocks
+
+    def caption(start):
+        return {'start': start, 'end': start+20, 'roi': (0., .86, 1., .97),
+                'ambiguous': False, 'candidates': [
+                    {'score': .7, 'roi': (.3, .89, .7, .945), 'examples': [], 'times': []}]}
+
+    blocks = [caption(i*20) for i in range(3)]
+    weak = {'start': 60, 'end': 80, 'roi': (0., .87, 1., .97), 'ambiguous': False,
+            'candidates': [{'score': .65, 'roi': (.7, .91, .9, .936), 'examples': [], 'times': []}]}
+    blocks.append(weak)
+    blocks += [caption(i*20) for i in range(4, 7)]
+    stabilize_ambiguous_blocks(blocks)
+    assert weak['profile_override']
+    assert weak['caption_candidate'] == (.3, .89, .7, .945)
+    assert not matches_caption_region(
+        TextBox((.7, .4, .9, .7), 'Ln 65, Col 13 Spaces: 2', .99),
+        weak['roi'], weak['caption_candidate'])
+
+
+def test_two_line_captions_keep_both_lines_after_geometry_filter(tmp_path):
+    engine = Mock()
+    probes = [(float(i), np.zeros((100, 100, 3), dtype=np.uint8)) for i in range(0, 10, 2)]
+    recognition = [(i*.2, np.zeros((100, 100, 3), dtype=np.uint8)) for i in range(50)]
+    probe_reads = [[TextBox((.3, .3, .7, .335), f'上行{i}', .99),
+                    TextBox((.3, .36, .7, .395), f'下行{i}', .99)] for i in range(0, 10, 2)]
+    crop_reads = [[TextBox((.3, .1, .7, .4), '上行', .99),
+                   TextBox((.3, .6, .7, .9), '下行', .99)] for _ in recognition]
+    engine.read.side_effect = probe_reads + crop_reads
+    extractor = HardSubtitleExtractor(engine=engine)
+    with patch.object(extractor, 'duration', return_value=10.), patch.object(extractor, 'frames', side_effect=[iter(probes), iter(recognition)]):
+        result = extractor.extract('unused', tmp_path/'two-lines.json')
+    assert result.status == 'success'
+    assert any('上行' in segment.text and '下行' in segment.text for segment in result.transcript.segments)
+
+
+def test_caption_references_exclude_same_line_menus_and_narrow_editor_rows():
+    from app.ocr.subtitle_tracker import caption_references
+
+    times = [0., 2., 4., 6.]
+    primary = {'score': .9, 'roi': (.3, .89, .7, .945), 'times': times}
+    menu = {'score': .9, 'roi': (.4, .89, .6, .945), 'times': times}
+    narrow_row = {'score': .9, 'roi': (.45, .835, .55, .88), 'times': times}
+    second_line = {'score': .9, 'roi': (.31, .825, .69, .875), 'times': times}
+    block = {'roi': (0., .8, 1., .97), 'candidates': [primary, menu, narrow_row, second_line]}
+    assert caption_references(block) == [primary['roi'], second_line['roi']]

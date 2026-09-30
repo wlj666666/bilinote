@@ -8,9 +8,9 @@ from pathlib import Path
 
 from app.models.transcriber_model import TranscriptResult, TranscriptSegment
 from app.ocr.ocr_engine import OCREngine
-from app.ocr.subtitle_tracker import locate_windows, merge_observations, within_caption_band
+from app.ocr.subtitle_tracker import caption_references, locate_windows, matches_caption_region, merge_observations, stabilize_ambiguous_blocks, within_caption_band
 
-PIPELINE_VERSION = 2
+PIPELINE_VERSION = 3
 
 
 def atomic_json(path, data):
@@ -115,6 +115,11 @@ class HardSubtitleExtractor:
                         windows[0]['roi'] = previous
                 report['blocks'].extend(windows)
                 previous = windows[-1]['roi']
+            stabilize_ambiguous_blocks(report['blocks'])
+            for block in report['blocks']:
+                block['caption_references'] = caption_references(block)
+            report['anchored_seconds'] = sum(b['end']-b['start'] for b in report['blocks'] if b.get('anchored'))
+            report['profile_override_seconds'] = sum(b['end']-b['start'] for b in report['blocks'] if b.get('profile_override'))
             atomic_json(diagnostic_path, {**report, "status": "extracting"})
             usable = [b for b in report['blocks'] if b['roi'] and not b['ambiguous']]
             if not usable:
@@ -124,7 +129,7 @@ class HardSubtitleExtractor:
                     '无法可靠定位讲话字幕，请重试或改用语音转写' if uncertain else '未检测到可提取的动态画面字幕，可改用语音转写')
             starts = [b["start"] for b in report["blocks"]]
             observations = []
-            low = total = edge_shapes = 0
+            low = total = edge_shapes = non_caption_shapes = 0
             last = -1.
             step = 1/self.fps
             # Stream frames; only text and small diagnostics are retained in memory.
@@ -139,6 +144,10 @@ class HardSubtitleExtractor:
                     boxes = self.engine.read(crop)
                     edge_shapes += sum(not within_caption_band(b) for b in boxes)
                     boxes = [b for b in boxes if within_caption_band(b)]
+                    references = block['caption_references']
+                    if references:
+                        non_caption_shapes += sum(not any(matches_caption_region(b, roi, ref) for ref in references) for b in boxes)
+                        boxes = [b for b in boxes if any(matches_caption_region(b, roi, ref) for ref in references)]
                     boxes.sort(key=lambda b: (round(b.box[1]*5), b.box[0]))
                     if boxes:
                         total += 1
@@ -162,7 +171,7 @@ class HardSubtitleExtractor:
                 gaps.append([cursor, duration])
             gap_seconds = sum(end-start for start,end in gaps)
             report.update(scan_complete=True, text_gaps=gaps, segment_count=len(segments),
-                          rejected_edge_shapes=edge_shapes,
+                          rejected_edge_shapes=edge_shapes, rejected_non_caption_shapes=non_caption_shapes,
                           missing_region_seconds=missing, low_score_fraction=low/max(total, 1))
             transcript = TranscriptResult(language='zh' if any('\u4e00' <= c <= '\u9fff' for seg in segments for c in seg.text) else 'en', full_text=' '.join(s.text for s in segments),
                 segments=segments, raw={'source': 'hard_subtitle_ocr', 'engine': 'rapidocr',

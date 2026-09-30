@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 import re
+from statistics import median
 import unicodedata
 
 from app.models.transcriber_model import TranscriptSegment
@@ -159,3 +160,133 @@ def locate_windows(samples, start, end):
                 + locate_windows(samples[middle:], boundary, end))
     return [{"start": start, "end": end, "roi": roi,
              "ambiguous": ambiguous, "candidates": candidates}]
+
+
+def stabilize_ambiguous_blocks(blocks):
+    """Recover captions from a stable band when editor text competes with them.
+
+    Require strong agreement across the video and reliable blocks on both sides.
+    If the caption is absent, leave the interval uncertain rather than reading UI text.
+    """
+    reliable = [(index, block) for index, block in enumerate(blocks)
+                if block.get('roi') and not block.get('ambiguous') and block.get('candidates')]
+    if len(reliable) < 5:
+        return blocks
+    centers = [(block['roi'][1] + block['roi'][3]) / 2 for _, block in reliable]
+    durations = [block['end'] - block['start'] for _, block in reliable]
+    total = sum(durations)
+    if total < 60:
+        return blocks
+    anchor = max(centers, key=lambda center: sum(
+        duration for other, duration in zip(centers, durations) if abs(other-center) <= .04))
+    stable = [(index, block) for (index, block), center in zip(reliable, centers)
+              if abs(center-anchor) <= .04]
+    stable_seconds = sum(block['end'] - block['start'] for _, block in stable)
+    if len(stable) < 5 or stable_seconds < total * .6:
+        return blocks
+    anchor = median((block['roi'][1] + block['roi'][3]) / 2 for _, block in stable)
+    reference = [block['candidates'][0]['roi'] for _, block in stable]
+    height = median(box[3]-box[1] for box in reference)
+    width = median(box[2]-box[0] for box in reference)
+    x_center = median((box[0]+box[2])/2 for box in reference)
+    typical_box = tuple(median(box[axis] for box in reference) for axis in range(4))
+    typical_band = tuple(median(block['roi'][axis] for _, block in stable) for axis in range(4))
+
+    def looks_like_caption(candidate):
+        x1, y1, x2, y2 = candidate['roi']
+        return (candidate['score'] >= .28 and abs((y1+y2)/2-anchor) <= .035
+                and y2-y1 >= max(.02, height*.7)
+                and x2-x1 >= max(.08, width*.3)
+                and abs((x1+x2)/2-x_center) <= .23)
+
+    trusted = [(index, block) for index, block in stable
+               if looks_like_caption(block['candidates'][0])]
+    if len(trusted) < 5 or sum(block['end']-block['start'] for _, block in trusted) < total*.5:
+        return blocks
+
+    for index, block in enumerate(blocks):
+        before = next((good for pos, good in reversed(trusted) if pos < index), None)
+        after = next((good for pos, good in trusted if pos > index), None)
+        if before is None or after is None:
+            continue
+        before_gap = block['start']-before['end']
+        after_gap = after['start']-block['end']
+        if not block.get('ambiguous'):
+            candidate = block['candidates'][0] if block.get('candidates') else None
+            if candidate and abs((block['roi'][1]+block['roi'][3])/2-anchor) <= .04 and looks_like_caption(candidate):
+                continue
+            limit = 60 if abs((block['roi'][1]+block['roi'][3])/2-anchor) <= .04 else 25
+            if before_gap <= limit and after_gap <= limit:
+                block['roi'] = typical_band
+                block['caption_candidate'] = typical_box
+                block['profile_override'] = True
+            continue
+        if before_gap > 60 or after_gap > 60:
+            continue
+        matches = []
+        for candidate in block.get('candidates', []):
+            if looks_like_caption(candidate):
+                matches.append(candidate)
+        if matches:
+            chosen = max(matches, key=lambda candidate: candidate['score'])
+            x1, y1, x2, y2 = chosen['roi']
+            h = y2-y1
+            block['roi'] = (0., max(0., y1-h*.4), 1., min(1., y2+h*.4))
+            block['caption_candidate'] = chosen['roi']
+        elif before_gap <= 25 and after_gap <= 25:
+            # Sparse probes can miss a short caption even between stable bands.
+            # OCR still has to find a real caption-shaped box in each frame.
+            block['roi'] = typical_band
+            block['caption_candidate'] = typical_box
+            block['anchor_fallback'] = True
+        else:
+            continue
+        block['ambiguous'] = False
+        block['anchored'] = True
+    return blocks
+
+
+def matches_caption_region(box, band, reference):
+    """Keep caption-shaped text, excluding smaller editor labels and status bars."""
+    x1, y1, x2, y2 = box.box
+    band_y1, band_y2 = band[1], band[3]
+    full_center_x = band[0] + (x1+x2)/2 * (band[2]-band[0])
+    full_center_y = band_y1 + (y1+y2)/2 * (band_y2-band_y1)
+    full_height = (y2-y1) * (band_y2-band_y1)
+    rx1, ry1, rx2, ry2 = reference
+    return (full_height >= max(.01, (ry2-ry1)*.7)
+            and abs(full_center_y-(ry1+ry2)/2) <= max(.015, (ry2-ry1)*.35)
+            and abs(full_center_x-(rx1+rx2)/2) <= .25)
+
+
+def caption_references(block):
+    """Include both subtitle lines while excluding nearby editor text tracks."""
+    candidates = block.get('candidates') or []
+    primary = block.get('caption_candidate') or (candidates[0]['roi'] if candidates else None)
+    if primary is None:
+        return []
+    result = [primary]
+    if not block.get('roi'):
+        return result
+    ph = primary[3]-primary[1]
+    pw = primary[2]-primary[0]
+    px = (primary[0]+primary[2])/2
+    py = (primary[1]+primary[3])/2
+    primary_track = next((c for c in candidates if c['roi'] == primary), None)
+    primary_score = primary_track['score'] if primary_track else (candidates[0]['score'] if candidates else 0.)
+    primary_times = set(primary_track.get('times', [])) if primary_track else set()
+    for candidate in candidates:
+        roi = candidate['roi']
+        if roi == primary or candidate['score'] < max(.28, primary_score*.8):
+            continue
+        h = roi[3]-roi[1]
+        w = roi[2]-roi[0]
+        x = (roi[0]+roi[2])/2
+        y = (roi[1]+roi[3])/2
+        distance = abs(y-py)
+        if (ph > 0 and pw > 0 and .7 <= h/ph <= 1.6 and .7 <= w/pw <= 1.4
+                and abs(x-px) <= .2 and ph*.75 <= distance <= ph*2
+                and len(primary_times.intersection(candidate.get('times', []))) >= 2
+                and block['roi'][1] <= y <= block['roi'][3]):
+            result.append(roi)
+    return result

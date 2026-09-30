@@ -74,10 +74,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.*
 !.env.example
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -318,11 +315,19 @@ cython_debug/
 /backend/.idea/*
 /backend/bili_note.db
 /backend/uploads/*
-/backend/.idea/*
 /backend/config/*
 /backend/vector_db/
-/BiliNote_frontend/.idea/*
-/BiliNote_frontend/src-tauri/bin/
+/BillNote_frontend/.idea/*
+/BillNote_frontend/src-tauri/bin/
+
+# Backend runtime files when started from the repository root
+/bili_note.db
+/note_tasks.db
+/config/
+/note_results/
+/static/
+/uploads/
+/vector_db/
 
 # FFmpeg 构建文件（不应该提交到仓库）
 ffmpeg*/

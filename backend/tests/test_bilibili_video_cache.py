@@ -133,3 +133,59 @@ def test_harmless_av1_metadata_warning_is_accepted(monkeypatch):
         ),
     )
     assert BilibiliDownloader._video_decodes_completely("cached.mp4")
+
+
+def test_validation_timeout_preserves_cached_video(tmp_path, monkeypatch):
+    from subprocess import TimeoutExpired
+
+    video = tmp_path / f"{VIDEO_ID}.mp4"
+    video.write_bytes(b"cached content")
+
+    def time_out(command, **kwargs):
+        raise TimeoutExpired(command, kwargs["timeout"])
+
+    monkeypatch.setattr("app.downloaders.bilibili_downloader.subprocess.run", time_out)
+    monkeypatch.setattr(
+        "app.downloaders.bilibili_downloader.yt_dlp.YoutubeDL",
+        lambda *_: pytest.fail("A validation timeout must not trigger a redownload"),
+    )
+    downloader = object.__new__(BilibiliDownloader)
+    downloader._cookiefile = None
+
+    assert downloader._video_decodes_completely(str(video)) is None
+    assert downloader.download_video(VIDEO_URL, str(tmp_path)) == str(video)
+    assert video.read_bytes() == b"cached content"
+
+
+def test_validation_timeout_preserves_new_download(tmp_path, monkeypatch):
+    from subprocess import TimeoutExpired
+
+    video = tmp_path / f"{VIDEO_ID}.mp4"
+    attempts = []
+
+    class FakeYoutubeDL:
+        def __init__(self, opts):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            pass
+
+        def extract_info(self, url, download):
+            attempts.append(1)
+            video.write_bytes(b"downloaded content")
+            return {"id": VIDEO_ID}
+
+    def time_out(command, **kwargs):
+        raise TimeoutExpired(command, kwargs["timeout"])
+
+    monkeypatch.setattr("app.downloaders.bilibili_downloader.subprocess.run", time_out)
+    monkeypatch.setattr("app.downloaders.bilibili_downloader.yt_dlp.YoutubeDL", FakeYoutubeDL)
+    downloader = object.__new__(BilibiliDownloader)
+    downloader._cookiefile = None
+
+    assert downloader.download_video(VIDEO_URL, str(tmp_path)) == str(video)
+    assert video.read_bytes() == b"downloaded content"
+    assert len(attempts) == 1

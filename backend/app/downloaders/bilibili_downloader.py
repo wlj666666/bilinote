@@ -105,8 +105,8 @@ class BilibiliDownloader(Downloader, ABC):
         )
 
     @staticmethod
-    def _video_decodes_completely(video_path: str) -> bool:
-        """Check all video packets outside the main process before OCR uses the file."""
+    def _video_decodes_completely(video_path: str) -> Optional[bool]:
+        """Return True for a clean decode, False for damage, None if verification is inconclusive."""
         try:
             result = subprocess.run(
                 ["ffmpeg", "-nostdin", "-v", "error", "-xerror", "-i", video_path,
@@ -122,9 +122,10 @@ class BilibiliDownloader(Downloader, ABC):
             if result.returncode == 0 and not errors:
                 return True
             logger.warning("视频无法完整解码: %s (%s)", video_path, "\n".join(errors)[-500:])
+            return False
         except (OSError, subprocess.TimeoutExpired) as exc:
-            logger.warning("视频解码校验失败: %s (%s)", video_path, exc)
-        return False
+            logger.warning("视频解码校验未完成，保留视频文件: %s (%s)", video_path, exc)
+            return None
 
     def download_video(
         self,
@@ -142,7 +143,8 @@ class BilibiliDownloader(Downloader, ABC):
         video_id=extract_video_id(video_url, "bilibili")
         video_path = os.path.join(output_dir, f"{video_id}.mp4")
         if os.path.exists(video_path):
-            if self._video_decodes_completely(video_path):
+            # A timeout or unavailable validator does not prove the cache is damaged.
+            if self._video_decodes_completely(video_path) is not False:
                 return video_path
             logger.warning("删除损坏的视频缓存并重新下载: %s", video_path)
             os.remove(video_path)
@@ -169,7 +171,7 @@ class BilibiliDownloader(Downloader, ABC):
 
             if not os.path.exists(video_path):
                 raise FileNotFoundError(f"视频文件未找到: {video_path}")
-            if self._video_decodes_completely(video_path):
+            if self._video_decodes_completely(video_path) is not False:
                 return video_path
             os.remove(video_path)
             if attempt == 0:

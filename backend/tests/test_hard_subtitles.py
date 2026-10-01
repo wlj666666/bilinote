@@ -270,3 +270,101 @@ def test_caption_references_exclude_same_line_menus_and_narrow_editor_rows():
     second_line = {'score': .9, 'roi': (.31, .825, .69, .875), 'times': times}
     block = {'roi': (0., .8, 1., .97), 'candidates': [primary, menu, narrow_row, second_line]}
     assert caption_references(block) == [primary['roi'], second_line['roi']]
+
+
+@pytest.mark.parametrize('window_seconds', [2., 20., 40.])
+@pytest.mark.parametrize('gap_factor, recovered', [(.15, True), (3., False)])
+def test_unlocated_nonambiguous_block_does_not_crash_stable_band(window_seconds, gap_factor, recovered):
+    from app.ocr.subtitle_tracker import stabilize_ambiguous_blocks
+
+    def caption(start):
+        return {'start': start, 'end': start+window_seconds, 'roi': (0., .42, 1., .53),
+                'ambiguous': False, 'candidates': [
+                    {'score': .7, 'roi': (.3, .45, .7, .505), 'times': [start, start+window_seconds/2]}]}
+
+    blocks = [caption(i*window_seconds) for i in range(3)]
+    gap_start = 3*window_seconds
+    gap_end = gap_start + gap_factor*window_seconds
+    gap = {'start': gap_start, 'end': gap_end, 'roi': None, 'ambiguous': False,
+           'candidates': [{'score': 0., 'roi': (.3, .45, .7, .505), 'times': [gap_start]}]}
+    blocks.append(gap)
+    blocks += [caption(gap_end+i*window_seconds) for i in range(3)]
+    stabilize_ambiguous_blocks(blocks)
+    assert bool(gap['roi']) is recovered
+    assert bool(gap.get('anchor_fallback')) is recovered
+
+
+@pytest.mark.parametrize('y', [.15, .5, .89])
+@pytest.mark.parametrize('window_seconds', [2., 20., 40.])
+def test_long_competition_follows_any_stable_caption_band(y, window_seconds):
+    from app.ocr.subtitle_tracker import stabilize_ambiguous_blocks
+
+    def stable(start):
+        return {'start': start, 'end': start+window_seconds,
+                'roi': (0., y-.02, 1., y+.075), 'ambiguous': False,
+                'candidates': [{'score': .7, 'roi': (.3, y, .7, y+.055),
+                                'times': [start, start+window_seconds/2]}]}
+
+    def competing(start, end):
+        other_y = .75 if y < .45 else .15
+        return {'start': start, 'end': end, 'roi': (0., other_y-.02, 1., other_y+.075),
+                'ambiguous': True, 'candidates': [
+                    {'score': .7, 'roi': (.3, y, .7, y+.055), 'times': [start, end]},
+                    {'score': .7, 'roi': (.2, other_y, .6, other_y+.04), 'times': [start, end]}]}
+
+    span = window_seconds
+    blocks = [stable(i*span) for i in range(5)]
+    first = competing(9*span, 10*span)
+    second = competing(10*span, 11*span)
+    isolated = competing(12.5*span, 12.75*span)
+    blocks += [first, second, isolated]
+    blocks += [stable((15+i)*span) for i in range(5)]
+    stabilize_ambiguous_blocks(blocks)
+    assert first['anchor_sequence'] and second['anchor_sequence']
+    assert not first['ambiguous'] and abs(first['caption_candidate'][1]-y) < .01
+    assert not second['ambiguous'] and abs(second['caption_candidate'][1]-y) < .01
+    assert isolated['ambiguous'] and not isolated.get('anchored')
+
+
+def test_long_competition_does_not_override_second_reliable_caption_layout():
+    from app.ocr.subtitle_tracker import stabilize_ambiguous_blocks
+
+    def reliable(start, y):
+        return {'start': start, 'end': start+20, 'roi': (0., y-.02, 1., y+.075),
+                'ambiguous': False, 'candidates': [
+                    {'score': .7, 'roi': (.3, y, .7, y+.055), 'times': [start, start+2]}]}
+
+    blocks = [reliable(start, .18) for start in (0, 20, 40)]
+    blocks += [reliable(start, .78) for start in (160, 180)]
+    competitors = [
+        {'start': start, 'end': start+20, 'roi': (0., .18, 1., .25),
+         'ambiguous': True, 'candidates': [
+             {'score': .7, 'roi': (.3, .18, .7, .235), 'times': [start, start+2]},
+             {'score': .7, 'roi': (.3, .78, .7, .835), 'times': [start, start+2]}]}
+        for start in (200, 220)]
+    blocks += competitors
+    blocks += [reliable(start, .78) for start in (240, 260)]
+    blocks += [reliable(start, .18) for start in (400, 420, 440)]
+    stabilize_ambiguous_blocks(blocks)
+    assert all(block['ambiguous'] and not block.get('anchor_sequence') for block in competitors)
+
+
+def test_side_by_side_ui_tracks_do_not_form_a_caption_sequence():
+    from app.ocr.subtitle_tracker import stabilize_ambiguous_blocks
+
+    def stable(start):
+        return {'start': start, 'end': start+20, 'roi': (0., .42, 1., .53),
+                'ambiguous': False, 'candidates': [
+                    {'score': .7, 'roi': (.3, .45, .7, .505), 'times': [start, start+2]}]}
+
+    blocks = [stable(i*20) for i in range(5)]
+    ui = []
+    for start, x in ((180, .2), (200, .6)):
+        block = {'start': start, 'end': start+20, 'roi': (0., .42, 1., .53),
+                 'ambiguous': True, 'candidates': [
+                     {'score': .7, 'roi': (x, .45, x+.2, .505), 'times': [start, start+2]}]}
+        ui.append(block)
+    blocks += ui
+    blocks += [stable(300+i*20) for i in range(5)]
+    stabilize_ambiguous_blocks(blocks)
+    assert all(block['ambiguous'] and not block.get('anchor_sequence') for block in ui)

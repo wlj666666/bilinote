@@ -175,8 +175,9 @@ def stabilize_ambiguous_blocks(blocks):
     centers = [(block['roi'][1] + block['roi'][3]) / 2 for _, block in reliable]
     durations = [block['end'] - block['start'] for _, block in reliable]
     total = sum(durations)
-    if total < 60:
-        return blocks
+    window_span = max(durations)
+    nearby_limit = 3*window_span
+    short_limit = window_span
     anchor = max(centers, key=lambda center: sum(
         duration for other, duration in zip(centers, durations) if abs(other-center) <= .04))
     stable = [(index, block) for (index, block), center in zip(reliable, centers)
@@ -204,6 +205,42 @@ def stabilize_ambiguous_blocks(blocks):
     if len(trusted) < 5 or sum(block['end']-block['start'] for _, block in trusted) < total*.5:
         return blocks
 
+    # A long ambiguous stretch can still contain a continuous caption track.
+    # Match neighboring candidate geometry and use each block's own duration
+    # as the continuity scale, so this works for different video lengths and
+    # window sizes without a whole-video dominance or fixed-second threshold.
+    matching = {}
+    for index, block in enumerate(blocks):
+        if block.get('ambiguous'):
+            candidates = [candidate for candidate in block.get('candidates', [])
+                          if looks_like_caption(candidate)]
+            if candidates:
+                matching[index] = max(candidates, key=lambda candidate: candidate['score'])
+
+    def connected(left_index, right_index):
+        left, right = blocks[left_index], blocks[right_index]
+        left_box, right_box = matching[left_index]['roi'], matching[right_index]['roi']
+        left_height = left_box[3]-left_box[1]
+        right_height = right_box[3]-right_box[1]
+        left_width = left_box[2]-left_box[0]
+        right_width = right_box[2]-right_box[0]
+        gap = right['start']-left['end']
+        return (gap <= max(left['end']-left['start'], right['end']-right['start'])
+                and abs((left_box[1]+left_box[3]-right_box[1]-right_box[3])/2)
+                <= max(left_height, right_height)*.65
+                and abs((left_box[0]+left_box[2]-right_box[0]-right_box[2])/2)
+                <= max(left_width, right_width)*.5)
+
+    sequence_supported = set()
+    # A comparable second layout may be real captions at another position.
+    # Extend long uncertain runs only when the established band has more than
+    # twice the reliable duration of every competing region combined.
+    if stable_seconds > 2*(total-stable_seconds):
+        matching_indices = list(matching)
+        for left_index, right_index in zip(matching_indices, matching_indices[1:]):
+            if connected(left_index, right_index):
+                sequence_supported.update((left_index, right_index))
+
     for index, block in enumerate(blocks):
         before = next((good for pos, good in reversed(trusted) if pos < index), None)
         after = next((good for pos, good in trusted if pos > index), None)
@@ -211,17 +248,31 @@ def stabilize_ambiguous_blocks(blocks):
             continue
         before_gap = block['start']-before['end']
         after_gap = after['start']-block['end']
+        if block.get('roi') is None:
+            # A static caption can score zero in sparse probes. Only scan a
+            # short gap bracketed by reliable blocks at the same local scale.
+            duration = block['end']-block['start']
+            before_duration = before['end']-before['start']
+            after_duration = after['end']-after['start']
+            if (duration <= max(before_duration, after_duration)
+                    and before_gap <= max(before_duration, duration)
+                    and after_gap <= max(after_duration, duration)):
+                block['roi'] = typical_band
+                block['caption_candidate'] = typical_box
+                block['anchor_fallback'] = True
+                block['anchored'] = True
+            continue
         if not block.get('ambiguous'):
             candidate = block['candidates'][0] if block.get('candidates') else None
             if candidate and abs((block['roi'][1]+block['roi'][3])/2-anchor) <= .04 and looks_like_caption(candidate):
                 continue
-            limit = 60 if abs((block['roi'][1]+block['roi'][3])/2-anchor) <= .04 else 25
+            limit = nearby_limit if abs((block['roi'][1]+block['roi'][3])/2-anchor) <= .04 else short_limit
             if before_gap <= limit and after_gap <= limit:
                 block['roi'] = typical_band
                 block['caption_candidate'] = typical_box
                 block['profile_override'] = True
             continue
-        if before_gap > 60 or after_gap > 60:
+        if (before_gap > nearby_limit or after_gap > nearby_limit) and index not in sequence_supported:
             continue
         matches = []
         for candidate in block.get('candidates', []):
@@ -233,7 +284,7 @@ def stabilize_ambiguous_blocks(blocks):
             h = y2-y1
             block['roi'] = (0., max(0., y1-h*.4), 1., min(1., y2+h*.4))
             block['caption_candidate'] = chosen['roi']
-        elif before_gap <= 25 and after_gap <= 25:
+        elif before_gap <= short_limit and after_gap <= short_limit:
             # Sparse probes can miss a short caption even between stable bands.
             # OCR still has to find a real caption-shaped box in each frame.
             block['roi'] = typical_band
@@ -243,6 +294,8 @@ def stabilize_ambiguous_blocks(blocks):
             continue
         block['ambiguous'] = False
         block['anchored'] = True
+        if index in sequence_supported and (before_gap > nearby_limit or after_gap > nearby_limit):
+            block['anchor_sequence'] = True
     return blocks
 
 

@@ -113,6 +113,38 @@ def test_switching_ocr_device_invalidates_text_cache(generator, monkeypatch):
         engine.return_value.extract.assert_called_once()
 
 
+def test_ocr_pipeline_version_invalidates_text_cache(generator, monkeypatch):
+    with patch.object(module, 'HardSubtitleExtractor') as engine:
+        engine.return_value.extract.return_value = ExtractionResult('success', transcript('hard_subtitle_ocr'), {})
+        assert run(generator, 'ocr') is not None
+        engine.return_value.extract.reset_mock()
+        monkeypatch.setattr(module, 'PIPELINE_VERSION', module.PIPELINE_VERSION+1)
+        assert run(generator, 'ocr') is not None
+        engine.return_value.extract.assert_called_once()
+
+
+def test_review_progress_uses_existing_extraction_state(generator):
+    def extract(video_path, diagnostic_path, progress):
+        progress('detect', .5)
+        progress('extract', .9)
+        progress('review', .5)
+        return ExtractionResult('success', transcript('hard_subtitle_ocr'), {})
+    with patch.object(module, 'HardSubtitleExtractor') as engine:
+        engine.return_value.extract.side_effect = extract
+        assert run(generator, 'ocr') is not None
+    messages = [call.args for call in generator._update_status.call_args_list]
+    assert any(args[1] == module.TaskStatus.EXTRACTING_SUBTITLES and args[2] == '复查字幕，已处理 50%'
+               for args in messages if len(args)>2)
+
+
+def test_ocr_version_change_preserves_existing_asr_cache(generator, monkeypatch):
+    assert run(generator, 'asr') is not None
+    generator._transcribe_audio.reset_mock()
+    monkeypatch.setattr(module, 'PIPELINE_VERSION', module.PIPELINE_VERSION+1)
+    assert run(generator, 'asr') is not None
+    generator._transcribe_audio.assert_not_called()
+
+
 def test_cache_requires_identity_and_preserves_source(tmp_path):
     path = tmp_path/'text.json'
     data = asdict(transcript('hard_subtitle_ocr'))

@@ -35,13 +35,17 @@ def main():
     timings = {'total_seconds': round(finished-started, 3)}
     if 'extract' in phases:
         timings.update(detect_seconds=round(phases['extract']-started, 3),
-                       extract_seconds=round(finished-phases['extract'], 3))
+                       extract_seconds=round(phases.get('review', finished)-phases['extract'], 3))
+    if 'review' in phases:
+        timings['review_seconds'] = round(finished-phases['review'], 3)
     result.diagnostics['benchmark'] = timings
     atomic_json(args.output, result.diagnostics)
     print(f'{result.status}: {result.message}; timings={timings}', flush=True)
     if result.transcript:
         print(f'segments={len(result.transcript.segments)}')
         print(result.transcript.full_text[:500])
+    print('quality=' + str({key: result.diagnostics.get(key) for key in (
+        'verified_no_subtitle_seconds', 'unresolved_gap_seconds', 'quality_reasons')}), flush=True)
     return 0 if result.status == 'success' else 1
 
 

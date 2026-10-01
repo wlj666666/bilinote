@@ -61,7 +61,9 @@ class OCREngine:
     def read(self, image) -> list[TextBox]:
         import numpy as np
         # PyAV emits RGB; RapidOCR's ndarray input follows OpenCV's BGR convention.
-        result = self.engine(np.ascontiguousarray(image[:, :, ::-1]))
+        # RapidOCR's call flags persist on the instance. Restore them after a
+        # detection-only review, otherwise subsequent reads silently omit text.
+        result = self.engine(np.ascontiguousarray(image[:, :, ::-1]), use_det=True, use_cls=True, use_rec=True)
         if result.boxes is None or result.txts is None:
             return []
         height, width = image.shape[:2]
@@ -76,3 +78,16 @@ class OCREngine:
                 text, float(score),
             ))
         return output
+
+    def detect(self, image) -> list[TextBox]:
+        """Retain detection evidence even when recognition returns no text."""
+        import numpy as np
+        result = self.engine(np.ascontiguousarray(image[:, :, ::-1]),
+                             use_det=True, use_cls=False, use_rec=False)
+        if result.boxes is None:
+            return []
+        height, width = image.shape[:2]
+        scores = result.scores if result.scores is not None else [0.] * len(result.boxes)
+        return [TextBox((float(box[:, 0].min())/width, float(box[:, 1].min())/height,
+                         float(box[:, 0].max())/width, float(box[:, 1].max())/height),
+                        '', float(score)) for box, score in zip(result.boxes, scores)]

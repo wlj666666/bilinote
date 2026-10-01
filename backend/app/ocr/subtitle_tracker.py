@@ -39,6 +39,24 @@ def within_caption_band(box):
 class Track:
     observations: list = field(default_factory=list)
 
+    def distance(self, item):
+        """Compare to a robust baseline, rather than following the last UI box."""
+        recent = [b.box for _, b in self.observations[-12:]]
+        height = median(b[3]-b[1] for b in recent)
+        baseline = median(b[3] for b in recent)
+        new = item.box
+        nh = new[3]-new[1]
+        if not .7 <= nh/max(height, .001) <= 1.45:
+            return float('inf')
+        vertical = abs(new[3]-baseline)/max(height, .001)
+        # At least one alignment must remain stable as a caption grows/shrinks.
+        horizontal = min(abs(new[0]-median(b[0] for b in recent)),
+                         abs(new[2]-median(b[2] for b in recent)),
+                         abs((new[0]+new[2])/2-median((b[0]+b[2])/2 for b in recent)))
+        if vertical > .35 or horizontal > .055:
+            return float('inf')
+        return vertical + horizontal/.055 + abs(nh/height-1)
+
     def matches(self, item):
         old = self.observations[-1][1].box
         new = item.box
@@ -52,7 +70,9 @@ class Track:
         texts = [b.text for _, b in self.observations]
         groups = []
         for text in texts:
-            if not any(similarity(text, old) >= .78 for old in groups):
+            protected = re.findall(r'\d+|不|没|无|非|[+<>=]', text)
+            if not any(similarity(text, old) >= .78
+                       and protected == re.findall(r'\d+|不|没|无|非|[+<>=]', old) for old in groups):
                 groups.append(text)
         presence = len(set(t for t, _ in self.observations)) / max(samples, 1)
         confidence = sum(b.score for _, b in self.observations) / max(len(texts), 1)
@@ -74,7 +94,10 @@ def locate(samples):
             x1, y1, x2, y2 = item.box
             if item.score < .65 or len(normalized(item.text)) < 2 or not .008 <= y2-y1 <= .13:
                 continue
-            match = next((i for i, tr in enumerate(tracks) if i not in used and tr.matches(item)), None)
+            choices = [(tr.distance(item), i) for i, tr in enumerate(tracks) if i not in used]
+            distance, match = min(choices, default=(float('inf'), None))
+            if distance == float('inf'):
+                match = None
             if match is None:
                 tracks.append(Track())
                 match = len(tracks)-1
@@ -90,6 +113,17 @@ def locate(samples):
                            "examples": [b.text for _, b in track.observations][:6],
                            "distinct": track.metrics(len(samples))[1],
                            "times": sorted(set(t for t, _ in track.observations))})
+        # A union box is useful for cropping, but is not a font/position model.
+        geometry = tuple(median(b[axis] for b in boxes) for axis in range(4))
+        alignments = {
+            'center': [(b[0]+b[2])/2 for b in boxes],
+            'left': [b[0] for b in boxes], 'right': [b[2] for b in boxes],
+        }
+        alignment = min(alignments, key=lambda key: median(abs(v-median(alignments[key])) for v in alignments[key]))
+        candidates[-1].update(geometry=geometry, alignment=alignment,
+                              anchor=median(alignments[alignment]),
+                              height=median(b[3]-b[1] for b in boxes),
+                              baseline=median(b[3] for b in boxes))
     if not candidates or candidates[0]["score"] < .28:
         return None, candidates, False
     best = candidates[0]

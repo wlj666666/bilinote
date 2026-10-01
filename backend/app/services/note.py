@@ -39,9 +39,13 @@ from app.utils.status_code import StatusCode
 from app.utils.video_helper import generate_screenshot
 from app.utils.video_reader import VideoReader
 from app.services.hard_subtitle_extractor import HardSubtitleExtractor, PIPELINE_VERSION, atomic_json
+
 from app.utils.path_helper import get_app_dir
 from app.utils.logger import get_logger
 from app.services.model_capabilities import saved_image_capability
+
+# Preserve the existing ASR cache signature when only the OCR algorithm changes.
+ASR_CACHE_POLICY_VERSION = 3
 
 # ------------------ 环境变量与全局配置 ------------------
 
@@ -156,7 +160,8 @@ class NoteGenerator:
                 identity.update(size=local_path.stat().st_size, mtime=local_path.stat().st_mtime_ns)
             input_key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
             policy = {"input_key": input_key, "method": text_extraction_method,
-                      "version": PIPELINE_VERSION, "fps": os.getenv("OCR_FPS", "5"),
+                      "version": PIPELINE_VERSION if text_extraction_method == "ocr" else ASR_CACHE_POLICY_VERSION,
+                      "fps": os.getenv("OCR_FPS", "5"),
                       "asr_model": self.model_size, "asr_engine": self.transcriber_type,
                       "audio_quality": str(quality), "ocr_model": "rapidocr-3.9.2-ppocrv6"}
             if text_extraction_method == "ocr":
@@ -190,7 +195,7 @@ class NoteGenerator:
                         if value != last_progress[0]:
                             last_progress[0] = value
                             state = TaskStatus.DETECTING_SUBTITLES if phase == "detect" else TaskStatus.EXTRACTING_SUBTITLES
-                            label = "定位字幕" if phase == "detect" else "提取字幕"
+                            label = {"detect": "定位字幕", "extract": "提取字幕", "review": "复查字幕"}.get(phase, "提取字幕")
                             self._update_status(task_id, state, f"{label}，已处理 {value[1]}%")
                     result = HardSubtitleExtractor().extract(
                         self.video_path, NOTE_OUTPUT_DIR / f"{task_id}_ocr_diagnostics.json", report_progress)

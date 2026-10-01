@@ -150,9 +150,12 @@ def test_static_closing_caption_continues_established_region(tmp_path, end_card)
     probes = [(float(i), np.zeros((100,100,3), dtype=np.uint8)) for i in range(0,30,2)]
     reads = [[] if end_card and i>=24 else [box(captions[(i//2)%4] if i<20 else '感谢观看')] for i in range(0,30,2)]
     recognition = [(i*.2, np.zeros((100,100,3), dtype=np.uint8)) for i in range(150)]
-    engine.read.side_effect = reads + [[] if end_card and ts>=24 else [TextBox((.3, .22, .7, .78), '字幕内容' if ts<20 else '感谢观看', .98)] for ts,_ in recognition]
+    recognition_reads = [[] if end_card and ts>=24 else [TextBox((.3, .22, .7, .78), '字幕内容' if ts<20 else '感谢观看', .98)] for ts,_ in recognition]
+    # Trusted context is retained; review only reads the subsequent blank frames.
+    engine.read.side_effect = reads + recognition_reads + [[]]*100
     extractor = HardSubtitleExtractor(engine=engine)
-    with patch.object(extractor, 'duration', return_value=30.), patch.object(extractor, 'frames', side_effect=[iter(probes),iter(recognition)]):
+    review = [(ts, image) for ts, image in recognition if ts >= 23.8]
+    with patch.object(extractor, 'duration', return_value=30.), patch.object(extractor, 'frames', side_effect=[iter(probes),iter(recognition),iter(review)]):
         result = extractor.extract('unused',tmp_path/'report.json')
     # A six-second blank exceeds the quality gate for this short synthetic clip;
     # the diagnostic transcript must still preserve the final spoken caption.

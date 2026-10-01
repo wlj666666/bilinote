@@ -13,9 +13,10 @@ import toast from 'react-hot-toast'
 
 interface ModelSelectorProps {
   providerId: string
+  onSaved?: () => Promise<void>
 }
 
-export function ModelSelector({ providerId }: ModelSelectorProps) {
+export function ModelSelector({ providerId, onSaved }: ModelSelectorProps) {
   const { models, loading, selectedModel, loadModels, setSelectedModel, addNewModel } =
     useModelStore()
   const [search, setSearch] = useState('')
@@ -41,6 +42,7 @@ export function ModelSelector({ providerId }: ModelSelectorProps) {
     try {
       setSubmitting(true)
       await addNewModel(providerId, selectedModel)
+      await onSaved?.()
       toast.success('保存模型成功 🎉')
     } catch (error) {
       toast.error('保存失败')

@@ -42,6 +42,14 @@ def create_model(data: CreateModelRequest):
         return R.error("模型添加失败")
     return R.success(msg="模型添加成功")
 
+@router.post("/models/import_recommended/{provider_id}")
+def import_recommended_models(provider_id: str):
+    try:
+        models = modelService.import_recommended_models(provider_id)
+        return R.success(models, msg="已导入推荐模型")
+    except Exception as exc:
+        return R.error(str(exc))
+
 @router.get("/model_enable/{provider_id}")
 def get_enabled_models_by_provider(provider_id: str):
     try:

@@ -41,7 +41,7 @@ from app.utils.video_reader import VideoReader
 from app.services.hard_subtitle_extractor import HardSubtitleExtractor, PIPELINE_VERSION, atomic_json
 from app.utils.path_helper import get_app_dir
 from app.utils.logger import get_logger
-from app.services.model_capabilities import is_text_only_model
+from app.services.model_capabilities import saved_image_capability
 
 # ------------------ 环境变量与全局配置 ------------------
 
@@ -132,9 +132,10 @@ class NoteGenerator:
             self._update_status(task_id, TaskStatus.PARSING)
 
             self.summary_notice = ""
-            if video_understanding and is_text_only_model(model_name):
+            image_capability = saved_image_capability(provider_id, model_name)
+            if video_understanding and (image_capability is False or (provider_id == "qwen" and image_capability is not True)):
                 video_understanding = False
-                self.summary_notice = f"{model_name} 使用文字总结，已跳过画面理解"
+                self.summary_notice = f"{model_name} 未确认支持图片输入，已跳过画面理解"
                 logger.warning("task_id=%s %s", task_id, self.summary_notice)
 
             # 获取下载器与 GPT 实例

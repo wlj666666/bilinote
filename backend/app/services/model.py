@@ -1,6 +1,6 @@
 
 
-from app.db.model_dao import insert_model, get_all_models, get_model_by_provider_and_name, delete_model
+from app.db.model_dao import insert_model, get_all_models, get_model_by_provider_and_name, delete_model, upsert_models
 from app.db.provider_dao import get_enabled_providers
 from app.enmus.exception import ProviderErrorEnum
 from app.exceptions.provider import ProviderError
@@ -8,6 +8,10 @@ from app.gpt.gpt_factory import GPTFactory
 from app.gpt.provider.OpenAI_compatible_provider import OpenAICompatibleProvider
 from app.models.model_config import ModelConfig
 from app.services.provider import ProviderService
+from app.services.model_capabilities import (
+    RECOMMENDED_CAPABILITIES, RECOMMENDED_QWEN_MODELS,
+    is_text_only_model, qwen_catalog_image_capability,
+)
 from app.utils.logger import get_logger
 
 logger=get_logger(__name__)
@@ -71,8 +75,16 @@ class ModelService:
                 "id": model.get("id"),
                 "provider_id": model.get("provider_id"),
                 "model_name": model.get("model_name"),
+                "supports_image_input": model.get("supports_image_input"),
                 "created_at": model.get("created_at", None),  # 如果有created_at字段
             })
+        recommended_order = {name: index for index, (name, _) in enumerate(RECOMMENDED_QWEN_MODELS)}
+        formatted.sort(key=lambda model: (
+            0 if model["provider_id"] == "qwen" and model["model_name"] == "qwen-plus" else
+            1 if model["provider_id"] == "qwen" and model["model_name"] in recommended_order else 2,
+            recommended_order.get(model["model_name"], -1),
+            model["provider_id"], model["model_name"],
+        ))
         return formatted
     @staticmethod
     def get_enabled_models_by_provider( provider_id: str|int,):
@@ -186,7 +198,7 @@ class ModelService:
             print(f"[{model_id}] <UNK>: {e}")
             return False
     @staticmethod
-    def add_new_model(provider_id: int, model_name: str) -> bool:
+    def add_new_model(provider_id: str, model_name: str) -> bool:
         try:
             # 先查供应商是否存在
             provider = ProviderService.get_provider_by_id(provider_id)
@@ -200,13 +212,29 @@ class ModelService:
                 print(f"模型 {model_name} 已存在于供应商ID {provider_id} 下，跳过插入")
                 return False
 
-            # 插入模型
-            insert_model(provider_id=provider_id, model_name=model_name)
+            # The catalog is the source of truth for arbitrary Qwen model IDs.
+            capability = qwen_catalog_image_capability(provider, model_name)
+            if capability is None and provider_id == "qwen":
+                capability = RECOMMENDED_CAPABILITIES.get(model_name)
+                if capability is None and is_text_only_model(model_name):
+                    capability = False
+            insert_model(
+                provider_id=provider_id, model_name=model_name,
+                supports_image_input=capability,
+            )
             print(f"模型 {model_name} 已成功添加到供应商ID {provider_id}")
             return True
         except Exception as e:
             print(f"添加模型失败: {e}")
             return False
+
+    @staticmethod
+    def import_recommended_models(provider_id: str) -> list[dict]:
+        provider = ProviderService.get_provider_by_id(provider_id)
+        if not provider or provider_id != "qwen" or not provider.get("api_key"):
+            raise ValueError("请先配置 Qwen 供应商的 API Key")
+        # Idempotent: existing rows, including the user's qwen-plus, are preserved.
+        return upsert_models(provider_id, RECOMMENDED_QWEN_MODELS)
 
 if __name__ == '__main__':
     # 单个 Provider 测试

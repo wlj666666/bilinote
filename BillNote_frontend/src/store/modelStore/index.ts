@@ -18,9 +18,10 @@ interface IModel {
 }
 
 interface IModelListItem {
-  id: string
+  id: number
   provider_id: string
   model_name: string
+  supports_image_input: boolean | null
   created_at?: string
 }
 
@@ -50,7 +51,7 @@ export const useModelStore = create<ModelStore>()(
     loadEnabledModels: async () => {
       try {
         set({ loading: true })
-        const list = await fetchEnableModels()
+        const list = await fetchEnableModels() as unknown as IModelListItem[]
         set({ modelList: list })
       } catch (error) {
         set({ modelList: [] })
@@ -64,7 +65,7 @@ export const useModelStore = create<ModelStore>()(
     loadModels: async (providerId: string) => {
       try {
         set({ loading: true })
-        const res = await fetchModels(providerId)
+        const res = await fetchModels(providerId) as unknown as { models: IModel[] | { data: IModel[] } }
 
         let models: IModel[] = []
 
@@ -87,7 +88,7 @@ export const useModelStore = create<ModelStore>()(
     //  单独获取某个供应商下已启用模型
     loadModelsById: async (providerId: string) => {
       try {
-        const models = await fetchEnableModelById(providerId)
+        const models = await fetchEnableModelById(providerId) as unknown as IModelListItem[]
         console.log('获取供应商模型成功:', models)
         return models
       } catch (error) {
@@ -96,32 +97,11 @@ export const useModelStore = create<ModelStore>()(
       }
     },
 
-    //  新增模型逻辑
+    // Save a model, then refresh the lists actually used by the home page.
     addNewModel: async (providerId: string, modelId: string) => {
-      try {
-        const res = await addModel({ provider_id: providerId, model_name: modelId })
-
-        if (res.code === 0) {
-          console.log('新增模型成功:', modelId)
-          set((state) => ({
-            models: [
-              ...state.models,
-              {
-                id: modelId,
-                created: Date.now(),
-                object: 'model',
-                owned_by: '',
-                permission: '',
-                root: '',
-              },
-            ],
-          }))
-        } else {
-          console.error('新增模型失败', res.msg)
-        }
-      } catch (error) {
-        console.error('添加模型出错', error)
-      }
+      await addModel({ provider_id: providerId, model_name: modelId })
+      const enabled = await fetchEnableModels() as unknown as IModelListItem[]
+      set({ modelList: enabled })
     },
 
     //  删除模型

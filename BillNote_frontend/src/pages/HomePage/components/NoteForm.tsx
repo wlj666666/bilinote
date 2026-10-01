@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from '@/components/ui/form.tsx'
 import { useEffect,useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
@@ -25,7 +25,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip.tsx'
 import { Checkbox } from '@/components/ui/checkbox.tsx'
-import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
   Select,
@@ -37,7 +36,6 @@ import {
 import { Input } from '@/components/ui/input.tsx'
 import { Textarea } from '@/components/ui/textarea.tsx'
 import { noteStyles, noteFormats, videoPlatforms } from '@/constant/note.ts'
-import { fetchModels } from '@/services/model.ts'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
@@ -139,7 +137,7 @@ const NoteForm = () => {
   /* ---- 全局状态 ---- */
   const { addPendingTask, currentTaskId, setCurrentTask, getCurrentTask, retryTask } =
     useTaskStore()
-  const { loadEnabledModels, modelList, showFeatureHint, setShowFeatureHint } = useModelStore()
+  const { loadEnabledModels, modelList } = useModelStore()
 
   /* ---- 表单 ---- */
   const form = useForm<z.input<typeof formSchema>, unknown, z.output<typeof formSchema>>({
@@ -149,6 +147,7 @@ const NoteForm = () => {
       platform: 'bilibili',
       quality: 'medium',
       model_name: modelList[0]?.model_name || '',
+      video_understanding: modelList[0]?.supports_image_input === true,
       style: 'minimal',
       video_interval: 6,
       grid_size: [2, 2],
@@ -161,7 +160,11 @@ const NoteForm = () => {
   const platform = useWatch({ control: form.control, name: 'platform' }) as string
   const videoUnderstandingEnabled = useWatch({ control: form.control, name: 'video_understanding' })
   const selectedModel = useWatch({ control: form.control, name: 'model_name' })
-  const textOnlyModel = /^qwen-(plus|turbo|max)(-latest|-\d{4}-\d{2}-\d{2})?$/.test((selectedModel || '').trim().toLowerCase())
+  const selectedModelInfo = modelList.find(m => m.model_name === selectedModel)
+  const supportsImageInput = selectedModelInfo?.supports_image_input === true
+  const videoUnderstandingAvailable = supportsImageInput || Boolean(
+    selectedModelInfo && selectedModelInfo.supports_image_input == null && selectedModelInfo.provider_id !== 'qwen'
+  )
   const editing = currentTask && currentTask.id
 
   const goModelAdd = () => {
@@ -173,6 +176,12 @@ const NoteForm = () => {
 
     return
   }, [])
+  useEffect(() => {
+    if (!currentTask && modelList.length > 0 && !form.getValues('model_name')) {
+      form.setValue('model_name', modelList[0].model_name)
+      form.setValue('video_understanding', modelList[0].supports_image_input === true)
+    }
+  }, [currentTask, modelList, form])
   useEffect(() => {
     if (!currentTask) return
     const { formData } = currentTask
@@ -207,10 +216,10 @@ const NoteForm = () => {
   const isGenerating = () => !['SUCCESS', 'FAILED', undefined].includes(getCurrentTask()?.status)
   const generating = isGenerating()
   useEffect(() => {
-    if (textOnlyModel && videoUnderstandingEnabled) {
+    if (modelList.length > 0 && !videoUnderstandingAvailable && videoUnderstandingEnabled) {
       form.setValue('video_understanding', false)
     }
-  }, [textOnlyModel, videoUnderstandingEnabled, form])
+  }, [modelList.length, videoUnderstandingAvailable, videoUnderstandingEnabled, form])
   const handleFileUpload = async (file: File, cb: (url: string) => void) => {
     const formData = new FormData()
     formData.append('file', file)
@@ -219,7 +228,7 @@ const NoteForm = () => {
 
     try {
   
-      const  data  = await uploadFile(formData)
+      const data = await uploadFile(formData) as unknown as { url: string }
         cb(data.url)
         setUploadSuccess(true)
     } catch (err) {
@@ -232,13 +241,17 @@ const NoteForm = () => {
 
   const onSubmit = async (values: NoteFormValues) => {
     localStorage.setItem("text-extraction-method", values.text_extraction_method)
-    console.log('Not even go here')
+    const chosenModel = modelList.find(m => m.model_name === values.model_name)
+    if (!chosenModel) {
+      toast.error('所选模型已不可用，请重新选择')
+      return
+    }
     const payload = {
       ...values,
-      video_understanding: Boolean(values.video_understanding && !textOnlyModel),
+      video_understanding: Boolean(values.video_understanding && (chosenModel.supports_image_input === true || (chosenModel.supports_image_input == null && chosenModel.provider_id !== 'qwen'))),
       video_url:
         values.platform === 'local' ? values.video_url || '' : withScheme(values.video_url || ''),
-      provider_id: modelList.find(m => m.model_name === values.model_name)!.provider_id,
+      provider_id: chosenModel.provider_id,
       task_id: currentTaskId || '',
     }
     if (currentTaskId) {
@@ -414,7 +427,6 @@ const NoteForm = () => {
             {
 
              modelList.length>0?(     <FormField
-               className="w-full"
                control={form.control}
                name="model_name"
                render={({ field }) => (
@@ -425,7 +437,14 @@ const NoteForm = () => {
                        loadEnabledModels()
                      }}
                      value={field.value}
-                     onValueChange={field.onChange}
+                     onValueChange={modelName => {
+                       field.onChange(modelName)
+                       const canReadImages = modelList.find(m => m.model_name === modelName)?.supports_image_input === true
+                       form.setValue('video_understanding', canReadImages)
+                       if (!canReadImages) {
+                         form.setValue('format', (form.getValues('format') || []).filter(value => value !== 'screenshot'))
+                       }
+                     }}
                      defaultValue={field.value}
                    >
                      <FormControl>
@@ -436,7 +455,7 @@ const NoteForm = () => {
                      <SelectContent>
                        {modelList.map(m => (
                          <SelectItem key={m.id} value={m.model_name}>
-                           {m.model_name}
+                           {m.model_name}{m.supports_image_input === true ? ' · 可读图' : m.supports_image_input === false ? ' · 纯文本' : ' · 能力待确认'}
                          </SelectItem>
                        ))}
                      </SelectContent>
@@ -457,7 +476,6 @@ const NoteForm = () => {
 
             {/* 笔记风格 */}
             <FormField
-              className="w-full"
               control={form.control}
               name="style"
               render={({ field }) => (
@@ -510,14 +528,14 @@ const NoteForm = () => {
             <FormField
               control={form.control}
               name="video_understanding"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <div className="flex items-center gap-2">
                     <FormLabel>启用</FormLabel>
                     <Checkbox
                       checked={videoUnderstandingEnabled}
-                      disabled={textOnlyModel}
-                      onCheckedChange={v => form.setValue('video_understanding', v)}
+                      disabled={!videoUnderstandingAvailable}
+                      onCheckedChange={v => form.setValue('video_understanding', v === true)}
                     />
                   </div>
                   <FormMessage />
@@ -569,9 +587,13 @@ const NoteForm = () => {
             </div>
             <Alert variant="warning" className="text-sm">
               <AlertDescription>
-                <strong>提示：</strong>{textOnlyModel
-                  ? '当前模型使用字幕或转写文字生成总结；画面理解需要选择视觉模型。'
-                  : '视频理解功能必须使用多模态模型。长视频会在全片均匀采样，控制图片数量。'}
+                <strong>提示：</strong>{supportsImageInput
+                  ? '当前模型支持图片输入，选择时会自动开启视频理解；你也可以手动关闭。长视频会均匀采样截图。'
+                  : selectedModelInfo?.supports_image_input === false
+                    ? '当前模型只使用字幕或转写文字生成总结；画面理解需要选择可读图模型。'
+                    : selectedModelInfo?.provider_id === 'qwen'
+                      ? '当前阿里云模型的图片输入能力尚未确认，暂不能开启视频理解。'
+                      : '当前模型的图片输入能力尚未确认，可手动开启视频理解并自行测试。'}
               </AlertDescription>
             </Alert>
           </div>

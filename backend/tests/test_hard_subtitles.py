@@ -143,6 +143,46 @@ def test_crop_edge_shapes_are_rejected_without_dropping_real_single_characters()
     assert within_caption_band(TextBox((.1,.04,.9,.80),'We learn about OCR',.99))
 
 
+def test_unchanged_band_reuses_ocr_but_single_character_change_is_read(tmp_path):
+    engine = Mock()
+    engine.supports_visual_reuse = True
+    band_reads = []
+
+    def read(image):
+        if image.shape[0] == 100:  # Full-frame localization probes.
+            return [box('定位字幕')]
+        changed = image[:, 50, :].max() > 3
+        band_reads.append(changed)
+        return [TextBox((.3, .2, .7, .6), 'C++' if changed else 'C', .99)]
+
+    engine.read.side_effect = read
+    layout = {'id': 0, 'lines': [{'height': .05, 'baseline': .9,
+                                 'alignment': 'center', 'anchor': .5}],
+              'roi': (0., .83, 1., .95)}
+    blocks = [{'start': 0., 'end': 5., 'layout_id': 0,
+               'roi': layout['roi'], 'ambiguous': False}]
+    probes = [(float(t), np.zeros((100, 100, 3), dtype=np.uint8)) for t in (0, 2, 4)]
+    extraction = []
+    for i in range(25):
+        frame = np.zeros((100, 100, 3), dtype=np.uint8)
+        if i >= 6:
+            frame[88, 50] = 255  # A single changed glyph pixel must invalidate reuse.
+        extraction.append((round(i*.2, 1), frame))
+    extractor = HardSubtitleExtractor(engine=engine)
+    with (patch.object(extractor, 'duration', return_value=5.),
+          patch.object(extractor, 'frames', side_effect=[iter(probes), iter(extraction)]),
+          patch('app.services.hard_subtitle_extractor.learn_layouts', return_value=([layout], {})),
+          patch('app.services.hard_subtitle_extractor.resolve_layouts', return_value=blocks)):
+        result = extractor.extract('unused', tmp_path/'report.json')
+
+    assert result.status == 'success'
+    assert [segment.text for segment in result.transcript.segments] == ['C', 'C++']
+    assert result.transcript.segments[1].start == pytest.approx(1.2)
+    assert result.diagnostics['visual_reused_frames'] > 10
+    assert len(band_reads) == result.diagnostics['band_ocr_reads'] < len(extraction)
+    assert band_reads[:3] == [False, False, True]
+
+
 @pytest.mark.parametrize('end_card', [False, True])
 def test_static_closing_caption_continues_established_region(tmp_path, end_card):
     engine = Mock()

@@ -14,6 +14,10 @@ class TextBox:
 
 
 class OCREngine:
+    # The same subtitle-band pixels produce the same local OCR input. The
+    # extractor may reuse a recent result when every channel changes by <= 3.
+    supports_visual_reuse = True
+
     def __init__(self):
         try:
             from rapidocr import RapidOCR

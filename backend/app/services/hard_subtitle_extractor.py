@@ -224,6 +224,12 @@ class HardSubtitleExtractor:
             observations = {}
             evidence = {}
             edge_shapes = non_caption_shapes = 0
+            reused_frames = band_ocr_reads = 0
+            can_reuse = getattr(self.engine, 'supports_visual_reuse', False) is True
+            if can_reuse:
+                import cv2
+            previous_band = previous_result = previous_layout_id = None
+            previous_read_ts = float('-inf')
             last = -1.
             step = 1/self.fps
             started = time.monotonic()
@@ -233,9 +239,28 @@ class HardSubtitleExtractor:
                 block = blocks[max(0, bisect_right(starts, ts)-1)]
                 if block['ambiguous']:
                     evidence[slot] = dict(time=ts, state='ambiguous')
+                    previous_band = previous_result = previous_layout_id = None
                 else:
                     layout = layouts[block['layout_id']]
-                    text, score, state, edge, rejected = self._read_band(image, block['roi'], layout)
+                    band = self._crop(image, block['roi']) if can_reuse else None
+                    reuse = (previous_band is not None and previous_layout_id == layout['id']
+                             and previous_result[2] in {'text', 'blank'}
+                             and ts-previous_read_ts < 1.-1e-6
+                             and previous_band.shape == band.shape
+                             and cv2.norm(band, previous_band, cv2.NORM_INF) <= 3)
+                    if reuse:
+                        text, score, state, edge, rejected = previous_result
+                        reused_frames += 1
+                    else:
+                        text, score, state, edge, rejected = self._read_band(image, block['roi'], layout)
+                        band_ocr_reads += 1
+                        if can_reuse and state in {'text', 'blank'}:
+                            previous_band = band.copy()
+                            previous_result = (text, score, state, edge, rejected)
+                            previous_layout_id = layout['id']
+                            previous_read_ts = ts
+                        else:
+                            previous_band = previous_result = previous_layout_id = None
                     edge_shapes += edge
                     non_caption_shapes += rejected
                     evidence[slot] = dict(time=ts, state=state)
@@ -245,6 +270,8 @@ class HardSubtitleExtractor:
             if last < 0 or duration-last > max(1., step*3):
                 raise ValueError('视频识别提前结束，请重试')
             timings['extract_seconds'] = time.monotonic()-started
+            report['visual_reused_frames'] = reused_frames
+            report['band_ocr_reads'] = band_ocr_reads
             segments = merge_observations(sorted(observations.values()), step, duration)
             initial_gaps = classify_gaps(segments, duration, evidence, step)
             intervals = plan_review(initial_gaps, duration, step)

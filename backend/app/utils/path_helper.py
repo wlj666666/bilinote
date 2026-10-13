@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+from app.services.storage_scope import scoped_runtime_dir
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 
@@ -15,7 +16,7 @@ def get_data_dir():
 
     data_path = os.path.join(base_dir, "data")
     os.makedirs(data_path, exist_ok=True)
-    return data_path
+    return str(scoped_runtime_dir(data_path))
 
 
 def get_model_dir(subdir: str = "whisper") -> str:
@@ -47,4 +48,4 @@ def get_app_dir(subdir: str = "") -> str:
 
     full_path = os.path.join(base_dir, subdir)
     os.makedirs(full_path, exist_ok=True)
-    return full_path
+    return str(scoped_runtime_dir(full_path))

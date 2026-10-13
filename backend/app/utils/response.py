@@ -2,6 +2,7 @@ from fastapi.responses import JSONResponse
 from app.utils.status_code import StatusCode
 from pydantic import BaseModel
 from typing import Optional, Any
+from app.utils.secrets import redact_secrets
 
 
 from fastapi.responses import JSONResponse
@@ -19,6 +20,6 @@ class ResponseWrapper:
     def error(msg="error", code=500, data=None):
         return JSONResponse(content={
             "code": code,
-            "msg": str(msg),
+            "msg": redact_secrets(str(msg)),
             "data": data
         })

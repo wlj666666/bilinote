@@ -10,6 +10,8 @@ import StepBar from '@/pages/HomePage/components/StepBar.tsx'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneLight as lightCodeStyle } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import Zoom from 'react-medium-image-zoom'
+import PrivateImage from '@/components/PrivateImage'
+import PrivateLink from '@/components/PrivateLink'
 import 'react-medium-image-zoom/dist/styles.css'
 import gfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -176,7 +178,7 @@ function createMarkdownComponents(baseURL: string) {
       }
 
       return (
-        <a
+        <PrivateLink
           href={href}
           target="_blank"
           rel="noopener noreferrer"
@@ -187,7 +189,7 @@ function createMarkdownComponents(baseURL: string) {
           {href?.startsWith('http') && (
             <ExternalLink className="ml-0.5 inline-block h-3 w-3" />
           )}
-        </a>
+        </PrivateLink>
       )
     },
     img: ({ node, ...props }: any) => {
@@ -200,7 +202,7 @@ function createMarkdownComponents(baseURL: string) {
       return (
         <div className="my-8 flex justify-center">
           <Zoom>
-            <img
+            <PrivateImage
               {...props}
               className="max-w-full cursor-zoom-in rounded-lg object-cover shadow-md transition-all hover:shadow-lg"
               style={{ maxHeight: '500px' }}

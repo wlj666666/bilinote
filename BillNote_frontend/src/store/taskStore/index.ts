@@ -1,9 +1,9 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 import { delete_task, generateNote, type GenerateNoteRequest } from '@/services/note.ts'
 import { v4 as uuidv4 } from 'uuid'
 import toast from 'react-hot-toast'
-import { get, set, del } from 'idb-keyval'
+import request from '@/utils/request'
+import { getAuthToken } from '@/utils/authSession'
 
 
 export type TaskStatus = 'PENDING' | 'RUNNING' | 'PARSING' | 'DOWNLOADING' | 'DETECTING_SUBTITLES' | 'EXTRACTING_SUBTITLES' | 'TRANSCRIBING' | 'SUMMARIZING' | 'FORMATTING' | 'SAVING' | 'SUCCESS' | 'FAILED'
@@ -53,6 +53,9 @@ export interface Task {
 
 interface TaskStore {
   tasks: Task[]
+  ownerId: number | null
+  setOwner: (id: number | null) => void
+  loadTasks: () => Promise<void>
   currentTaskId: string | null
   addPendingTask: (taskId: string, platform: string, formData: GenerateNoteRequest) => void
   updateTaskContent: (id: string, data: Partial<Omit<Task, 'id' | 'createdAt'>>) => void
@@ -63,11 +66,28 @@ interface TaskStore {
   retryTask: (id: string, payload?: GenerateNoteRequest) => void
 }
 
-export const useTaskStore = create<TaskStore>()(
-  persist(
-    (set, get) => ({
+export const useTaskStore = create<TaskStore>((set, get) => ({
       tasks: [],
+      ownerId: null,
       currentTaskId: null,
+      setOwner: ownerId => set({ ownerId, tasks: [], currentTaskId: null }),
+      loadTasks: async () => {
+        const ownerId = get().ownerId
+        const token = getAuthToken()
+        if (ownerId == null || !token) return
+        const tasks: Task[] = []
+        let offset = 0
+        while (true) {
+          const page = await request.get<unknown, { tasks: Task[]; has_more: boolean }>('/tasks', { params: { offset, limit: 100 }, sessionToken: token })
+          if (ownerId !== get().ownerId || token !== getAuthToken()) return
+          tasks.push(...page.tasks)
+          if (!page.has_more) break
+          offset += 100
+        }
+        const selected = sessionStorage.getItem(`bilinote-current-task:${ownerId}`)
+        tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        set({ tasks, currentTaskId: tasks.some(t => t.id === selected) ? selected : null })
+      },
 
       addPendingTask: (taskId: string, platform: string, formData: any) =>
 
@@ -101,7 +121,7 @@ export const useTaskStore = create<TaskStore>()(
           currentTaskId: taskId, // 默认设置为当前任务
         })),
 
-      updateTaskContent: (id, data) =>
+      updateTaskContent: (id, data) => {
           set(state => ({
             tasks: state.tasks.map(task => {
               if (task.id !== id) return task
@@ -146,8 +166,12 @@ export const useTaskStore = create<TaskStore>()(
 
               return { ...task, ...data }
             }),
-          })),
-
+          }))
+          if (data.markdown !== undefined) {
+            const task = get().tasks.find(task => task.id === id)
+            if (task) void request.patch(`/tasks/${id}/display`, { markdown: task.markdown }, { suppressToast: true }).catch(() => {})
+          }
+      },
 
       getCurrentTask: () => {
         const currentTaskId = get().currentTaskId
@@ -209,41 +233,23 @@ export const useTaskStore = create<TaskStore>()(
 
 
       removeTask: async id => {
-        const task = get().tasks.find(t => t.id === id)
-
-        // 更新 Zustand 状态
-        set(state => ({
-          tasks: state.tasks.filter(task => task.id !== id),
-          currentTaskId: state.currentTaskId === id ? null : state.currentTaskId,
-        }))
-
-        // 调用后端删除接口（如果找到了任务）
-        if (task) {
-          await delete_task({
-            video_id: task.audioMeta.video_id,
-            platform: task.platform,
-          })
-        }
+        const ownerId = get().ownerId
+        try {
+          await delete_task({ task_id: id })
+          if (ownerId !== get().ownerId) return
+          set(state => ({ tasks: state.tasks.filter(task => task.id !== id), currentTaskId: state.currentTaskId === id ? null : state.currentTaskId }))
+        } catch { /* The request interceptor shows the error; keep the task visible. */ }
       },
 
       clearTasks: () => set({ tasks: [], currentTaskId: null }),
 
-      setCurrentTask: taskId => set({ currentTaskId: taskId }),
-    }),
-    {
-      name: 'task-storage',
-      storage: createJSONStorage(() => ({
-        getItem: async (name: string): Promise<string | null> => {
-          const value = await get(name)
-          return value ?? null
-        },
-        setItem: async (name: string, value: string): Promise<void> => {
-          await set(name, value)
-        },
-        removeItem: async (name: string): Promise<void> => {
-          await del(name)
-        },
-      })),
-    }
-  )
-)
+      setCurrentTask: taskId => {
+        const ownerId = get().ownerId
+        if (ownerId != null) {
+          const key = `bilinote-current-task:${ownerId}`
+          if (taskId) sessionStorage.setItem(key, taskId)
+          else sessionStorage.removeItem(key)
+        }
+        set({ currentTaskId: taskId })
+      },
+    }))

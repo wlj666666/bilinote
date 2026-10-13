@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import request from '@/utils/request'
+import { getAuthToken } from '@/utils/authSession'
 import type { ChatSource } from '@/services/chat'
 
 export interface ChatMessage {
@@ -10,34 +11,35 @@ export interface ChatMessage {
 
 interface ChatState {
   chatHistory: Record<string, ChatMessage[]>
-  addMessage: (taskId: string, msg: ChatMessage) => void
-  clearChat: (taskId: string) => void
+  addMessage: (taskId: string, message: ChatMessage) => void
+  clearChat: (taskId: string) => Promise<void>
+  loadHistory: (taskId: string) => Promise<void>
   getMessages: (taskId: string) => ChatMessage[]
 }
 
-export const useChatStore = create<ChatState>()(
-  persist(
-    (set, get) => ({
-      chatHistory: {},
-
-      addMessage: (taskId, msg) =>
-        set(state => ({
-          chatHistory: {
-            ...state.chatHistory,
-            [taskId]: [...(state.chatHistory[taskId] || []), msg],
-          },
-        })),
-
-      clearChat: (taskId) =>
-        set(state => {
-          const { [taskId]: _, ...rest } = state.chatHistory
-          return { chatHistory: rest }
-        }),
-
-      getMessages: (taskId) => get().chatHistory[taskId] || [],
-    }),
-    {
-      name: 'bilinote-chat-storage',
-    },
-  ),
-)
+// The server owns chat history. Private content is never hydrated from shared storage.
+export const useChatStore = create<ChatState>((set, get) => ({
+  chatHistory: {},
+  addMessage: (taskId, message) => set(state => ({ chatHistory: {
+    ...state.chatHistory, [taskId]: [...(state.chatHistory[taskId] || []), message],
+  } })),
+  loadHistory: async taskId => {
+    const token = getAuthToken()
+    const messages = await request.get<unknown, ChatMessage[]>('/chat/history', { params: { task_id: taskId } })
+    if (token !== getAuthToken()) return
+    set(state => ({ chatHistory: { ...state.chatHistory, [taskId]: messages } }))
+  },
+  clearChat: async taskId => {
+    const token = getAuthToken()
+    try {
+      await request.delete('/chat/history', { params: { task_id: taskId } })
+      if (token !== getAuthToken()) return
+      set(state => {
+        const history = { ...state.chatHistory }
+        delete history[taskId]
+        return { chatHistory: history }
+      })
+    } catch { /* Keep the history when the server rejects the request. */ }
+  },
+  getMessages: taskId => get().chatHistory[taskId] || [],
+}))

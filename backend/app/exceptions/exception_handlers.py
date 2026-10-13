@@ -10,10 +10,25 @@ from app.exceptions.provider import ProviderError
 from app.utils.logger import get_logger
 from app.utils.response import ResponseWrapper as R
 import traceback
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException
+from fastapi.responses import JSONResponse
+from app.utils.secrets import redact_secrets
 
 logger = get_logger(__name__)
 
 def register_exception_handlers(app: FastAPI):
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request: Request, exc: HTTPException):
+        return JSONResponse(status_code=exc.status_code, headers=exc.headers, content={
+            "code": exc.status_code, "msg": redact_secrets(str(exc.detail)), "data": None,
+        })
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        # FastAPI's default validation response echoes input, including passwords.
+        return JSONResponse(status_code=422, content={"code": 422, "msg": "请求参数不正确", "data": None})
+
     @app.exception_handler(BizException)
     async def biz_exception_handler(request: Request, exc: BizException):
         logger.error(f"BizException: {exc.code} - {exc.message}")

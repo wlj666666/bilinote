@@ -39,7 +39,7 @@ export async function addModel(
 }
 
 export const fetchEnableModels = async () => {
-  return await request.get('/model_list')
+  return await request.get('/available_models')
 }
 
 export const deleteModelById = async (modelId: number) => {

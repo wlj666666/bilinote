@@ -6,6 +6,8 @@ Chat function calling 工具定义与执行。
 import json
 import os
 from typing import Optional
+from pathlib import Path
+from app.services.user_data import require_task, task_notes_dir
 
 from app.utils.logger import get_logger
 
@@ -14,9 +16,17 @@ logger = get_logger(__name__)
 NOTE_OUTPUT_DIR = os.getenv("NOTE_OUTPUT_DIR", "note_results")
 
 
-def _load_note_data(task_id: str) -> Optional[dict]:
-    path = os.path.join(NOTE_OUTPUT_DIR, f"{task_id}.json")
+def _load_note_data(task_id: str, user_id: int | None = None) -> Optional[dict]:
+    task = require_task(task_id, user_id) if user_id is not None else None
+    directory = task_notes_dir(task, NOTE_OUTPUT_DIR) if task else Path(NOTE_OUTPUT_DIR)
+    path = directory / f'{task_id}.json'
     if not os.path.exists(path):
+        if task and task.display_data:
+            display = json.loads(task.display_data)
+            markdown = display.get('markdown') or ''
+            if isinstance(markdown, list):
+                markdown = markdown[0].get('content', '') if markdown else ''
+            return {'markdown': markdown, 'transcript': display.get('transcript') or {}, 'audio_meta': display.get('audioMeta') or {}}
         return None
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -84,9 +94,9 @@ TOOLS = [
 
 # ── 工具执行 ──────────────────────────────────────────────────
 
-def execute_tool(task_id: str, tool_name: str, arguments: dict) -> str:
+def execute_tool(task_id: str, tool_name: str, arguments: dict, user_id: int | None = None) -> str:
     """执行工具调用，返回结果字符串。"""
-    data = _load_note_data(task_id)
+    data = _load_note_data(task_id, user_id)
     if not data:
         return json.dumps({"error": "笔记数据不存在"}, ensure_ascii=False)
 

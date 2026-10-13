@@ -17,6 +17,7 @@ export const useTaskPolling = (interval = 3000) => {
   }, [tasks])
 
   useEffect(() => {
+    let cancelled = false
     const timer = setInterval(async () => {
       const pendingTasks = tasksRef.current.filter(
         task => task.status != 'SUCCESS' &&
@@ -31,6 +32,7 @@ export const useTaskPolling = (interval = 3000) => {
         else reconciledFailedTasks.current.delete(task.id)
         try {
           const res = await get_task_status(task.id)
+          if (cancelled) return
           const { status } = res
 
           if (status && (status !== task.status || res.message !== task.message)) {
@@ -51,12 +53,13 @@ export const useTaskPolling = (interval = 3000) => {
             }
           }
         } catch (e) {
+          if (cancelled) return
           console.error('❌ 任务轮询失败：', e)
           updateTaskContent(task.id, { status: 'FAILED' })
         }
       }
     }, interval)
 
-    return () => clearInterval(timer)
+    return () => { cancelled = true; clearInterval(timer) }
   }, [interval])
 }

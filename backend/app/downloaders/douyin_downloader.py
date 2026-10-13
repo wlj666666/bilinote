@@ -114,7 +114,6 @@ class DouyinDownloader(Downloader):
         super().__init__()
         self.headers_config = DouyinConfig.HEADERS.copy()
         self.headers_config["Cookie"] = cfm.get('douyin')
-        print(self.headers_config)
         self.proxies_config = DouyinConfig.PROXIES.copy()
         self.ttwid_config = DouyinConfig.TTWID.copy()
         self.ms_token_config = DouyinConfig.MS_TOKEN.copy()
@@ -182,7 +181,6 @@ class DouyinDownloader(Downloader):
 
             aweme_id = self.extract_video_id(video_url)
             kwargs = self.headers_config
-            print("@kwargs:", kwargs)
             base_params = BaseRequestModel().model_dump()
             base_params["msToken"] = self.gen_real_msToken()
 
@@ -190,17 +188,13 @@ class DouyinDownloader(Downloader):
             bogus = ABogus()
             ab_value = bogus.get_value(base_params)
             a_bogus = quote(ab_value, safe='')
-            print("@a_bogus:", a_bogus)
-            print(base_params)
             query_str = urlencode(base_params)
             full_url = f"{DOUYIN_DOMAIN}/aweme/v1/web/aweme/detail/?{query_str}&a_bogus={a_bogus}"
 
-            print("Request URL:", full_url)
 
 
             response = requests.get(full_url, headers=kwargs)
 
-            print("Response JSON:", response.content)
             return response.json()
         except Exception as e:
             print("请求失败:", e)

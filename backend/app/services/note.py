@@ -43,6 +43,7 @@ from app.services.hard_subtitle_extractor import HardSubtitleExtractor, PIPELINE
 from app.utils.path_helper import get_app_dir
 from app.utils.logger import get_logger
 from app.services.model_capabilities import saved_image_capability
+from app.services.storage_scope import scoped_notes_dir, current_scope, static_root
 
 # Preserve the existing ASR cache signature when only the OCR algorithm changes.
 ASR_CACHE_POLICY_VERSION = 3
@@ -84,6 +85,11 @@ class NoteGenerator:
         self.video_path: Optional[Path] = None
         self.video_img_urls=[]
         self.summary_notice = ""
+        self.note_output_dir = scoped_notes_dir(NOTE_OUTPUT_DIR)
+        self.note_output_dir.mkdir(parents=True, exist_ok=True)
+        scope = current_scope.get()
+        self.image_output_dir = static_root() / 'users' / str(scope.user_id) / scope.task_id / 'screenshots' if scope else Path(IMAGE_OUTPUT_DIR)
+        self.image_base_url = f'/api/files/static/users/{scope.user_id}/{scope.task_id}/screenshots' if scope else IMAGE_BASE_URL
         logger.info("NoteGenerator 初始化完成")
 
 
@@ -148,9 +154,9 @@ class NoteGenerator:
             gpt = self._get_gpt(model_name, provider_id)
 
             # 缓存文件路径
-            audio_cache_file = NOTE_OUTPUT_DIR / f"{task_id}_audio.json"
-            transcript_cache_file = NOTE_OUTPUT_DIR / f"{task_id}_transcript.json"
-            markdown_cache_file = NOTE_OUTPUT_DIR / f"{task_id}_markdown.md"
+            audio_cache_file = self.note_output_dir / f"{task_id}_audio.json"
+            transcript_cache_file = self.note_output_dir / f"{task_id}_transcript.json"
+            markdown_cache_file = self.note_output_dir / f"{task_id}_markdown.md"
             if text_extraction_method not in {"asr", "ocr"}:
                 raise ValueError("文字提取方式必须是 asr 或 ocr")
             # Bind retries to the input and extraction policy, never just a task ID.
@@ -198,7 +204,7 @@ class NoteGenerator:
                             label = {"detect": "定位字幕", "extract": "提取字幕", "review": "复查字幕"}.get(phase, "提取字幕")
                             self._update_status(task_id, state, f"{label}，已处理 {value[1]}%")
                     result = HardSubtitleExtractor().extract(
-                        self.video_path, NOTE_OUTPUT_DIR / f"{task_id}_ocr_diagnostics.json", report_progress)
+                        self.video_path, self.note_output_dir / f"{task_id}_ocr_diagnostics.json", report_progress)
                     if result.status != "success":
                         raise RuntimeError(result.message)
                     transcript = result.transcript
@@ -234,7 +240,13 @@ class NoteGenerator:
                     platform=platform,
                 )
 
-            markdown = prepend_source_link(markdown, str(video_url))
+            source_url = str(video_url)
+            scope = current_scope.get()
+            if scope and platform == 'local':
+                from app.services.user_data import require_task
+                record = require_task(task_id, scope.user_id)
+                source_url = json.loads(record.form_data or '{}').get('video_url') or source_url
+            markdown = prepend_source_link(markdown, source_url)
 
             # 5. 保存记录到数据库
             self._update_status(task_id, TaskStatus.SAVING)
@@ -314,7 +326,8 @@ class NoteGenerator:
             raise NoteError(code=NoteErrorEnum.PLATFORM_NOT_SUPPORTED.code,
                             message=NoteErrorEnum.PLATFORM_NOT_SUPPORTED.message)
         try:
-            instance = downloader_cls
+            # Downloaders hold Cookie/config and mutable state: instantiate per task.
+            instance = type(downloader_cls)()
         except Exception as e:
             logger.error(f"实例化下载器失败：{e}")
 
@@ -333,8 +346,8 @@ class NoteGenerator:
         if not task_id:
             return
 
-        NOTE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        status_file = NOTE_OUTPUT_DIR / f"{task_id}.status.json"
+        self.note_output_dir.mkdir(parents=True, exist_ok=True)
+        status_file = self.note_output_dir / f"{task_id}.status.json"
         print(f"写入状态文件: {status_file} 当前状态: {status}")
         data = {"status": status.value if isinstance(status, TaskStatus) else status}
         if message:
@@ -591,10 +604,14 @@ class NoteGenerator:
         matches: List[Tuple[str, int]] = extract_screenshot_timestamps(markdown)
         for idx, (marker, ts) in enumerate(matches):
             try:
-                img_path = generate_screenshot(str(video_path), str(IMAGE_OUTPUT_DIR), ts, idx)
+                img_path = generate_screenshot(str(video_path), str(self.image_output_dir), ts, idx)
+                scope = current_scope.get()
+                if scope:
+                    from app.services.user_data import register_file
+                    register_file('static', Path(img_path), scope.user_id, scope.task_id, static_root())
                 filename = Path(img_path).name
                 # 构建前端可访问的 URL，例如 /static/screenshots/{filename}
-                img_url = f"{IMAGE_BASE_URL.rstrip('/')}/{filename}"
+                img_url = f"{self.image_base_url.rstrip('/')}/{filename}"
                 markdown = markdown.replace(marker, f"![]({img_url})", 1)
             except Exception as exc:
                 logger.error(f"生成截图失败 (timestamp={ts})：{exc}")

@@ -60,6 +60,9 @@ async def lifespan(app: FastAPI):
 
         logger.info("[startup 2/5] init_db() — 初始化 SQLite 数据库")
         init_db()
+        from app.services.legacy_migration import migrate_legacy_data
+        migration = migrate_legacy_data()
+        logger.info('旧数据归属迁移: %s', migration)
 
         logger.info("[startup 3/5] TranscriberConfigManager — 读取转写器配置")
         # 转写器不再在启动时强制初始化，而是在首次生成笔记时按需创建。
@@ -72,6 +75,11 @@ async def lifespan(app: FastAPI):
 
         logger.info("[startup 4/5] seed_default_providers() — 初始化默认 LLM 供应商")
         seed_default_providers()
+        # Register stored secrets before requests can produce errors or logs.
+        from app.services.provider import ProviderService
+        from app.services.cookie_manager import CookieConfigManager
+        ProviderService.get_all_providers()
+        CookieConfigManager().list_all()
 
         # 把已配置的代理 export 到环境变量，让 huggingface_hub（whisper 模型下载）
         # 也能走代理——含转写时的按需下载（issue #417）。
@@ -118,8 +126,7 @@ app.add_middleware(
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 register_exception_handlers(app)
-app.mount(static_path, StaticFiles(directory=static_dir), name="static")
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+# Private files are served by authenticated routes in app.routers.files.
 
 
 

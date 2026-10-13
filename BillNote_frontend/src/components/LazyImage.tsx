@@ -2,23 +2,26 @@
 import { useInView } from 'react-intersection-observer'
 import { FC, useState } from 'react'
 import clsx from 'clsx'
+import { useCoverImage } from '@/hooks/useCoverImage'
 
 interface LazyImageProps {
     src: string
     alt?: string
     className?: string
     placeholder?: string
+    proxy?: boolean
 }
 
-const LazyImage: FC<LazyImageProps> = ({ src, alt, className, placeholder = '.src/assets/placeholder.png' }) => {
+const LazyImage: FC<LazyImageProps> = ({ src, alt, className, placeholder = '.src/assets/placeholder.png', proxy = false }) => {
     const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 })
     const [loaded, setLoaded] = useState(false)
+    const coverUrl = useCoverImage(proxy ? src : undefined, inView)
 
     return (
         <div ref={ref} className={clsx('overflow-hidden', className)}>
             {inView ? (
                 <img
-                    src={src}
+                    src={proxy ? coverUrl || undefined : src}
                     alt={alt}
                     loading="lazy"
                     onLoad={() => setLoaded(true)}

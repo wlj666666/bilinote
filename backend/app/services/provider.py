@@ -12,6 +12,7 @@ from app.db.provider_dao import (
 )
 from app.gpt.gpt_factory import GPTFactory
 from app.models.model_config import ModelConfig
+from app.utils.secrets import register_secret
 
 
 class ProviderService:
@@ -65,11 +66,14 @@ class ProviderService:
         }
     @staticmethod
     def mask_key(key: str) -> str:
-        if not key or len(key) < 8:
+        if not key:
+            return ''
+        if len(key) <= 8:
             return '*' * len(key)
         return key[:4] + '*' * (len(key) - 8) + key[-4:]
     @staticmethod
     def add_provider( name: str, api_key: str, base_url: str, logo: str, type_: str, enabled: int = 1):
+        register_secret(api_key)
         try:
             # 内置供应商（type='built-in'）只能由 seed 流程写入；API 创建一律落到 'custom'，
             # 否则历史上出现过批量伪内置脏数据
@@ -86,6 +90,7 @@ class ProviderService:
             raise
     @staticmethod
     def provider_to_dict(p: Provider):
+        register_secret(p.api_key)
         return {
             "id": p.id,
             "name": p.name,
@@ -107,7 +112,7 @@ class ProviderService:
     def get_all_providers_safe():
         rows = get_all_providers()
 
-        return [ProviderService.serialize_provider(row) for row in rows] if (rows) else []
+        return [ProviderService.serialize_provider_safe(row) for row in rows] if rows else []
     @staticmethod
     def get_provider_by_name(name: str):
         row = get_provider_by_name(name)
@@ -133,7 +138,7 @@ class ProviderService:
             # 如果用户未重新输入直接保存，带星号的值不应覆盖原 key。
             if 'api_key' in filtered_data and '*' in str(filtered_data.get('api_key', '')):
                 filtered_data.pop('api_key')
-            print('更新模型供应商',filtered_data)
+            register_secret(filtered_data.get('api_key'))
             update_provider(id, **filtered_data)
             # 获取更新后的供应商信息
             updated_provider = get_provider_by_id(id)

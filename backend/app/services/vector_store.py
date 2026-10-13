@@ -7,6 +7,9 @@ import chromadb
 from chromadb.config import Settings
 
 from app.utils.logger import get_logger
+from pathlib import Path
+from app.services.storage_scope import current_scope
+from app.services.user_data import require_task, task_notes_dir, read_json
 
 logger = get_logger(__name__)
 
@@ -104,26 +107,61 @@ def _build_meta_chunk(audio_meta: dict) -> list[dict]:
 class VectorStoreManager:
     """基于 ChromaDB 的笔记向量存储管理器。"""
 
-    def __init__(self):
-        os.makedirs(VECTOR_DB_DIR, exist_ok=True)
+    def __init__(self, user_id: int | None = None):
+        scope = current_scope.get()
+        self.user_id = user_id if user_id is not None else (scope.user_id if scope else None)
+        path = Path(VECTOR_DB_DIR) / 'users' / str(self.user_id) if self.user_id is not None else Path(VECTOR_DB_DIR)
+        path.mkdir(parents=True, exist_ok=True)
         self._client = chromadb.PersistentClient(
-            path=VECTOR_DB_DIR,
+            path=str(path),
             settings=Settings(anonymized_telemetry=False),
         )
+
+    def _client_for(self, task_id: str, allow_deleted: bool = False):
+        if self.user_id is None:
+            return self._client
+        if allow_deleted:
+            from app.db import engine as db_module
+            from app.db.models.video_tasks import VideoTask
+            from sqlalchemy import select
+            with db_module.SessionLocal() as db:
+                task = db.scalar(select(VideoTask).where(VideoTask.task_id == task_id, VideoTask.user_id == self.user_id))
+                if task is None:
+                    from fastapi import HTTPException
+                    raise HTTPException(404, '任务不存在')
+        else:
+            task = require_task(task_id, self.user_id)
+        if task.storage_relpath == '':
+            return chromadb.PersistentClient(path=str(Path(VECTOR_DB_DIR)), settings=Settings(anonymized_telemetry=False))
+        return self._client
 
     def _collection_name(self, task_id: str) -> str:
         """ChromaDB collection 名称：直接使用 task_id（UUID 格式合法）。"""
         return task_id
 
     def index_task(self, task_id: str) -> None:
+        if self.user_id is None:
+            return self._index_task(task_id)
+        from app.services.task_data_lock import task_data_lock
+        with task_data_lock(self.user_id, task_id):
+            return self._index_task(task_id)
+
+    def _index_task(self, task_id: str) -> None:
         """读取笔记结果并建立向量索引。"""
-        result_path = os.path.join(NOTE_OUTPUT_DIR, f"{task_id}.json")
-        if not os.path.exists(result_path):
+        client = self._client_for(task_id)
+        directory = task_notes_dir(require_task(task_id, self.user_id), NOTE_OUTPUT_DIR) if self.user_id is not None else Path(NOTE_OUTPUT_DIR)
+        result_path = directory / f'{task_id}.json'
+        note_data = read_json(result_path)
+        if not note_data and self.user_id is not None:
+            task = require_task(task_id, self.user_id)
+            display = json.loads(task.display_data or '{}')
+            markdown = display.get('markdown') or ''
+            if isinstance(markdown, list):
+                markdown = markdown[0].get('content', '') if markdown else ''
+            note_data = {'markdown': markdown, 'transcript': display.get('transcript') or {}, 'audio_meta': display.get('audioMeta') or {}}
+        if not note_data.get('markdown'):
             logger.warning(f"笔记文件不存在，跳过索引: {result_path}")
             return
-
-        with open(result_path, "r", encoding="utf-8") as f:
-            note_data = json.load(f)
 
         markdown = note_data.get("markdown", "")
         transcript = note_data.get("transcript", {})
@@ -144,11 +182,11 @@ class VectorStoreManager:
 
         # 删除旧 collection（幂等）
         try:
-            self._client.delete_collection(col_name)
+            client.delete_collection(col_name)
         except Exception:
             pass
 
-        collection = self._client.create_collection(
+        collection = client.create_collection(
             name=col_name,
             metadata={"hnsw:space": "cosine"},
         )
@@ -179,8 +217,9 @@ class VectorStoreManager:
         确保三种来源都被召回。
         """
         col_name = self._collection_name(task_id)
+        client = self._client_for(task_id)
         try:
-            collection = self._client.get_collection(col_name)
+            collection = client.get_collection(col_name)
         except Exception:
             logger.warning(f"Collection 不存在: {col_name}")
             return []
@@ -203,20 +242,22 @@ class VectorStoreManager:
 
         return all_chunks
 
-    def delete_index(self, task_id: str) -> None:
+    def delete_index(self, task_id: str, allow_deleted: bool = False) -> None:
         """删除指定任务的向量索引。"""
         col_name = self._collection_name(task_id)
+        client = self._client_for(task_id, allow_deleted)
         try:
-            self._client.delete_collection(col_name)
+            client.delete_collection(col_name)
             logger.info(f"已删除向量索引: {task_id}")
-        except Exception:
+        except chromadb.errors.NotFoundError:
             pass
 
     def is_indexed(self, task_id: str) -> bool:
         """检查指定任务是否已建立完整索引（含 meta 信息）。"""
         col_name = self._collection_name(task_id)
+        client = self._client_for(task_id)
         try:
-            col = self._client.get_collection(col_name)
+            col = client.get_collection(col_name)
             if col.count() == 0:
                 return False
             # 检查是否包含 meta chunk，旧索引可能缺失

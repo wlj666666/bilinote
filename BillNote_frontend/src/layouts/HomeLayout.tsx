@@ -1,5 +1,6 @@
 import React, { FC, useRef, useState } from 'react'
-import { SlidersHorizontal, PanelLeftClose, PanelLeftOpen, History as HistoryIcon } from 'lucide-react'
+import { SlidersHorizontal, PanelLeftClose, PanelLeftOpen, History as HistoryIcon, LogOut } from 'lucide-react'
+import { useAuthStore } from '@/store/authStore'
 import {
   Tooltip,
   TooltipContent,
@@ -25,6 +26,8 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
   const [isMiddleCollapsed, setIsMiddleCollapsed] = useState(false)
   const leftPanelRef = useRef<ImperativePanelHandle>(null)
   const middlePanelRef = useRef<ImperativePanelHandle>(null)
+  const user = useAuthStore(state => state.user)
+  const logout = useAuthStore(state => state.logout)
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
@@ -64,7 +67,7 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <TooltipProvider>
+                {user?.role === 'admin' && <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger onClick={() => setShowSettings(true)}>
                       <Link to={'/settings'}>
@@ -75,12 +78,16 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
                       <span>全局配置</span>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
+                </TooltipProvider>}
               </div>
             </header>
             <ScrollArea className="flex-1 overflow-auto">
               <div className="p-4">{NoteForm}</div>
             </ScrollArea>
+            <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
+              <span className="truncate">{user?.username}{user?.role === 'admin' ? ' · 管理员' : ''}</span>
+              <button type="button" title="退出登录" aria-label="退出登录" onClick={() => { void logout().catch(() => {}) }} className="rounded p-1 hover:bg-sage"><LogOut className="h-4 w-4" /></button>
+            </div>
             <div
               className="pointer-events-none h-[28.8px] shrink-0"
               style={{

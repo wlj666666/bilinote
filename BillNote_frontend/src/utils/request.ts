@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import toast from 'react-hot-toast'
+import { getAuthToken } from './authSession'
 
 // 统一响应类型
 export interface IResponse<T = any> {
@@ -13,6 +14,7 @@ export interface IResponse<T = any> {
 declare module 'axios' {
   export interface AxiosRequestConfig {
     suppressToast?: boolean
+    sessionToken?: string | null
   }
 }
 
@@ -27,9 +29,24 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
   timeout: 10000,
 });
 
+request.interceptors.request.use(config => {
+  const token = getAuthToken()
+  if (config.sessionToken !== undefined && config.sessionToken !== token) {
+    return Promise.reject({ code: 401, msg: '登录状态已变更', data: null })
+  }
+  config.sessionToken = token
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
 // 响应拦截器
 request.interceptors.response.use(
   (response: AxiosResponse<IResponse>) => {
+    // Ignore responses from a previous login, including administrator config loads.
+    if (response.config.sessionToken !== getAuthToken()) {
+      return Promise.reject({ code: 401, msg: '登录状态已变更', data: null })
+    }
+    if (response.config.responseType === 'blob') return response.data
     const res = response.data;
     if (res.code === 0) {
       // 业务成功，可以根据需要显示成功消息，或者不显示（如果操作本身就是可见的）
@@ -44,9 +61,13 @@ request.interceptors.response.use(
     }
   },
   (error) => {
+    if (error?.response?.status === 401 && error?.config?.sessionToken && error.config.sessionToken === getAuthToken()) {
+      window.dispatchEvent(new Event('bilinote-auth-expired'))
+    }
     const suppress = error?.config?.suppressToast === true
     // 网络/服务器错误
-    const res = error?.response?.data as IResponse | undefined;
+    const body = error?.response?.data
+    const res = body ? { code: error.response.status, msg: body.msg || body.detail || '请求失败', data: body.data ?? null } as IResponse : undefined;
     if (res) {
       // 如果后端有返回错误信息，则显示后端信息
       if (!suppress) toast.error(res.msg || '服务器错误，请稍后再试');

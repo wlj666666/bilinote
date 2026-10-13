@@ -25,6 +25,10 @@ class ConcurrentTaskExecutor:
         with self._lock:
             self._task_ids.discard(task_id)
 
+    def is_reserved(self, task_id: str) -> bool:
+        with self._lock:
+            return task_id in self._task_ids
+
     def run(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
         future = self.submit(fn, *args, **kwargs)
         return future.result()

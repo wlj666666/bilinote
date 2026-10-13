@@ -56,6 +56,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
   const messages = useChatStore(state => state.chatHistory[taskId]) ?? []
   const addMessage = useChatStore(state => state.addMessage)
   const clearChat = useChatStore(state => state.clearChat)
+  const loadHistory = useChatStore(state => state.loadHistory)
 
   const currentTaskId = useTaskStore(state => state.currentTaskId)
   const tasks = useTaskStore(state => state.tasks)
@@ -69,6 +70,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
     if (!taskId) return
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | null = null
+    void loadHistory(taskId).catch(() => {})
 
     const poll = async () => {
       try {

@@ -24,6 +24,7 @@ if not DATABASE_URL.startswith("sqlite"):
 engine = create_engine(
     DATABASE_URL,
     echo=os.getenv("SQLALCHEMY_ECHO", "false").lower() == "true",
+    hide_parameters=True,
     **engine_args,
     **_pool_args,
 )

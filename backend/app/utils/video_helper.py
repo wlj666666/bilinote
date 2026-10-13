@@ -12,6 +12,7 @@ BACKEND_PORT= os.getenv("BACKEND_PORT", 8483)
 BACKEND_BASE_URL = f"{api_path}:{BACKEND_PORT}"
 
 from typing import Optional
+from app.services.storage_scope import current_scope, static_root
 def generate_screenshot(video_path: str, output_dir: str, timestamp: int, index: int) -> str:
     """
     使用 ffmpeg 生成截图，返回生成图片路径
@@ -53,7 +54,10 @@ def save_cover_to_static(local_cover_path: str, subfolder: Optional[str] = "cove
     project_root = os.getcwd()
 
     # static目录
-    static_dir = os.path.join(project_root, "static")
+    static_dir = str(static_root())
+    scope = current_scope.get()
+    if scope:
+        subfolder = f'users/{scope.user_id}/{scope.task_id}/{subfolder or "cover"}'
 
     # 确定目标子目录
     target_dir = os.path.join(static_dir, subfolder or "cover")
@@ -63,6 +67,11 @@ def save_cover_to_static(local_cover_path: str, subfolder: Optional[str] = "cove
     file_name = os.path.basename(local_cover_path)
     target_path = os.path.join(target_dir, file_name)
     shutil.copy2(local_cover_path, target_path)  # 保留原时间戳、权限
+    if scope:
+        from app.services.user_data import register_file
+        from urllib.parse import quote
+        relative = register_file('static', Path(target_path), scope.user_id, scope.task_id, static_root())
+        return f'/api/files/static/{quote(relative, safe="/")}'
     image_relative_path = f"/static/{subfolder}/{file_name}".replace("\\", "/")
     url_path = f"{BACKEND_BASE_URL.rstrip('/')}/{image_relative_path.lstrip('/')}"
     # 返回前端可访问的路径

@@ -38,6 +38,7 @@ import { Textarea } from '@/components/ui/textarea.tsx'
 import { noteStyles, noteFormats, videoPlatforms } from '@/constant/note.ts'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useAuthStore } from '@/store/authStore'
 
 /* -------------------- 校验 Schema -------------------- */
 /** 用户粘贴的链接常缺协议头（如 bilibili.com/...），无任何 scheme 时自动补 https:// */
@@ -131,6 +132,8 @@ const CheckboxGroup = ({
 
 /* -------------------- 主组件 -------------------- */
 const NoteForm = () => {
+  const isAdmin = useAuthStore(state => state.user?.role === 'admin')
+  const userId = useAuthStore(state => state.user?.id)
   const navigate = useNavigate();
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
@@ -143,7 +146,7 @@ const NoteForm = () => {
   const form = useForm<z.input<typeof formSchema>, unknown, z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      text_extraction_method: localStorage.getItem('text-extraction-method') === 'ocr' ? 'ocr' : 'asr',
+      text_extraction_method: localStorage.getItem(`text-extraction-method:${userId}`) === 'ocr' ? 'ocr' : 'asr',
       platform: 'bilibili',
       quality: 'medium',
       model_name: modelList[0]?.model_name || '',
@@ -240,7 +243,7 @@ const NoteForm = () => {
   }
 
   const onSubmit = async (values: NoteFormValues) => {
-    localStorage.setItem("text-extraction-method", values.text_extraction_method)
+    localStorage.setItem(`text-extraction-method:${userId}`, values.text_extraction_method)
     const chosenModel = modelList.find(m => m.model_name === values.model_name)
     if (!chosenModel) {
       toast.error('所选模型已不可用，请重新选择')
@@ -273,7 +276,7 @@ const NoteForm = () => {
             ? '转写模型正在下载中，请稍候再提交'
             : '转写模型尚未下载，请先去「音频转写配置」页下载',
         )
-        if (!downloading) navigate('/settings/transcriber')
+        if (!downloading && isAdmin) navigate('/settings/transcriber')
         return
       }
       // 其余错误：axios 拦截器已经弹过 toast，这里只兜底不让 promise 变成未处理 rejection
@@ -468,7 +471,7 @@ const NoteForm = () => {
                  <SectionHeader title="模型选择" tip="不同模型效果不同，建议自行测试" />
                   <Button type={'button'} variant={
                     'outline'
-                  } onClick={()=>{goModelAdd()}}>请先添加模型</Button>
+                  } onClick={()=>{goModelAdd()}} disabled={!isAdmin}>{isAdmin ? '请先添加模型' : '暂无可用模型，请联系管理员'}</Button>
                  <FormMessage />
                </FormItem>
              )

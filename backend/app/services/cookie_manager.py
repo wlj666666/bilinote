@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Optional, Dict
+from app.utils.secrets import register_secret
 
 
 class CookieConfigManager:
@@ -13,7 +14,10 @@ class CookieConfigManager:
     def _read(self) -> Dict[str, Dict[str, str]]:
         try:
             with self.path.open("r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            for item in data.values():
+                register_secret(item.get("cookie"), cookie=True)
+            return data
         except Exception:
             return {}
 
@@ -26,6 +30,7 @@ class CookieConfigManager:
         return data.get(platform, {}).get("cookie")
 
     def set(self, platform: str, cookie: str):
+        register_secret(cookie, cookie=True)
         data = self._read()
         data[platform] = {"cookie": cookie}
         self._write(data)

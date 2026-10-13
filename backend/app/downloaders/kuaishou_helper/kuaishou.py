@@ -45,7 +45,9 @@ class KuaiShou:
         return url[0]
 
     def get_photo_id(self, url):
-        response = requests.get(url, allow_redirects=True, headers=self.header)
+        # Resolve shared links without forwarding the platform account Cookie.
+        headers = {key: value for key, value in self.header.items() if key.lower() != "cookie"}
+        response = requests.get(url, allow_redirects=True, headers=headers, timeout=15)
         real_url = response.url
         # 提取short—video/后面的id
         pattern = re.compile(r'short-video/(\w+)')
@@ -54,7 +56,6 @@ class KuaiShou:
 
     def get_temp_cookies(self):
         is_exist = cfm.get('kuaishou')
-        print(is_exist)
         if is_exist:
             return is_exist
         res = requests.get(url=KUAISHOU_URL, headers=self.header, allow_redirects=True)

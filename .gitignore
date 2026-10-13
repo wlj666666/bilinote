@@ -317,6 +317,8 @@ cython_debug/
 /backend/uploads/*
 /backend/config/*
 /backend/vector_db/
+/backend/backups/
+/backups/
 /BillNote_frontend/.idea/*
 /BillNote_frontend/src-tauri/bin/
 

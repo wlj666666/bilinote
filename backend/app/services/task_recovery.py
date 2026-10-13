@@ -5,7 +5,7 @@ from pathlib import Path
 
 def recover_interrupted_tasks(output_dir: str | Path) -> int:
     recovered = 0
-    for path in Path(output_dir).glob("*.status.json"):
+    for path in Path(output_dir).rglob("*.status.json"):
         task_id = path.name.removesuffix(".status.json")
         if task_id.endswith("_markdown"):
             continue  # Legacy summary status files were never real tasks.

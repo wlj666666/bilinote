@@ -48,7 +48,8 @@ def add_provider(data: ProviderRequest):
 @router.get("/get_all_providers")
 def get_all_providers():
     try:
-        res = ProviderService.get_all_providers_safe()
+        # This management endpoint is admin-only; retain its existing full-key response.
+        res = ProviderService.get_all_providers()
         return R.success(data=res)
     except Exception as e:
         return R.error(msg=e)

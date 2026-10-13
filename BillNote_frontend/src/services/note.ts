@@ -42,11 +42,10 @@ export const generateNote = async (data: GenerateNoteRequest) => {
   }
 }
 
-export const delete_task = async ({ video_id, platform }: { video_id: string; platform: string }) => {
+export const delete_task = async ({ task_id }: { task_id: string }) => {
   try {
     const data = {
-      video_id,
-      platform,
+      task_id,
     }
     const res = await request.post('/delete_task', data)
 

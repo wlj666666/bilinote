@@ -17,6 +17,7 @@ from ffmpeg_helper import ensure_ffmpeg_or_raise
 logger = get_logger(__name__)
 
 router = APIRouter()
+public_router = APIRouter()
 cookie_manager = CookieConfigManager()
 transcriber_config_manager = TranscriberConfigManager()
 
@@ -442,7 +443,7 @@ async def sys_health():
     })
 
 
-@router.get("/sys_check")
+@public_router.get("/sys_check")
 async def sys_check():
     """轻量存活判定：后端进程能响应这个 endpoint 就算「起来了」，不查外部依赖。
 

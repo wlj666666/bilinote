@@ -4,11 +4,18 @@ import {
   HardDriveDownload,
   Info,
   Activity,
+  Users,
 } from 'lucide-react'
 import MenuBar, { IMenuProps } from '@/pages/SettingPage/components/menuBar.tsx'
 
 const Menu = () => {
   const menuList: IMenuProps[] = [
+    {
+      id: 'users',
+      name: '客户账号',
+      icon: <Users />,
+      path: '/settings/users',
+    },
     {
       id: 'model',
       name: 'AI 模型设置',

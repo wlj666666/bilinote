@@ -1,5 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import type { AudioMeta } from '@/store/taskStore'
+import { useCoverImage } from '@/hooks/useCoverImage'
+import PrivateLink from '@/components/PrivateLink'
 
 interface VideoBannerProps {
   audioMeta?: AudioMeta
@@ -15,14 +17,9 @@ const platformLabel: Record<string, string> = {
 }
 
 export default function VideoBanner({ audioMeta, videoUrl }: VideoBannerProps) {
+  const rawCover = audioMeta?.cover_url
+  const coverUrl = useCoverImage(rawCover)
   if (!audioMeta) return null
-
-  const rawCover = audioMeta.cover_url
-  // 通过后端代理加载封面，避免跨域/Referrer 限制
-  const apiBase = String(import.meta.env.VITE_API_BASE_URL || 'api').replace(/\/$/, '')
-  const coverUrl = rawCover
-    ? `${apiBase}/image_proxy?url=${encodeURIComponent(rawCover)}`
-    : ''
   const title = audioMeta.title
   const uploader = audioMeta.raw_info?.uploader || ''
   const platform = platformLabel[audioMeta.platform] || audioMeta.platform || ''
@@ -70,7 +67,7 @@ export default function VideoBanner({ audioMeta, videoUrl }: VideoBannerProps) {
 
         {/* 跳转原视频 */}
         {originalUrl && (
-          <a
+          <PrivateLink
             href={originalUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -78,7 +75,7 @@ export default function VideoBanner({ audioMeta, videoUrl }: VideoBannerProps) {
           >
             <ExternalLink className="h-3.5 w-3.5" />
             <span>原视频</span>
-          </a>
+          </PrivateLink>
         )}
       </div>
     </div>

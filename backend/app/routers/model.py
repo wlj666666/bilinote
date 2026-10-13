@@ -4,6 +4,14 @@ from pydantic import BaseModel
 from app.services.model import ModelService
 from app.utils.response import ResponseWrapper as R
 router = APIRouter()
+client_router = APIRouter()
+
+
+@client_router.get("/available_models")
+def client_available_models():
+    from app.services.available_models import available_models
+    return R.success(available_models())
+
 modelService = ModelService()
 class CreateModelRequest(BaseModel):
     provider_id: str

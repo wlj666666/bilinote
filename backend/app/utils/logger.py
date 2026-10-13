@@ -1,13 +1,19 @@
 import logging
 import sys
 from pathlib import Path
+from app.utils.secrets import redact_secrets
+
+
+class SecretFormatter(logging.Formatter):
+    def format(self, record):
+        return redact_secrets(super().format(record))
 
 # 日志目录
 LOG_DIR = Path("logs")
 LOG_DIR.mkdir(exist_ok=True)
 
 # 日志格式
-formatter = logging.Formatter(
+formatter = SecretFormatter(
     fmt="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )

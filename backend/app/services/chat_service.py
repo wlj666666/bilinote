@@ -72,6 +72,7 @@ def chat(
     history: list[dict],
     provider_id: str,
     model_name: str,
+    user_id: int | None = None,
 ) -> dict:
     """
     RAG + Tool Calling 问答。
@@ -80,7 +81,7 @@ def chat(
     3. 如果 LLM 调用了工具，执行工具并将结果返回给 LLM
     4. 循环直到 LLM 给出最终回答
     """
-    vector_store = VectorStoreManager()
+    vector_store = VectorStoreManager(user_id=user_id)
 
     # 1. 检索初始上下文
     chunks = vector_store.query(task_id, question, n_results=6)
@@ -140,7 +141,7 @@ def chat(
 
             logger.info(f"Tool call [{round_i+1}/{max_rounds}]: {fn_name}({fn_args})")
 
-            result = execute_tool(task_id, fn_name, fn_args)
+            result = execute_tool(task_id, fn_name, fn_args, user_id=user_id)
 
             messages.append({
                 "role": "tool",

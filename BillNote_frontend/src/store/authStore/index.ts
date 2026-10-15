@@ -17,7 +17,9 @@ interface AuthState {
   user: AuthUser | null
   ready: boolean
   bootstrap: () => Promise<void>
-  login: (username: string, password: string) => Promise<void>
+  login: (username: string, password: string, remember?: boolean) => Promise<void>
+  register: (username: string, password: string, remember?: boolean) => Promise<void>
+  syncSession: () => Promise<void>
   logout: () => Promise<void>
   expire: () => void
 }
@@ -30,49 +32,72 @@ function clearSensitiveState() {
 }
 
 let bootstrapPromise: Promise<void> | null = null
+let sessionRevision = 0
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  ready: false,
-  bootstrap: () => {
-    if (get().ready) return Promise.resolve()
-    if (bootstrapPromise) return bootstrapPromise
-    bootstrapPromise = (async () => {
-      try {
-        if (getAuthToken()) {
-          const user = await request.get('/auth/me', { suppressToast: true }) as unknown as AuthUser
-          clearSensitiveState()
-          useTaskStore.getState().setOwner(user.id)
-          set({ user })
-        }
-      } catch {
-        setAuthToken(null)
-        clearSensitiveState()
-        set({ user: null })
-      } finally {
-        set({ ready: true })
-        bootstrapPromise = null
-      }
-    })()
-    return bootstrapPromise
-  },
-  login: async (username, password) => {
-    const result = await request.post('/auth/login', { username, password }, { suppressToast: true }) as unknown as { token: string; user: AuthUser }
+export const useAuthStore = create<AuthState>((set, get) => {
+  const authenticate = async (path: string, username: string, password: string, remember = false) => {
+    const revision = ++sessionRevision
+    bootstrapPromise = null
+    const result = await request.post(path, { username, password, remember_me: remember }, { suppressToast: true }) as unknown as { token: string; user: AuthUser }
+    if (revision !== sessionRevision) throw { msg: '登录状态已变更，请重试' }
     clearSensitiveState()
-    setAuthToken(result.token)
+    setAuthToken(result.token, remember)
     useTaskStore.getState().setOwner(result.user.id)
     set({ user: result.user, ready: true })
-  },
-  logout: async () => {
-    try {
-      await request.post('/auth/logout', {}, { suppressToast: true })
-    } finally {
-      get().expire()
-    }
-  },
-  expire: () => {
-    setAuthToken(null)
-    clearSensitiveState()
-    set({ user: null, ready: true })
-  },
-}))
+  }
+  return {
+    user: null,
+    ready: false,
+    bootstrap: () => {
+      if (get().ready) return Promise.resolve()
+      if (bootstrapPromise) return bootstrapPromise
+      const revision = sessionRevision
+      const token = getAuthToken()
+      const job = (async () => {
+        try {
+          if (token) {
+            const user = await request.get('/auth/me', { suppressToast: true }) as unknown as AuthUser
+            if (revision !== sessionRevision || token !== getAuthToken()) return
+            clearSensitiveState()
+            useTaskStore.getState().setOwner(user.id)
+            set({ user })
+          }
+        } catch {
+          if (revision !== sessionRevision || token !== getAuthToken()) return
+          setAuthToken(null)
+          clearSensitiveState()
+          set({ user: null })
+        } finally {
+          if (revision === sessionRevision) set({ ready: true })
+        }
+      })()
+      bootstrapPromise = job
+      void job.finally(() => { if (bootstrapPromise === job) bootstrapPromise = null }).catch(() => {})
+      return job
+    },
+    login: (username, password, remember) => authenticate('/auth/login', username, password, remember),
+    register: (username, password, remember) => authenticate('/auth/register', username, password, remember),
+    syncSession: () => {
+      sessionRevision++
+      bootstrapPromise = null
+      clearSensitiveState()
+      set({ user: null, ready: false })
+      return get().bootstrap()
+    },
+    logout: async () => {
+      const token = getAuthToken()
+      try {
+        await request.post('/auth/logout', {}, { suppressToast: true })
+      } finally {
+        if (token === getAuthToken()) get().expire()
+      }
+    },
+    expire: () => {
+      sessionRevision++
+      bootstrapPromise = null
+      setAuthToken(null)
+      clearSensitiveState()
+      set({ user: null, ready: true })
+    },
+  }
+})

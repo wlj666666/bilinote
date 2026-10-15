@@ -16,6 +16,11 @@ def init_db():
         backup_database(engine)
 
     Base.metadata.create_all(bind=engine)
+    user_columns = {column['name'] for column in inspect(engine).get_columns('users')}
+    with engine.begin() as connection:
+        for name in ('created_at', 'last_login_at'):
+            if name not in user_columns:
+                connection.execute(text(f'ALTER TABLE users ADD COLUMN {name} INTEGER'))
     task_columns = {column['name'] for column in inspect(engine).get_columns('video_tasks')}
     additions = {'user_id': 'INTEGER', 'storage_relpath': "VARCHAR NOT NULL DEFAULT ''",
                  'form_data': 'TEXT', 'display_data': 'TEXT', 'deleted': 'BOOLEAN NOT NULL DEFAULT 0'}

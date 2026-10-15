@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 
 from app.db.engine import Base
@@ -11,6 +13,9 @@ class User(Base):
     password_hash = Column(String(256), nullable=False)
     role = Column(String(16), nullable=False, default="user")
     enabled = Column(Boolean, nullable=False, default=True)
+    # Older installations have no registration/login timestamps; preserve NULL.
+    created_at = Column(Integer, nullable=True, default=lambda: int(time.time()))
+    last_login_at = Column(Integer, nullable=True)
 
 
 class AuthSession(Base):

@@ -10,6 +10,7 @@ import BackendHealthIndicator from '@/components/BackendHealth/BackendHealthIndi
 import Index from '@/pages/Index.tsx'
 import { HomePage } from './pages/HomePage/Home.tsx'
 import { useAuthStore } from '@/store/authStore'
+import { AUTH_SESSION_KEY } from '@/utils/authSession'
 import LoginPage from '@/pages/Login'
 import { useTaskStore } from '@/store/taskStore'
 import { importLegacyBrowserData } from '@/services/userData'
@@ -118,7 +119,7 @@ function AuthenticatedApp() {
 
 function App() {
   const { loading, initialized, failed, lastError, retry } = useCheckBackend()
-  const { user, ready, bootstrap, expire } = useAuthStore()
+  const { user, ready, bootstrap, expire, syncSession } = useAuthStore()
 
   useEffect(() => {
     if (initialized) void bootstrap()
@@ -128,6 +129,16 @@ function App() {
     window.addEventListener('bilinote-auth-expired', expire)
     return () => window.removeEventListener('bilinote-auth-expired', expire)
   }, [expire])
+
+  useEffect(() => {
+    const sync = (event: StorageEvent) => {
+      if (event.storageArea !== localStorage || (event.key !== null && event.key !== AUTH_SESSION_KEY)) return
+      if (sessionStorage.getItem(AUTH_SESSION_KEY)) return
+      void syncSession()
+    }
+    window.addEventListener('storage', sync)
+    return () => window.removeEventListener('storage', sync)
+  }, [syncSession])
 
   if (!initialized) {
     return <BackendInitDialog open={loading} failed={failed} lastError={lastError} onRetry={retry} />

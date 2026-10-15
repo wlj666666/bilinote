@@ -17,6 +17,7 @@ from app.db.models.users import AuthSession, User
 
 PASSWORD_ITERATIONS = 600_000
 SESSION_SECONDS = 12 * 60 * 60
+REMEMBER_SESSION_SECONDS = 30 * 24 * 60 * 60
 bearer = HTTPBearer(auto_error=False)
 
 
@@ -89,9 +90,10 @@ def require_admin(user: User = Depends(get_current_user)) -> User:
 class LoginLimiter:
     """Bounded per-process throttling; applies to successes and failures alike."""
 
-    def __init__(self):
+    def __init__(self, action: str = "登录"):
         self._attempts: dict[str, deque] = {}
         self._lock = threading.Lock()
+        self._action = action
 
     def check(self, peer: str):
         now = time.monotonic()
@@ -102,8 +104,9 @@ class LoginLimiter:
             while attempts and attempts[0] <= now - 60:
                 attempts.popleft()
             if len(attempts) >= 10 or len(self._attempts) > 10_000:
-                raise HTTPException(429, "登录尝试过于频繁，请稍后重试", headers={"Retry-After": "60"})
+                raise HTTPException(429, f"{self._action}尝试过于频繁，请稍后重试", headers={"Retry-After": "60"})
             attempts.append(now)
 
 
 login_limiter = LoginLimiter()
+registration_limiter = LoginLimiter("注册")

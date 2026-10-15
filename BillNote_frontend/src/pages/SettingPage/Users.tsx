@@ -6,8 +6,16 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import toast from 'react-hot-toast'
 
+interface ManagedUser extends AuthUser {
+  created_at: number | null
+  last_login_at: number | null
+  task_count: number
+}
+
+const formatTime = (timestamp: number | null) => timestamp == null ? '暂无记录' : new Date(timestamp * 1000).toLocaleString('zh-CN', { hour12: false })
+
 export default function UsersPage() {
-  const [users, setUsers] = useState<AuthUser[]>([])
+  const [users, setUsers] = useState<ManagedUser[]>([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
@@ -15,7 +23,7 @@ export default function UsersPage() {
   const [newPassword, setNewPassword] = useState('')
 
   const reload = async () => {
-    setUsers(await request.get('/auth/users') as unknown as AuthUser[])
+    setUsers(await request.get('/auth/users') as unknown as ManagedUser[])
   }
   useEffect(() => { void reload().catch(() => {}) }, [])
 
@@ -57,8 +65,8 @@ export default function UsersPage() {
 
   return (
     <div className="h-full overflow-auto bg-paper p-8">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div><h1 className="text-2xl font-semibold">客户账号</h1><p className="mt-2 text-sm text-muted-foreground">创建和管理客户登录账号。客户只能使用业务功能，无法访问系统配置。</p></div>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div><h1 className="text-2xl font-semibold">客户账号</h1><p className="mt-2 text-sm text-muted-foreground">查看自行注册和管理员创建的账号，管理账号状态。普通用户只能使用业务功能，无法访问系统配置。</p></div>
         <form onSubmit={create} className="space-y-4 rounded-xl border border-border bg-linen p-5">
           <h2 className="font-medium">创建客户账号</h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -68,10 +76,12 @@ export default function UsersPage() {
           <Button type="submit" disabled={busy}>{busy ? '处理中…' : '创建账号'}</Button>
         </form>
         <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-linen"><tr><th className="p-3">账号</th><th className="p-3">角色</th><th className="p-3">状态</th><th className="p-3">操作</th></tr></thead>
+          <table className="w-full whitespace-nowrap text-left text-sm">
+            <thead className="bg-linen"><tr><th className="p-3">ID</th><th className="p-3">账号</th><th className="p-3">角色</th><th className="p-3">状态</th><th className="p-3">注册时间</th><th className="p-3">最近登录</th><th className="p-3" title="当前未删除的笔记任务，包含处理中和失败的任务">任务数</th><th className="p-3">操作</th></tr></thead>
             <tbody>{users.map(user => <tr key={user.id} className="border-t border-border">
+              <td className="p-3">{user.id}</td>
               <td className="p-3">{user.username}</td><td className="p-3">{user.role === 'admin' ? '管理员' : '客户'}</td><td className="p-3">{user.enabled ? '已启用' : '已停用'}</td>
+              <td className="p-3">{user.created_at == null ? '未知（旧账号）' : formatTime(user.created_at)}</td><td className="p-3">{formatTime(user.last_login_at)}</td><td className="p-3">{user.task_count}</td>
               <td className="p-3">{user.role === 'user' && <div className="flex gap-2">
                 <Button size="sm" variant="outline" disabled={busy} onClick={() => { void toggle(user) }}>{user.enabled ? '停用' : '启用'}</Button>
                 <Button size="sm" variant="outline" disabled={busy} onClick={() => { setNewPassword(''); setResetUser(user) }}>重置密码</Button>
@@ -79,6 +89,7 @@ export default function UsersPage() {
             </tr>)}</tbody>
           </table>
         </div>
+        <p className="text-xs text-muted-foreground">任务数统计当前未删除的笔记任务，包含处理中和失败的任务。旧账号未记录的时间不作推测。</p>
       </div>
       <Dialog open={Boolean(resetUser)} onOpenChange={open => { if (!open && !busy) { setResetUser(null); setNewPassword('') } }}>
         <DialogContent><DialogHeader><DialogTitle>重置 {resetUser?.username} 的密码</DialogTitle></DialogHeader>

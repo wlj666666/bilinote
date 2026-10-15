@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ExternalLink } from 'lucide-react'
 import type { AudioMeta } from '@/store/taskStore'
 import { useCoverImage } from '@/hooks/useCoverImage'
@@ -19,7 +20,9 @@ const platformLabel: Record<string, string> = {
 export default function VideoBanner({ audioMeta, videoUrl }: VideoBannerProps) {
   const rawCover = audioMeta?.cover_url
   const coverUrl = useCoverImage(rawCover)
+  const [brokenCover, setBrokenCover] = useState<string | null>(null)
   if (!audioMeta) return null
+  const showCover = Boolean(coverUrl && brokenCover !== coverUrl)
   const title = audioMeta.title
   const uploader = audioMeta.raw_info?.uploader || ''
   const platform = platformLabel[audioMeta.platform] || audioMeta.platform || ''
@@ -28,27 +31,27 @@ export default function VideoBanner({ audioMeta, videoUrl }: VideoBannerProps) {
   return (
     <div className="relative mb-4 overflow-hidden rounded-lg">
       {/* 模糊背景封面 */}
-      <div className="absolute inset-0">
-        {coverUrl ? (
+      <div className="absolute inset-0 bg-primary">
+        {showCover ? (
           <img
             src={coverUrl}
             alt=""
             referrerPolicy="no-referrer"
+            onError={() => setBrokenCover(coverUrl)}
             className="h-full w-full object-cover blur-md brightness-[0.4] scale-110"
           />
-        ) : (
-          <div className="h-full w-full bg-primary" />
-        )}
+        ) : null}
       </div>
 
       {/* 内容层 */}
       <div className="relative flex items-center gap-4 px-5 py-4">
         {/* 封面缩略图 */}
-        {coverUrl && (
+        {showCover && (
           <img
             src={coverUrl}
             alt={title}
             referrerPolicy="no-referrer"
+            onError={() => setBrokenCover(coverUrl)}
             className="h-16 w-28 shrink-0 rounded-md object-cover shadow-md"
           />
         )}

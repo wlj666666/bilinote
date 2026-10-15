@@ -14,6 +14,7 @@ export function useCoverImage(source: string | undefined, enabled = true) {
       void request.get<unknown, Blob>(privatePath || '/image_proxy', { params: privatePath ? undefined : { url: source }, responseType: 'blob', suppressToast: true })
         .then(blob => {
           if (cancelled) return
+          if (!blob.size || !blob.type.startsWith('image/')) return
           objectUrl = URL.createObjectURL(blob)
           setImageUrl(objectUrl)
         }).catch(() => {})

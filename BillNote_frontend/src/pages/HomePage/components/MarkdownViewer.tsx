@@ -351,6 +351,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
   const currentTask = useTaskStore(state => state.getCurrentTask())
   const taskStatus = currentTask?.status || 'PENDING'
   const retryTask = useTaskStore.getState().retryTask
+  const cancelTask = useTaskStore(state => state.cancelTask)
   const isMultiVersion = Array.isArray(currentTask?.markdown)
   const [showTranscribe, setShowTranscribe] = useState(false)
   const [showChat, setShowChat] = useState<false | 'half' | 'full'>(false)
@@ -445,12 +446,13 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
       <div className="flex h-screen w-full flex-col items-center justify-center space-y-4 text-neutral-500">
         <StepBar steps={steps.filter(step => currentTask?.formData?.text_extraction_method === 'ocr'
           ? step.key !== 'TRANSCRIBING'
-          : !['DETECTING_SUBTITLES', 'EXTRACTING_SUBTITLES'].includes(step.key))} currentStep={taskStatus} />
+          : !['DETECTING_SUBTITLES', 'EXTRACTING_SUBTITLES'].includes(step.key))} currentStep={taskStatus === 'WAITING_RESOURCE' || taskStatus === 'WAITING_RETRY' ? '' : taskStatus} />
         <Loading className="h-5 w-5" />
         <div className="text-center text-sm">
-          <p className="text-lg font-bold">正在生成笔记，请稍候…</p>
+          <p className="text-lg font-bold">{taskStatus === 'PENDING' ? '任务排队中' : taskStatus === 'WAITING_RESOURCE' ? '等待处理资源' : taskStatus === 'WAITING_RETRY' ? '等待自动重试' : '正在生成笔记，请稍候…'}</p>
           <p className="mt-2 text-xs text-neutral-500">{currentTask?.message || "处理时间取决于视频长度和提取方式"}</p>
         </div>
+        {currentTask?.can_cancel && <Button variant="outline" onClick={() => cancelTask(currentTask.id)}>取消排队</Button>}
       </div>
     )
   }
@@ -472,7 +474,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
       <div className="flex h-screen w-full flex-col items-center justify-center gap-4 space-y-3">
         <Error />
         <div className="text-center">
-          <p className="text-lg font-bold text-red-500">笔记生成失败</p>
+          <p className="text-lg font-bold text-red-500">{taskStatus === 'CANCELLED' ? '任务已取消' : '笔记生成失败'}</p>
           <p className="mt-2 mb-2 text-xs text-red-400">{currentTask?.message || "请检查设置或稍后重试"}</p>
 
           <Button onClick={() => retryTask(currentTask.id)} size="lg">

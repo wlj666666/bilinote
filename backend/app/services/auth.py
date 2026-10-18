@@ -12,7 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.db.engine import get_db
+from app.db import engine as db_module
 from app.db.models.users import AuthSession, User
 
 PASSWORD_ITERATIONS = 600_000
@@ -70,15 +70,18 @@ def token_digest(token: str) -> str:
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
-    db: Session = Depends(get_db),
 ) -> User:
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise HTTPException(401, "请先登录", headers={"WWW-Authenticate": "Bearer"})
-    session = db.get(AuthSession, token_digest(credentials.credentials))
-    user = db.get(User, session.user_id) if session and session.expires_at > time.time() else None
-    if user is None or not user.enabled:
-        raise HTTPException(401, "登录已过期，请重新登录", headers={"WWW-Authenticate": "Bearer"})
-    return user
+    # Release authentication's connection before endpoint code opens another
+    # session. Holding one per request deadlocks a bounded pool under a burst.
+    with db_module.SessionLocal() as db:
+        session = db.get(AuthSession, token_digest(credentials.credentials))
+        user = db.get(User, session.user_id) if session and session.expires_at > time.time() else None
+        if user is None or not user.enabled:
+            raise HTTPException(401, "登录已过期，请重新登录", headers={"WWW-Authenticate": "Bearer"})
+        db.expunge(user)
+        return user
 
 
 def require_admin(user: User = Depends(get_current_user)) -> User:

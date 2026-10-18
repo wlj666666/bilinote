@@ -1,12 +1,12 @@
 import { create } from 'zustand'
-import { delete_task, generateNote, type GenerateNoteRequest } from '@/services/note.ts'
+import { delete_task, generateNote, cancelTask, type GenerateNoteRequest } from '@/services/note.ts'
 import { v4 as uuidv4 } from 'uuid'
 import toast from 'react-hot-toast'
 import request from '@/utils/request'
 import { getAuthToken } from '@/utils/authSession'
 
 
-export type TaskStatus = 'PENDING' | 'RUNNING' | 'PARSING' | 'DOWNLOADING' | 'DETECTING_SUBTITLES' | 'EXTRACTING_SUBTITLES' | 'TRANSCRIBING' | 'SUMMARIZING' | 'FORMATTING' | 'SAVING' | 'SUCCESS' | 'FAILED'
+export type TaskStatus = 'CANCELLED' | 'WAITING_RESOURCE' | 'WAITING_RETRY' | 'PENDING' | 'RUNNING' | 'PARSING' | 'DOWNLOADING' | 'DETECTING_SUBTITLES' | 'EXTRACTING_SUBTITLES' | 'TRANSCRIBING' | 'SUMMARIZING' | 'FORMATTING' | 'SAVING' | 'SUCCESS' | 'FAILED'
 
 export interface AudioMeta {
   cover_url: string
@@ -45,6 +45,7 @@ export interface Task {
   transcript: Transcript
   status: TaskStatus
   message?: string
+  can_cancel?: boolean
   audioMeta: AudioMeta
   createdAt: string
   platform: string
@@ -59,6 +60,7 @@ interface TaskStore {
   currentTaskId: string | null
   addPendingTask: (taskId: string, platform: string, formData: GenerateNoteRequest) => void
   updateTaskContent: (id: string, data: Partial<Omit<Task, 'id' | 'createdAt'>>) => void
+  cancelTask: (id: string) => Promise<void>
   removeTask: (id: string) => void
   clearTasks: () => void
   setCurrentTask: (taskId: string | null) => void
@@ -97,6 +99,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
               formData: formData,
               id: taskId,
               status: 'PENDING',
+              can_cancel: true,
               markdown: '',
               platform: platform,
               transcript: {
@@ -116,7 +119,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
                 video_id: '',
               },
             },
-            ...state.tasks,
+            ...state.tasks.filter(task => task.id !== taskId),
           ],
           currentTaskId: taskId, // 默认设置为当前任务
         })),
@@ -224,6 +227,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
                     ...t,
                     formData: newFormData, // ✅ 显式更新 formData
                     status: 'PENDING',
+                    can_cancel: true,
                     message: '',
                   }
                   : t
@@ -231,6 +235,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         }))
       },
 
+
+      cancelTask: async id => {
+        const ownerId = get().ownerId
+        try {
+          await cancelTask(id)
+          if (ownerId !== get().ownerId) return
+          get().updateTaskContent(id, { status: 'CANCELLED', message: '任务已取消', can_cancel: false })
+          toast.success('任务已取消')
+        } catch { /* Server decides atomically whether execution has already started. */ }
+      },
 
       removeTask: async id => {
         const ownerId = get().ownerId

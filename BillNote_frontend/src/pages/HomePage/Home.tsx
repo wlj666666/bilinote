@@ -20,7 +20,7 @@ export const HomePage: FC = () => {
       setStatus('idle')
     } else if (currentTask.status === 'SUCCESS') {
       setStatus('success')
-    } else if (currentTask.status === 'FAILED') {
+    } else if (['FAILED', 'CANCELLED'].includes(currentTask.status)) {
       setStatus('failed')
     } else {
       // PENDING、PARSING、DOWNLOADING、TRANSCRIBING、SUMMARIZING 等所有进行中状态

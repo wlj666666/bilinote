@@ -187,7 +187,14 @@ class HardSubtitleExtractor:
         # Native codec/OCR failures cannot leave the main task worker blocked forever.
         # spawn a clean interpreter rather than forking a process with native threads.
         from app.ocr.worker_runner import run_worker
-        return run_worker(video_path, diagnostic_path, self.fps, self.block_seconds, progress)
+        from app.services.task_resources import resources
+        from app.ocr.runtime import requested_device
+        names = ('cpu', 'gpu') if requested_device() == 'cuda' else ('cpu',)
+        with resources(*names):
+            if requested_device() == 'cuda' and os.getenv('TASK_INFERENCE_KEY'):
+                from app.services.inference_runtime import inference_call
+                inference_call('prepare_ocr')
+            return run_worker(video_path, diagnostic_path, self.fps, self.block_seconds, progress)
 
     def _extract_direct(self, video_path, diagnostic_path, progress=None):
         report = {'pipeline_version': PIPELINE_VERSION, 'fps': self.fps, 'blocks': []}

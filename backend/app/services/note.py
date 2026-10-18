@@ -77,10 +77,12 @@ class NoteGenerator:
 
     def __init__(self):
         from app.services.transcriber_config_manager import TranscriberConfigManager
+        from app.services.task_context import transcriber_snapshot
         config_manager = TranscriberConfigManager()
-        self.model_size: str = config_manager.get_whisper_model_size()
+        snapshot = transcriber_snapshot.get() or config_manager.get_config()
+        self.model_size: str = snapshot["whisper_model_size"]
         self.device: Optional[str] = None
-        self.transcriber_type: str = config_manager.get_transcriber_type()
+        self.transcriber_type: str = snapshot["transcriber_type"]
         self.transcriber: Optional[Transcriber] = None
         self.video_path: Optional[Path] = None
         self.video_img_urls=[]
@@ -259,6 +261,9 @@ class NoteGenerator:
 
         except Exception as exc:
             logger.error(f"生成笔记流程异常 (task_id={task_id})：{exc}", exc_info=True)
+            from app.services.task_context import attempt
+            if attempt.get():
+                raise
             self._handle_exception(task_id, exc)
             return None
 
@@ -346,6 +351,8 @@ class NoteGenerator:
         if not task_id:
             return
 
+        from app.services.task_context import status as update_managed_status
+        update_managed_status(status.value if isinstance(status, TaskStatus) else status, message or TaskStatus.description(status))
         self.note_output_dir.mkdir(parents=True, exist_ok=True)
         status_file = self.note_output_dir / f"{task_id}.status.json"
         print(f"写入状态文件: {status_file} 当前状态: {status}")
@@ -375,6 +382,9 @@ class NoteGenerator:
                 logger.error(f"写入错误  {e}")
 
     def _handle_exception(self, task_id, exc):
+        from app.services.task_context import attempt
+        if attempt.get():
+            return  # The managed worker decides retry versus terminal failure.
         logger.error(f"任务异常 (task_id={task_id})", exc_info=True)
         error_message = getattr(exc, 'detail', str(exc))
         if type(exc).__name__ == "APITimeoutError":
@@ -447,9 +457,11 @@ class NoteGenerator:
                     has_audio = bool(container.streams.audio)
                 if has_audio:
                     extracted_audio = str(Path(media_dir) / "audio.mp3")
-                    subprocess.run(["ffmpeg", "-y", "-i", str(self.video_path), "-vn",
-                                    "-codec:a", "libmp3lame", "-q:a", "4", extracted_audio],
-                                   check=True, capture_output=True)
+                    from app.services.task_resources import resources
+                    with resources('cpu'):
+                        subprocess.run(["ffmpeg", "-y", "-threads", "1", "-i", str(self.video_path), "-vn",
+                                        "-codec:a", "libmp3lame", "-threads", "1", "-q:a", "4", extracted_audio],
+                                       check=True, capture_output=True)
             if "skip_download" in inspect.signature(downloader.download).parameters:
                 kwargs["skip_download"] = skip_download or extracted_audio is not None
                 cached = downloader.download(**kwargs)
@@ -491,13 +503,31 @@ class NoteGenerator:
         # 调用转写器
         try:
             logger.info("开始转写音频")
-            if self.transcriber is None:
+            if self.transcriber_type == 'fast-whisper' and os.getenv('TASK_INFERENCE_KEY'):
                 from app.services.transcriber_config_manager import TranscriberConfigManager
-                readiness = TranscriberConfigManager().is_model_ready()
-                if not readiness["ready"]:
-                    raise RuntimeError(readiness["reason"])
-                self.transcriber = self._init_transcriber()
-            transcript = self.transcriber.transcript(file_path=audio_file)
+                readiness = TranscriberConfigManager().is_model_ready({
+                    'transcriber_type': self.transcriber_type, 'whisper_model_size': self.model_size})
+                if not readiness['ready']:
+                    raise RuntimeError(readiness['reason'])
+                from app.services.task_resources import resources
+                from app.services.inference_runtime import inference_call
+                with resources('cpu', 'gpu'):
+                    data = inference_call('transcribe', model_size=self.model_size, file_path=str(Path(audio_file).resolve()))
+                transcript = TranscriptResult(data.get('language'), data['full_text'],
+                    [TranscriptSegment(**seg) for seg in data['segments']], data.get('raw'))
+                atomic_json(transcript_cache_file, asdict(transcript))
+                return transcript
+            from app.services.task_resources import resources
+            resource_names = ('cpu', 'gpu') if self.transcriber_type in {'fast-whisper', 'mlx-whisper'} else ()
+            with resources(*resource_names):
+                if self.transcriber is None:
+                    from app.services.transcriber_config_manager import TranscriberConfigManager
+                    readiness = TranscriberConfigManager().is_model_ready({
+                        'transcriber_type': self.transcriber_type, 'whisper_model_size': self.model_size})
+                    if not readiness['ready']:
+                        raise RuntimeError(readiness['reason'])
+                    self.transcriber = self._init_transcriber()
+                transcript = self.transcriber.transcript(file_path=audio_file)
             transcript_cache_file.write_text(json.dumps(asdict(transcript), ensure_ascii=False, indent=2), encoding="utf-8")
             logger.info(f"转写并缓存成功 ({transcript_cache_file})")
             return transcript
@@ -551,8 +581,17 @@ class NoteGenerator:
             checkpoint_key=checkpoint_key,
         )
 
+        signature = gpt._build_source_signature(source)
+        summary_cache = markdown_cache_file.with_suffix('.summary.json')
+        try:
+            cached = json.loads(summary_cache.read_text(encoding='utf-8'))
+            if cached.get('signature') == signature and cached.get('markdown'):
+                return cached['markdown']
+        except (OSError, ValueError, TypeError):
+            pass
         try:
             markdown = gpt.summarize(source)
+            atomic_json(summary_cache, {'signature': signature, 'markdown': markdown})
             markdown_cache_file.write_text(markdown, encoding="utf-8")
             logger.info(f"GPT 总结并缓存成功 ({markdown_cache_file})")
             return markdown

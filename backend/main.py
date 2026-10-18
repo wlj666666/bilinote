@@ -88,16 +88,24 @@ async def lifespan(app: FastAPI):
         if _proxy:
             logger.info(f"           已应用全局代理到环境变量: {_proxy}")
 
+        from app.services.task_scheduler import task_scheduler
+        task_scheduler.start()
+
         from app.services.task_recovery import recover_interrupted_tasks
         recovered = recover_interrupted_tasks(os.getenv("NOTE_OUTPUT_DIR", "note_results"))
         logger.info("已处理 %s 个服务中断遗留任务", recovered)
 
         logger.info("[startup 5/5] 启动完成，等待请求")
     except Exception:
+        from app.services.task_scheduler import task_scheduler
+        task_scheduler.stop()
         logger.exception("[startup FAILED] 后端启动期异常，详见堆栈；容器会退出并由 restart 策略决定是否重试")
         raise
 
-    yield
+    try:
+        yield
+    finally:
+        task_scheduler.stop()
 
 app = create_app(lifespan=lifespan)
 

@@ -12,7 +12,9 @@ BACKEND_PORT= os.getenv("BACKEND_PORT", 8483)
 BACKEND_BASE_URL = f"{api_path}:{BACKEND_PORT}"
 
 from typing import Optional
+from app.services.task_resources import cpu_stage
 from app.services.storage_scope import current_scope, static_root
+@cpu_stage
 def generate_screenshot(video_path: str, output_dir: str, timestamp: int, index: int) -> str:
     """
     使用 ffmpeg 生成截图，返回生成图片路径
@@ -24,11 +26,11 @@ def generate_screenshot(video_path: str, output_dir: str, timestamp: int, index:
     output_path = output_dir / filename
 
     command = [
-        "ffmpeg",
+        "ffmpeg", "-threads", "1",
         "-ss", str(timestamp),
         "-i", str(video_path),
         "-frames:v", "1",
-        "-q:v", "2",
+        "-q:v", "2", "-threads", "1",
         str(output_path),
         "-y"
     ]

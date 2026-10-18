@@ -104,8 +104,11 @@ class UniversalGPT(GPT):
         return self.checkpoint_dir / f"{safe_key}.gpt.checkpoint.json"
 
     def _build_source_signature(self, source: GPTSource) -> str:
+        from app.services.task_context import summary_revision
         payload = {
             "model": self.model,
+            "provider_endpoint": str(getattr(self.client, "base_url", "")),
+            "generation_revision": summary_revision.get(),
             "temperature": self.temperature,
             "max_request_bytes": self.max_request_bytes,
             "title": source.title,
@@ -168,6 +171,8 @@ class UniversalGPT(GPT):
     @staticmethod
     def _is_retryable_error(exc: Exception) -> bool:
         raw = str(exc).lower()
+        if UniversalGPT._is_insufficient_quota_error(exc):
+            return False
         retryable_tokens = (
             "error code: 524",
             "bad_response_status_code",
@@ -186,7 +191,7 @@ class UniversalGPT(GPT):
         if any(token in raw for token in retryable_tokens):
             return True
 
-        status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
+        status = getattr(exc, "status_code", None) or getattr(exc, "status", None) or getattr(getattr(exc, "response", None), "status_code", None)
         return status in {408, 409, 429, 500, 502, 503, 504, 524}
 
     @staticmethod
@@ -201,6 +206,42 @@ class UniversalGPT(GPT):
         )
 
     def _do_create(self, messages: list):
+        from app.services.task_resources import resources, provider_cooldown_key, provider_cooldown_remaining, record_provider_cooldown
+        from app.services.task_context import status, retry_wait
+        key = provider_cooldown_key(self.client)
+        while True:
+            remaining = provider_cooldown_remaining(key)
+            if remaining > 0:
+                retry_wait(min(remaining, 10), '模型接口限流，等待恢复后重试')
+                continue
+            with resources('api'):
+                if provider_cooldown_remaining(key) > 0:
+                    continue
+                status('SUMMARIZING', '正在请求模型总结')
+                try:
+                    return self._do_create_unlimited(messages)
+                except Exception as exc:
+                    headers = getattr(getattr(exc, 'response', None), 'headers', {}) or {}
+                    raw_retry = headers.get('retry-after')
+                    seconds = None
+                    if raw_retry:
+                        try:
+                            seconds = float(raw_retry)
+                        except ValueError:
+                            try:
+                                from email.utils import parsedate_to_datetime
+                                seconds = parsedate_to_datetime(raw_retry).timestamp() - time.time()
+                            except (ValueError, TypeError, OverflowError):
+                                pass
+                    import math
+                    code = getattr(exc, 'status_code', None) or getattr(getattr(exc, 'response', None), 'status_code', None)
+                    if code == 429 and not self._is_insufficient_quota_error(exc) and seconds is None:
+                        seconds = max(1, self._retry_base_backoff)
+                    if seconds is not None and math.isfinite(seconds) and seconds > 0:
+                        record_provider_cooldown(key, seconds)
+                    raise
+
+    def _do_create_unlimited(self, messages: list):
         """单次调用。如果模型拒绝自定义 temperature，就地去掉该参数再试一次
         （不消耗外层的重试次数预算），仍失败则把异常抛给外层重试逻辑。"""
         try:
@@ -235,7 +276,8 @@ class UniversalGPT(GPT):
                 if attempt == self._max_retry_attempts - 1 or not self._is_retryable_error(exc):
                     raise
                 sleep_seconds = self._retry_base_backoff * (2 ** attempt)
-                time.sleep(sleep_seconds)
+                from app.services.task_context import retry_wait
+                retry_wait(sleep_seconds)
 
         if last_exc is not None:
             raise last_exc

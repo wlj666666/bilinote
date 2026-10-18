@@ -1,5 +1,8 @@
 import request from '@/utils/request'
 import toast from 'react-hot-toast'
+import { getAuthToken } from '@/utils/authSession'
+
+const pendingSubmissions = new Map<string, string>()
 import type { AudioMeta, Transcript, TaskStatus } from '@/store/taskStore'
 
 export interface GenerateNoteRequest {
@@ -9,6 +12,7 @@ export interface GenerateNoteRequest {
   model_name: string
   provider_id: string
   task_id?: string
+  request_id?: string
   format?: Array<string>
   style?: string
   extras?: string
@@ -21,11 +25,14 @@ export interface GenerateNoteRequest {
 }
 
 export const generateNote = async (data: GenerateNoteRequest) => {
+  const key = JSON.stringify([getAuthToken(), data])
+  const requestId = data.request_id || pendingSubmissions.get(key) || crypto.randomUUID()
+  pendingSubmissions.set(key, requestId)
   try {
-    console.log('generateNote', data)
-    const response = await request.post<unknown, { task_id: string }>('/generate_note', data)
+    const response = await request.post<unknown, { task_id: string }>('/generate_note', { ...data, request_id: requestId })
 
     if (!response) throw new Error('任务提交未返回有效结果')
+    pendingSubmissions.delete(key)
     toast.success('笔记生成任务已提交！')
 
     console.log('res', response)
@@ -33,6 +40,7 @@ export const generateNote = async (data: GenerateNoteRequest) => {
 
     return response
   } catch (e: any) {
+    if (e?.code && e.code !== 500 && e.code !== 500000) pendingSubmissions.delete(key)
     console.error('❌ 请求出错', e)
 
     // 错误提示
@@ -63,7 +71,7 @@ export const get_task_status = async (task_id: string) => {
   try {
     // 成功提示
 
-    return await request.get<unknown, { status: TaskStatus; message?: string; result: { markdown: string; transcript: Transcript; audio_meta: AudioMeta } }>('/task_status/' + task_id)
+    return await request.get<unknown, { status: TaskStatus; message?: string; can_cancel?: boolean; result: { markdown: string; transcript: Transcript; audio_meta: AudioMeta } }>('/task_status/' + task_id)
   } catch (e) {
     console.error('❌ 请求出错', e)
 
@@ -73,3 +81,5 @@ export const get_task_status = async (task_id: string) => {
     throw e // 抛出错误以便调用方处理
   }
 }
+
+export const cancelTask = (taskId: string) => request.post('/cancel_task', { task_id: taskId })

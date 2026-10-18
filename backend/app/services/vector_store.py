@@ -9,6 +9,8 @@ from chromadb.config import Settings
 from app.utils.logger import get_logger
 from pathlib import Path
 from app.services.storage_scope import current_scope
+from app.services.task_resources import cpu_stage
+from app.services.local_embeddings import CPUEmbeddingFunction
 from app.services.user_data import require_task, task_notes_dir, read_json
 
 logger = get_logger(__name__)
@@ -109,6 +111,7 @@ class VectorStoreManager:
 
     def __init__(self, user_id: int | None = None):
         scope = current_scope.get()
+        self.embedding_function = CPUEmbeddingFunction()
         self.user_id = user_id if user_id is not None else (scope.user_id if scope else None)
         path = Path(VECTOR_DB_DIR) / 'users' / str(self.user_id) if self.user_id is not None else Path(VECTOR_DB_DIR)
         path.mkdir(parents=True, exist_ok=True)
@@ -139,6 +142,7 @@ class VectorStoreManager:
         """ChromaDB collection 名称：直接使用 task_id（UUID 格式合法）。"""
         return task_id
 
+    @cpu_stage
     def index_task(self, task_id: str) -> None:
         if self.user_id is None:
             return self._index_task(task_id)
@@ -188,6 +192,7 @@ class VectorStoreManager:
 
         collection = client.create_collection(
             name=col_name,
+            embedding_function=self.embedding_function,
             metadata={"hnsw:space": "cosine"},
         )
 
@@ -211,6 +216,7 @@ class VectorStoreManager:
             })
         return chunks
 
+    @cpu_stage
     def query(self, task_id: str, query_text: str, n_results: int = 6) -> list[dict]:
         """
         按固定配额从各来源检索：meta 1 条、markdown 2 条、transcript 3 条，
@@ -219,7 +225,7 @@ class VectorStoreManager:
         col_name = self._collection_name(task_id)
         client = self._client_for(task_id)
         try:
-            collection = client.get_collection(col_name)
+            collection = client.get_collection(col_name, embedding_function=self.embedding_function)
         except Exception:
             logger.warning(f"Collection 不存在: {col_name}")
             return []
@@ -257,7 +263,7 @@ class VectorStoreManager:
         col_name = self._collection_name(task_id)
         client = self._client_for(task_id)
         try:
-            col = client.get_collection(col_name)
+            col = client.get_collection(col_name, embedding_function=self.embedding_function)
             if col.count() == 0:
                 return False
             # 检查是否包含 meta chunk，旧索引可能缺失

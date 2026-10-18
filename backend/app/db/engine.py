@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 
@@ -11,7 +11,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///bili_note.db")
 # SQLite 需要特定连接参数，其他数据库不需要
 engine_args = {}
 if DATABASE_URL.startswith("sqlite"):
-    engine_args["connect_args"] = {"check_same_thread": False}
+    engine_args["connect_args"] = {"check_same_thread": False, "timeout": 30}
 
 _pool_args = {}
 if not DATABASE_URL.startswith("sqlite"):
@@ -28,6 +28,12 @@ engine = create_engine(
     **engine_args,
     **_pool_args,
 )
+
+if DATABASE_URL.startswith("sqlite"):
+    @event.listens_for(engine, 'connect')
+    def configure_sqlite(connection, _record):
+        connection.execute('PRAGMA journal_mode=WAL')
+        connection.execute('PRAGMA busy_timeout=30000')
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

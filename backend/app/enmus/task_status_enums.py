@@ -2,6 +2,9 @@ import enum
 
 
 class TaskStatus(str, enum.Enum):
+    WAITING_RESOURCE = "WAITING_RESOURCE"
+    WAITING_RETRY = "WAITING_RETRY"
+    CANCELLED = "CANCELLED"
     PENDING = "PENDING"
     PARSING = "PARSING"
     DOWNLOADING = "DOWNLOADING"
@@ -17,6 +20,9 @@ class TaskStatus(str, enum.Enum):
     @classmethod
     def description(cls, status):
         desc_map = {
+            cls.WAITING_RESOURCE: "等待资源",
+            cls.WAITING_RETRY: "等待重试",
+            cls.CANCELLED: "已取消",
             cls.PENDING: "排队中",
             cls.PARSING: "解析链接",
             cls.DOWNLOADING: "下载中",

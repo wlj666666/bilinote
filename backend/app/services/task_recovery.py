@@ -4,9 +4,16 @@ from pathlib import Path
 
 
 def recover_interrupted_tasks(output_dir: str | Path) -> int:
+    from app.db import engine as db_module
+    from app.db.models.task_jobs import TaskJob
+    from sqlalchemy import select
+    with db_module.SessionLocal() as db:
+        managed = set(db.scalars(select(TaskJob.task_id)).all())
     recovered = 0
     for path in Path(output_dir).rglob("*.status.json"):
         task_id = path.name.removesuffix(".status.json")
+        if task_id in managed:
+            continue
         if task_id.endswith("_markdown"):
             continue  # Legacy summary status files were never real tasks.
         try:

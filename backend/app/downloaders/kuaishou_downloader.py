@@ -10,6 +10,7 @@ from app.downloaders.kuaishou_helper.kuaishou import KuaiShou
 from app.enmus.note_enums import DownloadQuality
 from app.models.audio_model import AudioDownloadResult
 from app.utils.path_helper import get_data_dir
+from app.services.task_resources import resources
 
 
 class KuaiShouDownloader(Downloader, ABC):
@@ -64,9 +65,10 @@ class KuaiShouDownloader(Downloader, ABC):
 
         # 使用 ffmpeg 转换为 mp3
         try:
-            subprocess.run([
-                "ffmpeg", "-y", "-i", mp4_path, "-vn", "-acodec", "libmp3lame", mp3_path
-            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            with resources('cpu'):
+                subprocess.run([
+                    "ffmpeg", "-y", "-threads", "1", "-i", mp4_path, "-vn", "-acodec", "libmp3lame", "-threads", "1", mp3_path
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError:
             raise Exception("ffmpeg 转换 MP3 失败")
 

@@ -52,6 +52,7 @@ class WhisperTranscriber(Transcriber):
             os.getenv("WHISPER_CUDA_COMPUTE_TYPE", "int8_float32")
             if self.device == "cuda" else "int8"
         )
+        self.cpu_threads = cpu_threads
         self.model_size = model_size
 
         model_dir = get_model_dir("whisper")
@@ -74,6 +75,8 @@ class WhisperTranscriber(Transcriber):
             device=self.device,
             compute_type=self.compute_type,
             download_root=model_dir,
+            cpu_threads=self.cpu_threads,
+            num_workers=1,
         )
 
     @staticmethod

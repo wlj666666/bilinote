@@ -11,7 +11,7 @@ from sqlalchemy import select
 from app.db import engine as db_module
 from app.db.models.video_tasks import VideoTask
 from app.services.storage_scope import current_scope, scoped_notes_dir, task_scope
-from app.services.user_data import create_task, require_task, task_notes_dir, save_form, register_file, require_file, read_json
+from app.services.user_data import require_task, task_notes_dir, register_file, require_file, read_json
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -21,7 +21,7 @@ from app.services.auth import get_current_user
 from app.services.available_models import require_available_model
 from app.utils.request_paths import MEDIA_SUFFIXES, validate_task_id, validate_local_upload, validate_platform_url
 from app.utils.secrets import customer_result
-from pydantic import BaseModel, validator, field_validator, model_validator
+from pydantic import BaseModel, Field, validator, field_validator, model_validator
 from dataclasses import asdict
 
 from app.db.video_task_dao import get_task_by_video
@@ -29,13 +29,11 @@ from app.enmus.exception import NoteErrorEnum
 from app.enmus.note_enums import DownloadQuality
 from app.exceptions.note import NoteError
 from app.services.note import NoteGenerator, logger
-from app.services.task_serial_executor import task_serial_executor
 from app.utils.response import ResponseWrapper as R
 from app.utils.url_parser import extract_video_id, normalize_video_url
 from app.validators.video_url_validator import is_supported_video_url
 from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import StreamingResponse
-import httpx
+from app.utils.image_proxy import fetch_proxy_image
 from app.enmus.task_status_enums import TaskStatus
 
 # from app.services.downloader import download_raw_audio
@@ -59,6 +57,7 @@ class VideoRequest(BaseModel):
     model_name: str
     provider_id: str
     task_id: Optional[str] = None
+    request_id: Optional[str] = Field(default=None, min_length=1, max_length=80)
     format: Optional[list] = []
     style: str = None
     extras: Optional[str]=None
@@ -157,11 +156,7 @@ def run_note_task(task_id: str, video_url: str, platform: str, quality: Download
             video_understanding, video_interval, grid_size, text_extraction_method)
     if user_id is None:
         return _run_note_task(*args)
-    try:
-        task = require_task(task_id, user_id)
-    except Exception:
-        task_serial_executor.release(task_id)
-        raise
+    task = require_task(task_id, user_id)
     with task_scope(user_id, task_id, task_notes_dir(task, NOTE_OUTPUT_DIR)):
         return _run_note_task(*args)
 
@@ -189,16 +184,15 @@ def _run_note_task(task_id, video_url, platform, quality, link=False, screenshot
             text_extraction_method=text_extraction_method,
         )
 
+    from app.services.task_context import attempt
     logger.info(f"任务进入执行队列 (task_id={task_id})")
     try:
         if not model_name or not provider_id:
             raise ValueError("请选择模型和提供者")
-        # Already running inside our executor; never occupy a FastAPI thread
-        # waiting on another worker (or submit recursively to the same pool).
+        # The managed worker owns this workflow; never submit recursively.
         note = _execute_note_task()
         if not note or not note.markdown:
-            logger.warning(f"任务 {task_id} 执行失败，跳过保存")
-            return
+            raise RuntimeError("生成任务没有返回有效笔记")
         scope = current_scope.get()
         if scope:
             require_task(task_id, scope.user_id)
@@ -207,10 +201,10 @@ def _run_note_task(task_id, video_url, platform, quality, link=False, screenshot
         logger.info(f"笔记已保存: {task_id}")
     except Exception as exc:
         logger.exception("任务执行或保存失败 task_id=%s", task_id)
+        if attempt.get():
+            raise
         NoteGenerator()._handle_exception(task_id, exc)
         return
-    finally:
-        task_serial_executor.release(task_id)
 
     # 自动建立向量索引（用于 AI 问答），失败不影响笔记生成
     try:
@@ -238,8 +232,15 @@ def delete_task(data: RecordRequest, user: User = Depends(get_current_user)):
         marker = db.get(DeletedTask, task_id)
         if task is None and (marker is None or marker.user_id != user.id):
             raise HTTPException(404, '任务不存在')
-    if task_serial_executor.is_reserved(task_id) or not task_serial_executor.reserve(task_id):
-        raise HTTPException(409, '任务正在处理，请结束后再删除')
+    from app.services.task_queue import transaction
+    from app.db.models.task_jobs import TaskJob
+    with transaction() as db:
+        job = db.get(TaskJob, task_id)
+        if job and job.state in {'QUEUED', 'RUNNING'}:
+            raise HTTPException(409, '任务正在排队或处理，请先取消排队或等待结束后再删除')
+        task = db.scalar(select(VideoTask).where(VideoTask.task_id == task_id, VideoTask.user_id == user.id))
+        if task:
+            task.deleted = True
     try:
         from app.services.task_deletion import purge_task
         purge_task(task_id, user.id, NOTE_OUTPUT_DIR, UPLOAD_DIR)
@@ -248,8 +249,6 @@ def delete_task(data: RecordRequest, user: User = Depends(get_current_user)):
     except Exception:
         logger.exception('清理任务失败 task_id=%s', task_id)
         raise HTTPException(500, '任务清理未完成，请重试删除或联系管理员') from None
-    finally:
-        task_serial_executor.release(task_id)
     return R.success(msg='删除成功')
 
 
@@ -296,57 +295,55 @@ def generate_note(data: VideoRequest, user: User = Depends(get_current_user)):
     if data.task_id:
         validate_task_id(data.task_id)
         require_task(data.task_id, user.id)
-    reserved = False
-    try:
-        video_id = extract_video_id(data.video_url, data.platform)
-        # if not video_id:
-        #     raise HTTPException(status_code=400, detail="无法提取视频 ID")
-        # existing = get_task_by_video(video_id, data.platform)
-        # if existing:
-        #     return R.error(
-        #         msg='笔记已生成，请勿重复发起',
-        #
-        #     )
-        if data.task_id:
-            # 如果传了task_id，说明是重试！
-            task_id = data.task_id
-            logger.info(f"重试模式，复用已有 task_id={task_id}")
-        else:
-            # 正常新建任务
-            task_id = str(uuid.uuid4())
-            create_task(task_id, user.id, data.model_dump(exclude={'prefetched_transcript'}, mode='json'))
+    from app.services.task_queue import enqueue
+    from app.services.transcriber_config_manager import TranscriberConfigManager
+    payload = {
+        'source': local_source,
+        'form': data.model_dump(exclude={'task_id', 'request_id'}, mode='json'),
+        'transcriber': TranscriberConfigManager().get_config(),
+    }
+    task_id = enqueue(user.id, payload, task_id=data.task_id, request_id=data.request_id)
+    return R.success({'task_id': task_id})
 
-        if not task_serial_executor.reserve(task_id):
-            return R.success({"task_id": task_id}, msg="任务已在队列中，无需重复提交")
-        reserved = True
-        save_form(task_id, user.id, data.model_dump(exclude={'prefetched_transcript'}, mode='json'))
-        task = require_task(task_id, user.id)
-        with task_scope(user.id, task_id, task_notes_dir(task, NOTE_OUTPUT_DIR)):
-            NoteGenerator()._update_status(task_id, TaskStatus.PENDING, '已进入队列，等待处理')
 
-        # 客户端已经抓好字幕的话，写到转写缓存文件，NoteGenerator 的 cache-hit 逻辑会直接用上
-        if data.prefetched_transcript:
-            try:
-                with task_scope(user.id, task_id, task_notes_dir(task, NOTE_OUTPUT_DIR)):
-                    _persist_prefetched_transcript(task_id, data.prefetched_transcript, local_source, data.platform)
-            except Exception as e:
-                logger.warning(f"写入预取字幕失败 (task_id={task_id}): {e}")
+@router.get('/task_queue')
+def task_queue_info(user: User = Depends(get_current_user)):
+    from dataclasses import asdict
+    import time
+    from sqlalchemy import func
+    from app.db.models.task_jobs import TaskJob
+    from app.services.task_limits import TaskLimits
+    with db_module.SessionLocal() as db:
+        mine = dict(db.execute(select(TaskJob.state, func.count()).where(TaskJob.user_id == user.id)
+                               .group_by(TaskJob.state)).all())
+        result = {'limits': asdict(TaskLimits.from_env()), 'active': mine.get('RUNNING', 0),
+                  'queued': mine.get('QUEUED', 0)}
+        if user.role == 'admin':
+            result['global_states'] = dict(db.execute(select(TaskJob.state, func.count()).group_by(TaskJob.state)).all())
+            result['global_phases'] = dict(db.execute(select(TaskJob.phase, func.count()).where(
+                TaskJob.state == 'RUNNING').group_by(TaskJob.phase)).all())
+            oldest = db.scalar(select(func.min(TaskJob.created_at)).where(TaskJob.state == 'QUEUED'))
+            result['oldest_queued_seconds'] = max(0, time.time() - oldest) if oldest else 0
+    return R.success(result)
 
-        task_serial_executor.submit(run_note_task, task_id, local_source, data.platform, data.quality, data.link,
-                                  data.screenshot, data.model_name, data.provider_id, data.format, data.style,
-                                  data.extras, data.video_understanding, data.video_interval, data.grid_size, data.text_extraction_method, user_id=user.id)
-        return R.success({"task_id": task_id})
-    except Exception as e:
-        if reserved:
-            task_serial_executor.release(task_id)
-            with task_scope(user.id, task_id, task_notes_dir(require_task(task_id, user.id), NOTE_OUTPUT_DIR)):
-                NoteGenerator()._handle_exception(task_id, e)
-        raise HTTPException(status_code=500, detail=str(e) if user.role == "admin" else "任务提交失败，请稍后重试")
+
+@router.post('/cancel_task')
+def cancel_task(data: RecordRequest, user: User = Depends(get_current_user)):
+    if not data.task_id:
+        raise HTTPException(400, '缺少任务编号')
+    require_task(data.task_id, user.id)
+    from app.services.task_queue import cancel
+    cancel(data.task_id, user.id)
+    return R.success({'task_id': data.task_id, 'status': 'CANCELLED'}, msg='任务已取消')
 
 
 @router.get("/task_status/{task_id}")
 def get_task_status(task_id: str, user: User = Depends(get_current_user)):
     task = require_task(task_id, user.id)
+    from app.services.task_queue import public_job
+    managed = public_job(task_id, user.role == 'admin')
+    if managed and managed['status'] != 'SUCCESS':
+        return R.success(managed)
     directory = task_notes_dir(task, NOTE_OUTPUT_DIR)
     status_path = directory / f'{task_id}.status.json'
     result_path = directory / f'{task_id}.json'
@@ -428,30 +425,4 @@ async def image_proxy(request: Request, url: str, user: User = Depends(get_curre
     reference = local_file_reference(url)
     if reference:
         return private_file(*reference, user)
-    headers = {
-        "Referer": "https://www.bilibili.com/",
-        "User-Agent": request.headers.get("User-Agent", ""),
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(url, headers=headers)
-
-            if resp.status_code != 200:
-                raise HTTPException(status_code=resp.status_code, detail="图片获取失败")
-
-            content_type = resp.headers.get("Content-Type", "image/jpeg")
-            if content_type.split(";", 1)[0].lower() not in {"image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"}:
-                raise HTTPException(400, "仅支持代理图片")
-            return StreamingResponse(
-                resp.aiter_bytes(),
-                media_type=content_type,
-                headers={
-                    "Cache-Control": "public, max-age=86400",  #  缓存一天
-                    "Content-Type": content_type,
-                }
-            )
-    except HTTPException:
-        raise
-    except Exception:
-        raise HTTPException(status_code=500, detail="图片获取失败") from None
+    return await fetch_proxy_image(url, request.headers.get("User-Agent", ""))

@@ -52,6 +52,10 @@ BiliNote 是一个开源的 AI 视频笔记助手，支持通过哔哩哔哩、Y
 
 ## 📝 使用文档
 详细文档可以查看[这里](https://docs.bilinote.app/)
+
+本分支已加入管理员／客户登录。首次运行请先按[管理员登录与凭据保护](understanding/管理员登录与凭据保护.md)初始化管理员账号；现有模型与 Cookie 配置沿用。
+
+笔记、文件、聊天和检索已按用户隔离，旧数据归原管理员。迁移和使用说明见[用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)。
 ## 📦 桌面版下载
 本项目提供了 Windows 和 macOS 桌面客户端，可在 [Releases](https://github.com/JefferyHcool/BiliNote/releases) 页面下载最新版本。
 
@@ -420,3 +424,7 @@ MIT License
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=JefferyHcool/BiliNote&type=Date)](https://www.star-history.com/#JefferyHcool/BiliNote&Date)
+
+多用户部署的并发、排队、取消和中断恢复规则见 [任务调度说明](backend/TASK_SCHEDULING.md)。默认全站执行 6 个、每用户执行 1 个；GPU 推理 1 个、CPU 密集阶段 2 个、模型总结请求 2 个。
+
+参数选择依据、GPU 并发 1/2/3/4 对比、显存驻留实验和复现命令见 [并发压测记录及参数选择依据](backend/CONCURRENCY_BENCHMARK.md)。

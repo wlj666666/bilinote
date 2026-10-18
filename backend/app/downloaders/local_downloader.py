@@ -12,12 +12,16 @@ import subprocess
 from app.utils.video_helper import save_cover_to_static
 
 
+from app.services.task_resources import cpu_stage
+
+
 class LocalDownloader(Downloader, ABC):
     def __init__(self):
 
         super().__init__()
 
 
+    @cpu_stage
     def extract_cover(self, input_path: str, output_dir: Optional[str] = None) -> str:
         """
         从本地视频文件中提取一张封面图（默认取第一帧）
@@ -36,11 +40,12 @@ class LocalDownloader(Downloader, ABC):
 
         try:
             command = [
-                'ffmpeg',
+                'ffmpeg', '-threads', '1',
                 '-i', input_path,
                 '-ss', '00:00:01',  # 跳到视频第1秒，防止黑屏
                 '-vframes', '1',  # 只截取一帧
                 '-q:v', '2',  # 输出质量高一点（qscale，2是很高）
+                '-threads', '1',
                 '-y',  # 覆盖
                 output_path
             ]
@@ -53,6 +58,7 @@ class LocalDownloader(Downloader, ABC):
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"提取封面失败: {output_path}") from e
 
+    @cpu_stage
     def convert_to_mp3(self,input_path: str, output_path: str = None) -> str:
         """
         将本地视频文件转为 MP3 音频文件
@@ -69,10 +75,11 @@ class LocalDownloader(Downloader, ABC):
         try:
         # 调用 ffmpeg 转换
             command = [
-                'ffmpeg',
+                'ffmpeg', '-threads', '1',
                 '-i', input_path,
                 '-vn',  # 不要视频流
                 '-acodec', 'libmp3lame',  # 使用mp3编码
+                '-threads', '1',
                 '-y',  # 覆盖输出文件
                 output_path
             ]

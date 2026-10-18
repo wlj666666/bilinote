@@ -4,6 +4,7 @@ from abc import ABC
 from typing import Union, Optional, List
 
 import yt_dlp
+from app.downloaders.common import ResourceLimitedYoutubeDL
 
 from app.downloaders.base import Downloader, DownloadQuality, YDL_RETRY_OPTS
 from app.downloaders.youtube_subtitle import YouTubeSubtitleFetcher
@@ -62,7 +63,7 @@ class YoutubeDownloader(Downloader, ABC):
             ydl_opts['ignore_no_formats_error'] = True
 
         _apply_proxy(ydl_opts)
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with ResourceLimitedYoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=not skip_download)
             video_id = info.get("id")
             title = info.get("title")
@@ -110,7 +111,7 @@ class YoutubeDownloader(Downloader, ABC):
         }
 
         _apply_proxy(ydl_opts)
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with ResourceLimitedYoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=True)
             video_id = info.get("id")
             video_path = os.path.join(output_dir, f"{video_id}.mp4")

@@ -31,7 +31,9 @@ def list_tasks(user: User = Depends(get_current_user), limit: int = Query(100, g
     with db_module.SessionLocal() as db:
         tasks = db.scalars(select(VideoTask).where(VideoTask.user_id == user.id, VideoTask.deleted.is_(False))
                            .order_by(VideoTask.created_at.desc(), VideoTask.id.desc()).offset(offset).limit(limit + 1)).all()
-        return R.success({'tasks': [display_task(task, note_root(), user.role == 'admin', models[0] if models else None) for task in tasks[:limit]], 'has_more': len(tasks) > limit})
+    # Rendering each task opens short sessions for execution state; don't keep
+    # the history query's connection checked out while doing that work.
+    return R.success({'tasks': [display_task(task, note_root(), user.role == 'admin', models[0] if models else None) for task in tasks[:limit]], 'has_more': len(tasks) > limit})
 
 
 @router.get('/tasks/{task_id}/export')

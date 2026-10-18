@@ -18,24 +18,28 @@ export const useTaskPolling = (interval = 3000) => {
 
   useEffect(() => {
     let cancelled = false
+    let polling = false
     const timer = setInterval(async () => {
+      if (polling) return
+      polling = true
+      const ownerId = useTaskStore.getState().ownerId
       const pendingTasks = tasksRef.current.filter(
-        task => task.status != 'SUCCESS' &&
+        task => task.status !== 'CANCELLED' && task.status != 'SUCCESS' &&
           (task.status != 'FAILED' || !reconciledFailedTasks.current.has(task.id))
       )
 
       // 无活跃任务时跳过轮询
-      if (pendingTasks.length === 0) return
+      if (pendingTasks.length === 0) { polling = false; return }
 
       for (const task of pendingTasks) {
         if (task.status === 'FAILED') reconciledFailedTasks.current.add(task.id)
         else reconciledFailedTasks.current.delete(task.id)
         try {
           const res = await get_task_status(task.id)
-          if (cancelled) return
+          if (cancelled || useTaskStore.getState().ownerId !== ownerId) { polling = false; return }
           const { status } = res
 
-          if (status && (status !== task.status || res.message !== task.message)) {
+          if (status && (status !== task.status || res.message !== task.message || res.can_cancel !== task.can_cancel)) {
             if (status === 'SUCCESS') {
               const { markdown, transcript, audio_meta } = res.result
               toast.success('笔记生成成功')
@@ -46,18 +50,20 @@ export const useTaskPolling = (interval = 3000) => {
                 audioMeta: audio_meta,
               })
             } else if (status === 'FAILED') {
-              updateTaskContent(task.id, { status, message: res.message })
+              updateTaskContent(task.id, { status, message: res.message, can_cancel: res.can_cancel })
               console.warn(`⚠️ 任务 ${task.id} 失败`)
             } else {
-              updateTaskContent(task.id, { status, message: res.message })
+              updateTaskContent(task.id, { status, message: res.message, can_cancel: res.can_cancel })
             }
           }
         } catch (e) {
-          if (cancelled) return
+          if (cancelled || useTaskStore.getState().ownerId !== ownerId) { polling = false; return }
+          reconciledFailedTasks.current.delete(task.id)
           console.error('❌ 任务轮询失败：', e)
-          updateTaskContent(task.id, { status: 'FAILED' })
+          // A transient polling failure does not change the server task state.
         }
       }
+      polling = false
     }, interval)
 
     return () => { cancelled = true; clearInterval(timer) }

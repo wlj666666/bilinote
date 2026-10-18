@@ -128,11 +128,15 @@ def display_task(task: VideoTask, root: str | Path, admin: bool = False, default
                      'created_at': datetime.now(timezone.utc).isoformat()}, *markdown]
     elif latest and not isinstance(markdown, list):
         markdown = latest
-    message = status.get('message') or display.get('message') or ''
+    from app.services.task_queue import public_job
+    managed = public_job(task.task_id, admin)
+    if managed:
+        result_status = managed['status']
+    message = (managed or {}).get('message') or status.get('message') or display.get('message') or ''
     if result_status == 'FAILED' and not admin:
         message = '任务处理失败，请重试或联系管理员'
     response = {'id': task.task_id, 'markdown': markdown, 'transcript': result.get('transcript') or display.get('transcript') or {'full_text': '', 'language': '', 'segments': [], 'raw': {}},
-                'status': result_status, 'message': message, 'audioMeta': audio,
+                'status': result_status, 'message': message, 'can_cancel': bool(managed and managed['can_cancel']), 'audioMeta': audio,
                 'createdAt': display.get('createdAt') or (created.isoformat() if created else ''),
                 'platform': task.platform, 'formData': {'video_url': video_url,
                     'platform': task.platform, 'quality': 'medium', 'model_name': '', 'provider_id': '', 'style': 'minimal', **form}}

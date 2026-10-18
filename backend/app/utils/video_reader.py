@@ -10,6 +10,9 @@ from PIL import Image, ImageDraw, ImageFont
 from app.utils.logger import get_logger
 from app.utils.path_helper import get_app_dir
 
+from app.services.task_resources import cpu_stage
+from app.services.task_limits import positive_env
+
 logger = get_logger(__name__)
 class VideoReader:
     def __init__(self,
@@ -59,7 +62,7 @@ class VideoReader:
         """提取单帧，返回输出路径或 None（失败时）。"""
         time_label = self.format_time(ts)
         output_path = os.path.join(self.frame_dir, f"frame_{time_label}.jpg")
-        cmd = ["ffmpeg", "-ss", str(ts), "-i", self.video_path, "-frames:v", "1", "-q:v", "2", "-y", output_path,
+        cmd = ["ffmpeg", "-threads", "1", "-ss", str(ts), "-i", self.video_path, "-frames:v", "1", "-q:v", "2", "-threads", "1", "-y", output_path,
                "-hide_banner", "-loglevel", "error"]
         try:
             subprocess.run(cmd, check=True)
@@ -67,6 +70,7 @@ class VideoReader:
         except subprocess.CalledProcessError:
             return None
 
+    @cpu_stage
     def extract_frames(self, max_frames=1000) -> list[str]:
 
         try:
@@ -79,7 +83,7 @@ class VideoReader:
                               for i in range(max_frames)]
 
             # 并行提取帧
-            max_workers = min(os.cpu_count() or 4, 8, len(timestamps))
+            max_workers = min(positive_env('VIDEO_FRAME_WORKERS', 2), len(timestamps))
             frame_results: dict[int, str | None] = {}
             with ThreadPoolExecutor(max_workers=max_workers) as pool:
                 futures = {pool.submit(self._extract_single_frame, ts): ts for ts in timestamps}
@@ -148,6 +152,7 @@ class VideoReader:
                 base64_images.append(f"data:image/jpeg;base64,{encoded_string}")
         return base64_images
 
+    @cpu_stage
     def run(self)->list[str]:
         logger.info("开始提取视频帧...")
         try:

@@ -5,17 +5,23 @@ from app.db.models.users import User, AuthSession
 from app.db.models.user_data import UserFile, ChatEntry, DataMigration, DeletedTask
 from app.db.engine import get_engine, Base
 from sqlalchemy import inspect, text
+from app.db.models.task_jobs import TaskJob, TaskSubmission, TaskSchedulerState
 
 def init_db():
     engine = get_engine()
 
     # Back up existing SQLite data before adding ownership columns.
     inspector = inspect(engine)
-    if 'video_tasks' in inspector.get_table_names() and 'user_id' not in {c['name'] for c in inspector.get_columns('video_tasks')}:
+    if 'video_tasks' in inspector.get_table_names() and (
+            'task_jobs' not in inspector.get_table_names() or
+            'user_id' not in {c['name'] for c in inspector.get_columns('video_tasks')}):
         from app.services.legacy_migration import backup_database
         backup_database(engine)
 
     Base.metadata.create_all(bind=engine)
+    with engine.begin() as connection:
+        if not connection.execute(text("SELECT id FROM task_scheduler_state WHERE id = 1")).first():
+            connection.execute(text("INSERT INTO task_scheduler_state (id) VALUES (1)"))
     user_columns = {column['name'] for column in inspect(engine).get_columns('users')}
     with engine.begin() as connection:
         for name in ('created_at', 'last_login_at'):

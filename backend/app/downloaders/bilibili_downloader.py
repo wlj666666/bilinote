@@ -7,6 +7,8 @@ from abc import ABC
 from typing import Union, Optional, List
 
 import yt_dlp
+from app.downloaders.common import ResourceLimitedYoutubeDL
+from app.services.task_resources import cpu_stage
 
 from app.downloaders.base import Downloader, DownloadQuality, QUALITY_MAP, YDL_RETRY_OPTS
 from app.downloaders.bilibili_dm_patch import apply_bilibili_dm_img_patch
@@ -85,7 +87,7 @@ class BilibiliDownloader(Downloader, ABC):
         if self._cookiefile:
             ydl_opts['cookiefile'] = self._cookiefile
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with ResourceLimitedYoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=not skip_download)
             video_id = info.get("id")
             title = info.get("title")
@@ -105,11 +107,12 @@ class BilibiliDownloader(Downloader, ABC):
         )
 
     @staticmethod
+    @cpu_stage
     def _video_decodes_completely(video_path: str) -> Optional[bool]:
         """Return True for a clean decode, False for damage, None if verification is inconclusive."""
         try:
             result = subprocess.run(
-                ["ffmpeg", "-nostdin", "-v", "error", "-xerror", "-i", video_path,
+                ["ffmpeg", "-threads", "1", "-nostdin", "-v", "error", "-xerror", "-i", video_path,
                  "-map", "0:v:0", "-an", "-f", "null", "-"],
                 stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
                 timeout=300, check=False,
@@ -164,7 +167,7 @@ class BilibiliDownloader(Downloader, ABC):
             ydl_opts['cookiefile'] = self._cookiefile
 
         for attempt in range(2):
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            with ResourceLimitedYoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(video_url, download=True)
                 video_id = info.get("id")
                 video_path = os.path.join(output_dir, f"{video_id}.mp4")
@@ -236,7 +239,7 @@ class BilibiliDownloader(Downloader, ABC):
             ydl_opts['http_headers'] = {'Referer': 'https://www.bilibili.com'}
 
         try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            with ResourceLimitedYoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(video_url, download=True)
 
                 # 查找下载的字幕文件

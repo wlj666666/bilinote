@@ -62,7 +62,7 @@ class TranscriberConfigManager:
     def get_whisper_model_size(self) -> str:
         return self.get_config()["whisper_model_size"]
 
-    def is_model_ready(self) -> Dict[str, Any]:
+    def is_model_ready(self, config: dict | None = None) -> Dict[str, Any]:
         """当前转写器是否就绪可用。
 
         返回 {ready, transcriber_type, model_size, downloading, reason}：
@@ -71,7 +71,7 @@ class TranscriberConfigManager:
           - mlx-whisper：检查 {repo_id}/config.json 落盘
         给 /generate_note 入口做「开始视频前先确认模型下载好」的门禁用。
         """
-        cfg = self.get_config()
+        cfg = config or self.get_config()
         ttype = cfg["transcriber_type"]
         size = cfg["whisper_model_size"]
         result = {

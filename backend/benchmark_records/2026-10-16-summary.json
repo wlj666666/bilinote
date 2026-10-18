@@ -1,0 +1,729 @@
+{
+  "test_date": "2026-10-16",
+  "description": "Aggregate metrics preserved from existing local benchmark reports; no benchmark rerun. Source logs and per-job details remain in data/concurrency_benchmark.",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "gpu_memory_mib": 8151,
+    "linux_logical_cpus": 32,
+    "linux_memory_gib_approx": 15.5
+  },
+  "scope": {
+    "asr_model": "large-v3",
+    "compute_type": "int8_float32",
+    "api_summary": "stub, 6 seconds per call; no paid requests",
+    "requests": "FastAPI TestClient ASGI; no public network load test"
+  },
+  "adopted_parameters": {
+    "TASK_MAX_WORKERS": 6,
+    "TASK_GPU_SLOTS": 1,
+    "TASK_CPU_SLOTS": 2,
+    "TASK_API_SLOTS": 2,
+    "TASK_USER_ACTIVE": 1,
+    "TASK_USER_QUEUE_LIMIT": 3,
+    "TASK_QUEUE_LIMIT": 20,
+    "WHISPER_KEEP_DURING_OCR": 0,
+    "OCR_GPU_RESERVE_MIB": 3072
+  },
+  "totals": {
+    "gpu_runs": 5,
+    "gpu_inferences": 60,
+    "pipeline_runs": 10,
+    "pipeline_jobs": 132,
+    "indexed_jobs": 132,
+    "burst_requests": 800,
+    "burst_accepted": 200,
+    "burst_http_429": 600
+  },
+  "runs": [
+    {
+      "source": "data/concurrency_benchmark/gpu-1.json",
+      "source_sha256": "2adcc40f6220a5b74a85709a5474420d95a64b0c3d23b13502c91776c05cb76f",
+      "result": {
+        "kind": "shared_whisper_gpu",
+        "gpu_concurrency": 1,
+        "jobs": 12,
+        "succeeded": 12,
+        "errors": [],
+        "elapsed_seconds": 38.844,
+        "jobs_per_minute": 18.536,
+        "audio_seconds": 30,
+        "audio_realtime_multiplier": 9.268,
+        "latency_p50_seconds": 3.236,
+        "latency_p95_seconds": 3.264,
+        "load_seconds": 4.818,
+        "model": "large-v3",
+        "compute_type": "int8_float32",
+        "resource_summary": {
+          "gpu_peak_mib": 2781.0,
+          "gpu_util_mean_pct": 75.5,
+          "gpu_temp_peak_c": 74.0,
+          "ram_available_min_mib": 9851,
+          "cpu_host_mean_pct": 3.9,
+          "cpu_host_peak_pct": 7.26,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 102,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/gpu-2.json",
+      "source_sha256": "a606962a6f5685f08c45c7f60cd428f0cdcf329f5f2b41ae08232d74378b4989",
+      "result": {
+        "kind": "shared_whisper_gpu",
+        "gpu_concurrency": 2,
+        "jobs": 12,
+        "succeeded": 12,
+        "errors": [],
+        "elapsed_seconds": 78.66,
+        "jobs_per_minute": 9.153,
+        "audio_seconds": 30,
+        "audio_realtime_multiplier": 4.577,
+        "latency_p50_seconds": 13.247,
+        "latency_p95_seconds": 14.019,
+        "load_seconds": 3.995,
+        "model": "large-v3",
+        "compute_type": "int8_float32",
+        "resource_summary": {
+          "gpu_peak_mib": 3941.0,
+          "gpu_util_mean_pct": 40.0,
+          "gpu_temp_peak_c": 73.0,
+          "ram_available_min_mib": 9735,
+          "cpu_host_mean_pct": 4.3,
+          "cpu_host_peak_pct": 7.12,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 190,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/gpu-3.json",
+      "source_sha256": "4323526e50b9fd707eba8dda2582453995a27f667009fa88f5bff41fb911d1be",
+      "result": {
+        "kind": "shared_whisper_gpu",
+        "gpu_concurrency": 3,
+        "jobs": 12,
+        "succeeded": 12,
+        "errors": [],
+        "elapsed_seconds": 89.258,
+        "jobs_per_minute": 8.066,
+        "audio_seconds": 30,
+        "audio_realtime_multiplier": 4.033,
+        "latency_p50_seconds": 22.388,
+        "latency_p95_seconds": 23.453,
+        "load_seconds": 4.009,
+        "model": "large-v3",
+        "compute_type": "int8_float32",
+        "resource_summary": {
+          "gpu_peak_mib": 5037.0,
+          "gpu_util_mean_pct": 34.4,
+          "gpu_temp_peak_c": 70.0,
+          "ram_available_min_mib": 9691,
+          "cpu_host_mean_pct": 4.8,
+          "cpu_host_peak_pct": 10.14,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 215,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/gpu-4.json",
+      "source_sha256": "3cd5982ae02100da7a697a8eb14c6f8e327385e4db141856f7717ea913d3d387",
+      "result": {
+        "kind": "shared_whisper_gpu",
+        "gpu_concurrency": 4,
+        "jobs": 12,
+        "succeeded": 12,
+        "errors": [],
+        "elapsed_seconds": 92.362,
+        "jobs_per_minute": 7.795,
+        "audio_seconds": 30,
+        "audio_realtime_multiplier": 3.898,
+        "latency_p50_seconds": 30.514,
+        "latency_p95_seconds": 31.989,
+        "load_seconds": 3.948,
+        "model": "large-v3",
+        "compute_type": "int8_float32",
+        "resource_summary": {
+          "gpu_peak_mib": 6165.0,
+          "gpu_util_mean_pct": 35.3,
+          "gpu_temp_peak_c": 71.0,
+          "ram_available_min_mib": 9757,
+          "cpu_host_mean_pct": 5.1,
+          "cpu_host_peak_pct": 13.16,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 221,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/gpu-1-repeat.json",
+      "source_sha256": "4926cfe3f499103a0921c29a248dc3820aebbf9af2cd1b25339224f770dd9a23",
+      "result": {
+        "kind": "shared_whisper_gpu",
+        "gpu_concurrency": 1,
+        "jobs": 12,
+        "succeeded": 12,
+        "errors": [],
+        "elapsed_seconds": 38.721,
+        "jobs_per_minute": 18.594,
+        "audio_seconds": 30,
+        "audio_realtime_multiplier": 9.297,
+        "latency_p50_seconds": 3.228,
+        "latency_p95_seconds": 3.241,
+        "load_seconds": 4.243,
+        "model": "large-v3",
+        "compute_type": "int8_float32",
+        "resource_summary": {
+          "gpu_peak_mib": 2717.0,
+          "gpu_util_mean_pct": 76.7,
+          "gpu_temp_peak_c": 70.0,
+          "ram_available_min_mib": 9728,
+          "cpu_host_mean_pct": 3.9,
+          "cpu_host_peak_pct": 6.88,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 100,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-1.json",
+      "source_sha256": "253029cd4e1364270e6a735521a5b2afe9348a80c16b9762365facf07e504760",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 1,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 143.344,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.453,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 5.023,
+        "summary_stub_seconds": 6.0,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.127,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 128.284,
+        "completion_p50_seconds": 79.698,
+        "completion_p95_seconds": 138.818,
+        "max_active_observed": 1,
+        "resource_summary": {
+          "gpu_peak_mib": 2717.0,
+          "gpu_util_mean_pct": 11.4,
+          "gpu_temp_peak_c": 64.0,
+          "ram_available_min_mib": 8911,
+          "cpu_host_mean_pct": 2.3,
+          "cpu_host_peak_pct": 7.38,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 324,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-3.json",
+      "source_sha256": "9c5255cbf8351cd8c2aeb5b7ed7b1cc1de0f096191abea80064198ebdd003606",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 3,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 59.211,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.453,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 12.16,
+        "summary_stub_seconds": 6.0,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.135,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 41.952,
+        "completion_p50_seconds": 34.876,
+        "completion_p95_seconds": 55.459,
+        "max_active_observed": 3,
+        "resource_summary": {
+          "gpu_peak_mib": 2749.0,
+          "gpu_util_mean_pct": 27.6,
+          "gpu_temp_peak_c": 66.0,
+          "ram_available_min_mib": 8685,
+          "cpu_host_mean_pct": 4.6,
+          "cpu_host_peak_pct": 10.64,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 133,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-6.json",
+      "source_sha256": "f25fb00a66603980b647a7725238bc8086744c86d38b6b29a2ee72dc521d70f2",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 6,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 51.713,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.463,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 13.923,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": false,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.267,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 24.637,
+        "completion_p50_seconds": 27.578,
+        "completion_p95_seconds": 48.232,
+        "max_active_observed": 6,
+        "resource_summary": {
+          "gpu_peak_mib": 2781.0,
+          "gpu_util_mean_pct": 30.1,
+          "gpu_temp_peak_c": 68.0,
+          "ram_available_min_mib": 8629,
+          "cpu_host_mean_pct": 4.9,
+          "cpu_host_peak_pct": 19.29,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 116,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-9.json",
+      "source_sha256": "95bfad8d8b7424a5ddf6c87874f02729fadd2c6298e11e3c66e029d62db00cba",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 9,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 52.338,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.544,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 13.757,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": false,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "ocr_profiles": [
+            "portrait_speech"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.266,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 11.86,
+        "completion_p50_seconds": 24.665,
+        "completion_p95_seconds": 50.028,
+        "max_active_observed": 9,
+        "resource_summary": {
+          "gpu_peak_mib": 2717.0,
+          "gpu_util_mean_pct": 29.4,
+          "gpu_temp_peak_c": 68.0,
+          "ram_available_min_mib": 8753,
+          "cpu_host_mean_pct": 4.9,
+          "cpu_host_peak_pct": 29.43,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 118,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-keep-3.json",
+      "source_sha256": "b378645287aa4c2544d64fbb31917a0d7afdaaaca60329169e2e9cc315a7d401",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 3,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 53.211,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.449,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 13.531,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": true,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "ocr_profiles": [
+            "portrait_speech"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.173,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 40.418,
+        "completion_p50_seconds": 33.062,
+        "completion_p95_seconds": 51.372,
+        "max_active_observed": 3,
+        "resource_summary": {
+          "gpu_peak_mib": 3126.0,
+          "gpu_util_mean_pct": 28.9,
+          "gpu_temp_peak_c": 65.0,
+          "ram_available_min_mib": 9064,
+          "cpu_host_mean_pct": 4.5,
+          "cpu_host_peak_pct": 9.87,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 120,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-keep-6.json",
+      "source_sha256": "72b006578eec9eba09430e4a0eab6bb320d14bb0165184ad77d76bc8418ca0fc",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 6,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 49.04,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.463,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 14.682,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": true,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "ocr_profiles": [
+            "portrait_speech"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.126,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 25.361,
+        "completion_p50_seconds": 28.875,
+        "completion_p95_seconds": 46.812,
+        "max_active_observed": 6,
+        "resource_summary": {
+          "gpu_peak_mib": 3124.0,
+          "gpu_util_mean_pct": 31.8,
+          "gpu_temp_peak_c": 68.0,
+          "ram_available_min_mib": 8644,
+          "cpu_host_mean_pct": 4.9,
+          "cpu_host_peak_pct": 19.29,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 111,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-keep-9.json",
+      "source_sha256": "d52977fc73b2701e489ef201bfc22f2b4f8c9d37cbf169a51c01c5ae3eb0da41",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 9,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 49.111,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.46,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 14.661,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": true,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "ocr_profiles": [
+            "portrait_speech"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.153,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 11.436,
+        "completion_p50_seconds": 24.663,
+        "completion_p95_seconds": 46.942,
+        "max_active_observed": 9,
+        "resource_summary": {
+          "gpu_peak_mib": 3250.0,
+          "gpu_util_mean_pct": 30.9,
+          "gpu_temp_peak_c": 67.0,
+          "ram_available_min_mib": 8630,
+          "cpu_host_mean_pct": 5.1,
+          "cpu_host_peak_pct": 29.53,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 112,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/pipeline-keep-12.json",
+      "source_sha256": "963f0a14d414d24e191f1bb886b95b4b0a538aab830813a45abf847d6da43ffb",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 12,
+        "users": 12,
+        "jobs": 12,
+        "succeeded": 12,
+        "indexed_count": 12,
+        "refused": [],
+        "elapsed_seconds": 49.397,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.45,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 14.576,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": true,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 30,
+          "ocr_seconds": 15,
+          "ocr_profiles": [
+            "portrait_speech"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.125,
+        "poll_p95_seconds": 0.004,
+        "queue_p95_seconds": 0.577,
+        "completion_p50_seconds": 24.673,
+        "completion_p95_seconds": 46.056,
+        "max_active_observed": 12,
+        "resource_summary": {
+          "gpu_peak_mib": 3126.0,
+          "gpu_util_mean_pct": 32.4,
+          "gpu_temp_peak_c": 69.0,
+          "ram_available_min_mib": 8148,
+          "cpu_host_mean_pct": 5.1,
+          "cpu_host_peak_pct": 38.83,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 111,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/long-keep-6.json",
+      "source_sha256": "d2d1d89b44101acd3b7dfab8d4005b8a1be8ed4b1d16cc8080352fcc0eeacd1e",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 6,
+        "users": 18,
+        "jobs": 18,
+        "succeeded": 18,
+        "indexed_count": 18,
+        "refused": [],
+        "elapsed_seconds": 266.334,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.435,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 4.055,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": true,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 180,
+          "ocr_seconds": 60,
+          "ocr_profiles": [
+            "portrait_speech",
+            "portrait_second",
+            "landscape_second",
+            "landscape_fourth"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.194,
+        "poll_p95_seconds": 0.005,
+        "queue_p95_seconds": 127.169,
+        "completion_p50_seconds": 103.984,
+        "completion_p95_seconds": 246.141,
+        "max_active_observed": 6,
+        "resource_summary": {
+          "gpu_peak_mib": 3677.0,
+          "gpu_util_mean_pct": 53.9,
+          "gpu_temp_peak_c": 74.0,
+          "ram_available_min_mib": 8619,
+          "cpu_host_mean_pct": 4.7,
+          "cpu_host_peak_pct": 18.97,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 601,
+          "guard_reason": null
+        }
+      }
+    },
+    {
+      "source": "data/concurrency_benchmark/long-keep-12.json",
+      "source_sha256": "f43b1abf390638add26a33e52eab57d3019b99301be7a4d30974ad2cc71f3310",
+      "result": {
+        "kind": "authenticated_pipeline",
+        "active": 12,
+        "users": 18,
+        "jobs": 18,
+        "succeeded": 18,
+        "indexed_count": 18,
+        "refused": [],
+        "elapsed_seconds": 270.738,
+        "burst": {
+          "requests": 80,
+          "accepted": 20,
+          "rate_limited": 60,
+          "other_statuses": [],
+          "p95_seconds": 0.446,
+          "queued_after_burst": 20
+        },
+        "jobs_per_minute": 3.989,
+        "summary_stub_seconds": 6.0,
+        "keep_whisper_during_ocr": true,
+        "gpu_slots": 1,
+        "cpu_slots": 2,
+        "api_slots": 2,
+        "local_indexing": "real CPU ONNX embeddings",
+        "media": {
+          "asr_seconds": 180,
+          "ocr_seconds": 60,
+          "ocr_profiles": [
+            "portrait_speech",
+            "portrait_second",
+            "landscape_second",
+            "landscape_fourth"
+          ],
+          "subtitle": "simulated platform subtitle"
+        },
+        "submit_p95_seconds": 0.176,
+        "poll_p95_seconds": 0.005,
+        "queue_p95_seconds": 25.029,
+        "completion_p50_seconds": 88.116,
+        "completion_p95_seconds": 250.917,
+        "max_active_observed": 12,
+        "resource_summary": {
+          "gpu_peak_mib": 3645.0,
+          "gpu_util_mean_pct": 52.9,
+          "gpu_temp_peak_c": 73.0,
+          "ram_available_min_mib": 8101,
+          "cpu_host_mean_pct": 4.7,
+          "cpu_host_peak_pct": 41.59,
+          "swap_used_peak_mib": 0.0,
+          "sample_count": 606,
+          "guard_reason": null
+        }
+      }
+    }
+  ]
+}

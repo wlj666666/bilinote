@@ -129,13 +129,14 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
                     已完成
                   </div>
                 )}
-                {task.status !== 'SUCCESS' && task.status !== 'FAILED' ? (
+                {!['SUCCESS', 'FAILED', 'CANCELLED'].includes(task.status) ? (
                   <div className={'w-auto rounded-full border border-oak bg-linen px-2 py-0.5 text-center text-muted-foreground'}>
-                    等待中
+                    {task.status === 'PENDING' ? '排队中' : task.status === 'WAITING_RESOURCE' ? '等待资源' : task.status === 'WAITING_RETRY' ? '等待重试' : '处理中'}
                   </div>
                 ) : (
                   <></>
                 )}
+                {task.status === 'CANCELLED' && <span>已取消</span>}
                 {task.status === 'FAILED' && (
                   <div className={'w-auto rounded-full border border-red-300 bg-red-50 px-2 py-0.5 text-center text-red-700'}>失败</div>
                 )}

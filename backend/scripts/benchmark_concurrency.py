@@ -134,7 +134,7 @@ def prepare_inputs(seconds=30):
     OUTPUT.mkdir(parents=True, exist_ok=True)
     audio = OUTPUT / f'speech{seconds}.wav'
     if not audio.exists():
-        source = BACKEND / 'data/data/BV1CuNd6GECx.mp3'
+        source = BACKEND / 'data/media/914ed34a6c4e2e4c68c6ab24/BV1CuNd6GECx.mp3'
         subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-threads', '1', '-ss', '40',
             '-i', str(source), '-t', str(seconds), '-ac', '1', '-ar', '16000', str(audio)], check=True)
     video = OUTPUT / f'speech{seconds}.mp4'

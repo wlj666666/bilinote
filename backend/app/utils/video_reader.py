@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from app.utils.logger import get_logger
 from app.utils.path_helper import get_app_dir
+from app.utils.timestamps import format_timestamp
 
 from app.services.task_resources import cpu_stage
 from app.services.task_limits import positive_env
@@ -52,7 +53,7 @@ class VideoReader:
         return f"{mm:02d}_{ss:02d}"
 
     def extract_time_from_filename(self, filename: str) -> float:
-        match = re.search(r"frame_(\d{2})_(\d{2})\.jpg", filename)
+        match = re.search(r"frame_(\d{2,})_(\d{2})\.jpg", filename)
         if match:
             mm, ss = map(int, match.groups())
             return mm * 60 + ss
@@ -126,8 +127,8 @@ class VideoReader:
 
         for path in image_paths:
             img = Image.open(path).convert("RGB").resize((self.unit_width, self.unit_height), Image.Resampling.LANCZOS)
-            timestamp = re.search(r"frame_(\d{2})_(\d{2})\.jpg", os.path.basename(path))
-            time_text = f"{timestamp.group(1)}:{timestamp.group(2)}" if timestamp else ""
+            seconds = self.extract_time_from_filename(os.path.basename(path))
+            time_text = format_timestamp(seconds) if seconds != float('inf') else ""
             draw = ImageDraw.Draw(img)
             draw.text((10, 10), time_text, fill="yellow", font=font, stroke_width=1, stroke_fill="black")
             images.append(img)

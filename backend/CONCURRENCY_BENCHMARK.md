@@ -139,7 +139,7 @@ GPU 独立对比只覆盖同一份 30 秒语音的 Whisper 推理，未比较多
 
 另发现 Chroma 默认 embedding 可能选用可用 GPU provider，从而绕过资源名额。现显式固定为 CPU、ONNX 内部线程 2，索引和查询均受 CPU 阶段额度限制；保持原有 MiniLM 权重和维度，回归验证旧默认索引仍可打开。
 
-修复后运行 `python -m pytest tests/test_task_scheduling.py -q`：24 项全部通过；相关 Python 编译检查与 `git diff --check` 通过。
+修复时的 24 项调度检查、Python 编译检查与 `git diff --check` 均通过；临时回归测试脚本已清理。
 
 初次失败记录保留在 [原始日志](data/concurrency_benchmark/pipeline-1-before-auth-fix.log) 和 [失败汇总](data/concurrency_benchmark/pipeline-summary-before-auth-fix.json)。
 

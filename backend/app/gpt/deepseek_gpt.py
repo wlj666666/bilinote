@@ -5,7 +5,7 @@ from app.gpt.prompt import BASE_PROMPT, AI_SUM, SCREENSHOT
 from app.gpt.utils import fix_markdown
 from app.models.gpt_model import GPTSource
 from app.models.transcriber_model import TranscriptSegment
-from datetime import timedelta
+from app.utils.timestamps import format_timestamp
 
 
 class DeepSeekGPT(GPT):
@@ -19,7 +19,7 @@ class DeepSeekGPT(GPT):
         self.screenshot = False
 
     def _format_time(self, seconds: float) -> str:
-        return str(timedelta(seconds=int(seconds)))[2:]  # e.g., 03:15
+        return format_timestamp(seconds)
 
     def _build_segment_text(self, segments: List[TranscriptSegment]) -> str:
         return "\n".join(

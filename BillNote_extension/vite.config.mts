@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { dirname, relative } from 'node:path'
 import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
@@ -107,9 +105,5 @@ export default defineConfig(({ command }) => ({
         sidepanel: r('src/sidepanel/index.html'),
       },
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
   },
 }))

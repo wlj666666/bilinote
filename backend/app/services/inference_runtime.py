@@ -31,6 +31,7 @@ def inference_call(operation, **kwargs):
 
 
 def _inference_call_once(operation, **kwargs):
+    stall_timeout = positive_env('TASK_INFERENCE_STALL_TIMEOUT_SECONDS', 120)
     endpoint, family = address()
     deadline = time.monotonic() + 10
     while True:
@@ -43,16 +44,19 @@ def _inference_call_once(operation, **kwargs):
             time.sleep(.1)
     with connection:
         connection.send_bytes(json.dumps({'op': operation, **kwargs}).encode())
-        if not connection.poll(positive_env('TASK_INFERENCE_TIMEOUT_SECONDS', 1800)):
-            # Stop the model owner BEFORE the caller releases the GPU gate.
-            info = json.loads((runtime_dir() / 'inference.json').read_text())
-            if os.name == 'posix':
-                os.killpg(info['pid'], signal.SIGKILL)
-            else:
-                import subprocess
-                subprocess.run(['taskkill', '/PID', str(info['pid']), '/T', '/F'], capture_output=True)
-            raise TimeoutError('本地推理超时，已停止推理进程')
-        response = json.loads(connection.recv_bytes())
+        while True:
+            if not connection.poll(stall_timeout):
+                # Stop the model owner BEFORE the caller releases the GPU gate.
+                info = json.loads((runtime_dir() / 'inference.json').read_text())
+                if os.name == 'posix':
+                    os.killpg(info['pid'], signal.SIGKILL)
+                else:
+                    import subprocess
+                    subprocess.run(['taskkill', '/PID', str(info['pid']), '/T', '/F'], capture_output=True)
+                raise TimeoutError(f'本地推理连续 {stall_timeout} 秒无进度，已停止推理进程')
+            response = json.loads(connection.recv_bytes())
+            if 'progress' not in response:
+                break
     if 'error' in response:
         raise RuntimeError(response['error'])
     return response.get('result')
@@ -93,7 +97,7 @@ class ModelOwner:
             gc.collect()
             self.log_memory('whisper_unloaded')
 
-    def handle(self, request):
+    def handle(self, request, progress=None):
         if request['op'] == 'prepare_ocr':
             # Opt-in reuse still runs under the single GPU compute gate. Keep a
             # reserve for OCR workspaces, and unload if memory cannot be measured.
@@ -114,7 +118,9 @@ class ModelOwner:
                 cpu_threads=positive_env('WHISPER_CPU_THREADS', 2))
             self.model_size = model_size
         self.log_memory('whisper_loaded')
-        result = self.transcriber.transcript(request['file_path'])
+        if progress:
+            progress('model_loaded', 0.)
+        result = self.transcriber.transcript(request['file_path'], progress=progress)
         self.log_memory('whisper_finished')
         result.raw = {**(asdict(result.raw) if is_dataclass(result.raw) else {}),
                       'device': self.transcriber.device, 'compute_type': getattr(self.transcriber, 'compute_type', None)}
@@ -133,7 +139,15 @@ def serve():
             with listener.accept() as connection:
                 try:
                     request = json.loads(connection.recv_bytes())
-                    result = owner.handle(request)
+                    last_progress = [None, 0.]
+                    def progress(phase, audio_seconds):
+                        now = time.monotonic()
+                        # Only actual transcription work resets the caller's timer.
+                        if phase != last_progress[0] or now - last_progress[1] >= 5:
+                            connection.send_bytes(json.dumps({'progress': {
+                                'phase': phase, 'audio_seconds': audio_seconds}}).encode())
+                            last_progress[:] = [phase, now]
+                    result = owner.handle(request, progress=progress)
                     connection.send_bytes(json.dumps({'result': result}).encode())
                 except Exception as exc:
                     from app.utils.logger import get_logger

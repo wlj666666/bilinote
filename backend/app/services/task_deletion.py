@@ -95,6 +95,8 @@ def purge_task(task_id: str, user_id: int, notes_root: str | Path,
         _remove(image_root, image_root / 'users' / str(user_id) / task_id, summary)
 
         runtime = Path(runtime_root or RUNTIME_ROOT).resolve()
+        # source_cache/users/<user>/<source> is independent of task lifetime.
+        # Deleting a note must not remove media/text reused by other/new notes.
         for name in ('media', 'data', 'output_frames', 'grid_output'):
             base = runtime / name
             _remove(runtime, base / 'users' / str(user_id) / task_id, summary)

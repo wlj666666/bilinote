@@ -4,6 +4,7 @@ import inspect
 import subprocess
 import os
 from dataclasses import asdict
+from contextlib import nullcontext
 from pathlib import Path
 from typing import List, Optional, Tuple, Union, Any
 
@@ -44,6 +45,7 @@ from app.utils.path_helper import get_app_dir
 from app.utils.logger import get_logger
 from app.services.model_capabilities import saved_image_capability
 from app.services.storage_scope import scoped_notes_dir, current_scope, static_root
+from app.services.source_cache import SourceCache, source_identity, cache_signature, quality_value
 
 # Preserve the existing ASR cache signature when only the OCR algorithm changes.
 ASR_CACHE_POLICY_VERSION = 3
@@ -87,6 +89,8 @@ class NoteGenerator:
         self.video_path: Optional[Path] = None
         self.video_img_urls=[]
         self.summary_notice = ""
+        self.source_cache = None
+        self.legacy_cache_entries = None
         self.note_output_dir = scoped_notes_dir(NOTE_OUTPUT_DIR)
         self.note_output_dir.mkdir(parents=True, exist_ok=True)
         scope = current_scope.get()
@@ -162,61 +166,37 @@ class NoteGenerator:
             if text_extraction_method not in {"asr", "ocr"}:
                 raise ValueError("文字提取方式必须是 asr 或 ocr")
             # Bind retries to the input and extraction policy, never just a task ID.
-            identity = {"url": str(video_url), "platform": platform}
+            identity = source_identity(str(video_url), platform) if platform != 'local' else {"url": str(video_url), "platform": platform}
             if platform == "local":
                 local_path = Path(downloader.download_video(video_url))
                 identity.update(size=local_path.stat().st_size, mtime=local_path.stat().st_mtime_ns)
             input_key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
-            policy = {"input_key": input_key, "method": text_extraction_method,
+            legacy_policy = {"input_key": input_key, "method": text_extraction_method,
                       "version": PIPELINE_VERSION if text_extraction_method == "ocr" else ASR_CACHE_POLICY_VERSION,
                       "fps": os.getenv("OCR_FPS", "5"),
                       "asr_model": self.model_size, "asr_engine": self.transcriber_type,
                       "audio_quality": str(quality), "ocr_model": "rapidocr-3.9.2-ppocrv6"}
             if text_extraction_method == "ocr":
-                policy["ocr_device"] = os.getenv("OCR_DEVICE", "cpu").strip().lower()
-            signature = hashlib.sha256(json.dumps(policy, sort_keys=True).encode()).hexdigest()
-            transcript = self._load_text_cache(transcript_cache_file, signature, input_key)
-            if transcript is None:
-                try:
-                    transcript = downloader.download_subtitles(video_url)
-                    if not transcript or not transcript.segments:
-                        transcript = None
-                    else:
-                        transcript.raw = {**(transcript.raw or {}), "source": "platform_subtitle"}
-                except Exception as exc:
-                    logger.warning(f"平台字幕获取失败，将使用所选提取方式: {exc}")
-
-            needs_ocr = transcript is None and text_extraction_method == "ocr"
-            audio_meta = self._download_media(
-                downloader=downloader, video_url=video_url, quality=quality,
-                audio_cache_file=audio_cache_file, status_phase=TaskStatus.DOWNLOADING,
-                platform=platform, output_path=output_path, screenshot=screenshot,
-                video_understanding=video_understanding, video_interval=video_interval,
-                grid_size=grid_size, skip_download=transcript is not None or needs_ocr,
-                require_video=needs_ocr, input_key=input_key,
-            )
-            if transcript is None:
-                if needs_ocr:
-                    last_progress = [None]
-                    def report_progress(phase, fraction):
-                        value = (phase, int(fraction*100))
-                        if value != last_progress[0]:
-                            last_progress[0] = value
-                            state = TaskStatus.DETECTING_SUBTITLES if phase == "detect" else TaskStatus.EXTRACTING_SUBTITLES
-                            label = {"detect": "定位字幕", "extract": "提取字幕", "review": "复查字幕"}.get(phase, "提取字幕")
-                            self._update_status(task_id, state, f"{label}，已处理 {value[1]}%")
-                    result = HardSubtitleExtractor().extract(
-                        self.video_path, self.note_output_dir / f"{task_id}_ocr_diagnostics.json", report_progress)
-                    if result.status != "success":
-                        raise RuntimeError(result.message)
-                    transcript = result.transcript
-                else:
-                    transcript = self._transcribe_audio(audio_meta.file_path, transcript_cache_file,
-                                                        TaskStatus.TRANSCRIBING)
-                    raw = asdict(transcript).get("raw") or {}
-                    transcript.raw = {**(raw if isinstance(raw, dict) else {"original": raw}), "source": "asr"}
-            transcript.raw = {**(transcript.raw or {}), "input_key": input_key, "cache_signature": signature}
-            atomic_json(transcript_cache_file, asdict(transcript))
+                legacy_policy["ocr_device"] = os.getenv("OCR_DEVICE", "cpu").strip().lower()
+            policy = {k: legacy_policy[k] for k in ('input_key', 'method', 'version')}
+            if text_extraction_method == 'asr':
+                policy.update(asr_model=self.model_size, asr_engine=self.transcriber_type,
+                              audio_quality=quality_value(quality))
+                if self.transcriber_type == 'fast-whisper':
+                    policy['asr_compute_type'] = os.getenv('WHISPER_CUDA_COMPUTE_TYPE', 'int8_float32')
+                elif self.transcriber_type == 'groq':
+                    policy['asr_api_model'] = os.getenv('GROQ_TRANSCRIBER_MODEL')
+            else:
+                policy.update(ocr_model=legacy_policy['ocr_model'], fps=float(legacy_policy['fps']),
+                              ocr_device=legacy_policy['ocr_device'])
+            signature = cache_signature(policy)
+            scope = current_scope.get()
+            self.source_cache = SourceCache(scope.user_id, input_key) if scope and platform != 'local' else None
+            self.legacy_cache_entries = None
+            audio_meta, transcript = self._prepare_source(
+                downloader, video_url, quality, audio_cache_file, transcript_cache_file, task_id,
+                platform, output_path, screenshot, video_understanding, video_interval, grid_size,
+                identity, input_key, policy, signature, legacy_policy)
 
             # 3. GPT 总结
             markdown = self._summarize_text(
@@ -403,7 +383,11 @@ class NoteGenerator:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             raw = data.get("raw") or {}
+            if not isinstance(raw, dict):
+                return None
             if raw.get("input_key") != input_key:
+                return None
+            if raw.get('source') == 'hard_subtitle_ocr' and raw.get('quality_status') != 'passed':
                 return None
             shared_platform = raw.get("source") in {"platform_subtitle", "client_prefetched"} and raw.get("input_key") == input_key
             if raw.get("cache_signature") != signature and not shared_platform:
@@ -415,20 +399,110 @@ class NoteGenerator:
         except (OSError, ValueError, KeyError, TypeError):
             return None
 
-    def _download_media(self, downloader, video_url, quality, audio_cache_file,
+    def _legacy_entries(self, identity):
+        if self.legacy_cache_entries is None:
+            self.legacy_cache_entries = list(self.source_cache.legacy_entries(NOTE_OUTPUT_DIR, identity))
+        return self.legacy_cache_entries
+
+    def _prepare_source(self, downloader, video_url, quality, audio_cache_file,
+                        transcript_cache_file, task_id, platform, output_path, screenshot,
+                        video_understanding, video_interval, grid_size, identity, input_key,
+                        policy, signature, legacy_policy):
+        cache = self.source_cache
+        # Serialize producers of the same text configuration before taking any
+        # CPU/GPU slot. ASR and OCR use independent text locks and one media lock.
+        with cache.lock('text:' + signature) if cache else nullcontext():
+            transcript = self._load_text_cache(transcript_cache_file, signature, input_key)
+            if transcript is None and cache:
+                for path in (cache.text_path(signature), cache.platform_text_path):
+                    transcript = self._load_text_cache(path, signature, input_key)
+                    if transcript:
+                        break
+                if transcript is None:
+                    transcript = cache.import_text(self._legacy_entries(identity), policy, signature, legacy_policy)
+            if transcript:
+                logger.info('复用字幕缓存 task_id=%s method=%s source=%s', task_id, policy['method'], input_key[:12])
+            else:
+                with cache.lock('platform') if cache else nullcontext():
+                    if cache:
+                        transcript = self._load_text_cache(cache.platform_text_path, signature, input_key)
+                    if transcript is None:
+                        try:
+                            transcript = downloader.download_subtitles(video_url)
+                            if not transcript or not transcript.segments:
+                                transcript = None
+                            else:
+                                transcript.raw = {**(transcript.raw or {}), 'source': 'platform_subtitle'}
+                                if cache:
+                                    transcript.raw.update(input_key=input_key, cache_signature=signature)
+                                    cache.save_text(transcript, signature)
+                        except Exception as exc:
+                            logger.warning('平台字幕获取失败，将使用所选提取方式: %s', exc)
+            needs_ocr = transcript is None and policy['method'] == 'ocr'
+            audio_meta = self._download_media(
+                downloader=downloader, video_url=video_url, quality=quality,
+                audio_cache_file=audio_cache_file, status_phase=TaskStatus.DOWNLOADING,
+                platform=platform, output_path=output_path, screenshot=screenshot,
+                video_understanding=video_understanding, video_interval=video_interval,
+                grid_size=grid_size, skip_download=transcript is not None or needs_ocr,
+                require_video=needs_ocr, input_key=input_key)
+            if transcript is None:
+                if needs_ocr:
+                    last_progress = [None]
+                    def report_progress(phase, fraction):
+                        value = (phase, int(fraction*100))
+                        if value != last_progress[0]:
+                            last_progress[0] = value
+                            state = TaskStatus.DETECTING_SUBTITLES if phase == 'detect' else TaskStatus.EXTRACTING_SUBTITLES
+                            label = {'detect': '定位字幕', 'extract': '提取字幕', 'review': '复查字幕'}.get(phase, '提取字幕')
+                            self._update_status(task_id, state, f'{label}，已处理 {value[1]}%')
+                    result = HardSubtitleExtractor().extract(
+                        self.video_path, self.note_output_dir / f'{task_id}_ocr_diagnostics.json', report_progress)
+                    if result.status != 'success':
+                        raise RuntimeError(result.message)
+                    transcript = result.transcript
+                else:
+                    transcript = self._transcribe_audio(audio_meta.file_path, transcript_cache_file, TaskStatus.TRANSCRIBING)
+                    raw = asdict(transcript).get('raw') or {}
+                    transcript.raw = {**(raw if isinstance(raw, dict) else {'original': raw}), 'source': 'asr'}
+            transcript.raw = {**(transcript.raw or {}), 'input_key': input_key, 'cache_signature': signature}
+            atomic_json(transcript_cache_file, asdict(transcript))
+            if cache:
+                cache.save_text(transcript, signature)
+            return audio_meta, transcript
+
+    def _download_media(self, *args, **kwargs):
+        cache = getattr(self, 'source_cache', None)
+        with cache.lock('media') if cache else nullcontext():
+            return self._download_media_locked(*args, **kwargs)
+
+    def _download_media_locked(self, downloader, video_url, quality, audio_cache_file,
                         status_phase, platform, output_path, screenshot,
                         video_understanding, video_interval, grid_size,
                         skip_download=False, require_video=False, input_key=""):
         task_id = audio_cache_file.stem.split("_")[0]
         self._update_status(task_id, status_phase)
+        cache = getattr(self, 'source_cache', None)
         # URL (including Bilibili p) scoped directories avoid cross-part cache collisions.
-        media_dir = str(Path(output_path or get_app_dir("media")) / input_key[:24])
+        media_dir = str(cache.audio_directory(quality) if cache else Path(output_path or get_app_dir("media")) / input_key[:24])
         Path(media_dir).mkdir(parents=True, exist_ok=True)
         need_video = require_video or screenshot or video_understanding
         self.video_img_urls = []
         self.video_path = None
+        if cache:
+            if (cache.get_metadata(quality, need_audio=not skip_download) is None
+                    or (need_video and cache.get_video() is None)):
+                cache.import_media(self._legacy_entries(source_identity(str(video_url), platform)), quality)
+            self.video_path = cache.get_video()
         if need_video:
-            self.video_path = Path(downloader.download_video(video_url, output_dir=media_dir))
+            if self.video_path is None:
+                if cache:
+                    cache.discard_invalid_media()
+                self.video_path = Path(downloader.download_video(video_url, output_dir=str(cache.video_directory()) if cache else media_dir))
+                if cache:
+                    cache.save_video(self.video_path)
+            else:
+                logger.info('复用视频缓存 task_id=%s source=%s', task_id, input_key[:12])
             if not self.video_path.is_file():
                 raise ValueError("无法获得可解码视频文件")
             if video_understanding:
@@ -436,19 +510,24 @@ class NoteGenerator:
                     video_path=str(self.video_path), grid_size=tuple(grid_size or [2, 2]),
                     frame_interval=video_interval if video_interval and video_interval > 0 else 6,
                     unit_width=480, unit_height=270, save_quality=75,
-                    frame_dir=str(Path(media_dir)/task_id/"frames"),
-                    grid_dir=str(Path(media_dir)/task_id/"grids"),
+                    frame_dir=get_app_dir('output_frames') if cache else str(Path(media_dir)/task_id/'frames'),
+                    grid_dir=get_app_dir('grid_output') if cache else str(Path(media_dir)/task_id/'grids'),
                 ).run()
-        cached = None
-        try:
-            record = json.loads(audio_cache_file.read_text(encoding="utf-8"))
-            if record.pop("_input_key", None) == input_key:
-                cached = AudioDownloadResult(**record)
-                if not skip_download and (not cached.file_path or not Path(cached.file_path).is_file()):
-                    cached = None
-        except (OSError, ValueError, TypeError):
-            pass
+        cached = cache.get_metadata(quality, need_audio=not skip_download) if cache else None
+        if cache is None:
+            try:
+                record = json.loads(audio_cache_file.read_text(encoding="utf-8"))
+                if record.pop("_input_key", None) == input_key:
+                    cached = AudioDownloadResult(**record)
+                    if not skip_download and (not cached.file_path or not Path(cached.file_path).is_file()):
+                        cached = None
+            except (OSError, ValueError, TypeError):
+                pass
+        elif cached:
+            logger.info('复用媒体缓存 task_id=%s source=%s audio=%s', task_id, input_key[:12], bool(cached.file_path))
         if cached is None:
+            if cache and not skip_download:
+                cache.discard_invalid_media(quality)
             kwargs = dict(video_url=video_url, quality=quality, output_dir=media_dir, need_video=need_video)
             extracted_audio = None
             if not skip_download and self.video_path:
@@ -464,7 +543,9 @@ class NoteGenerator:
                                        check=True, capture_output=True)
             if "skip_download" in inspect.signature(downloader.download).parameters:
                 kwargs["skip_download"] = skip_download or extracted_audio is not None
-                cached = downloader.download(**kwargs)
+                cached = cache.get_metadata(quality) if cache and extracted_audio else None
+                if cached is None:
+                    cached = downloader.download(**kwargs)
                 if extracted_audio:
                     cached.file_path = extracted_audio
             elif not skip_download:
@@ -479,6 +560,8 @@ class NoteGenerator:
                     self.video_path.stem, {}, str(self.video_path))
         if self.video_path:
             cached.video_path = str(self.video_path)
+        if cache:
+            cache.save_metadata(cached, quality)
         atomic_json(audio_cache_file, {**asdict(cached), "_input_key": input_key})
         return cached
 

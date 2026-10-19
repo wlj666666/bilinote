@@ -314,6 +314,10 @@ cython_debug/
 /backend/models
 /backend/.idea/*
 /backend/bili_note.db
+# SQLite runtime sidecars
+*.db-wal
+*.db-shm
+*.db-journal
 /backend/uploads/*
 /backend/config/*
 /backend/vector_db/

@@ -13,7 +13,7 @@ from app.gpt.prompt import BASE_PROMPT, AI_SUM, SCREENSHOT, LINK, MERGE_PROMPT
 from app.gpt.utils import fix_markdown
 from app.gpt.request_chunker import RequestChunker
 from app.models.transcriber_model import TranscriptSegment
-from datetime import timedelta
+from app.utils.timestamps import format_timestamp
 from typing import List
 from app.services.storage_scope import scoped_notes_dir
 
@@ -35,7 +35,7 @@ class UniversalGPT(GPT):
         self._retry_base_backoff = float(os.getenv("OPENAI_RETRY_BACKOFF_SECONDS", "1.5"))
 
     def _format_time(self, seconds: float) -> str:
-        return str(timedelta(seconds=int(seconds)))[2:]
+        return format_timestamp(seconds)
 
     def _build_segment_text(self, segments: List[TranscriptSegment]) -> str:
         return "\n".join(
@@ -106,6 +106,7 @@ class UniversalGPT(GPT):
     def _build_source_signature(self, source: GPTSource) -> str:
         from app.services.task_context import summary_revision
         payload = {
+            "timestamp_format": "elapsed-hms-v1",
             "model": self.model,
             "provider_endpoint": str(getattr(self.client, "base_url", "")),
             "generation_revision": summary_revision.get(),

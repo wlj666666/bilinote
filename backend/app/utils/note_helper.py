@@ -1,4 +1,5 @@
 import re
+from app.utils.timestamps import TIMESTAMP_PATTERN, parse_timestamp
 
 
 def prepend_source_link(markdown: str | None, source_url: str) -> str | None:
@@ -33,17 +34,15 @@ def prepend_source_link(markdown: str | None, source_url: str) -> str | None:
 
 def replace_content_markers(markdown: str, video_id: str, platform: str = 'bilibili') -> str:
     """
-    替换 *Content-04:16*、Content-04:16 或 Content-[04:16] 为超链接，跳转到对应平台视频的时间位置
+    将 Content 标记转换为原片链接，支持 mm:ss、累计分钟及 hh:mm:ss。
     """
-    # 匹配三种形式：*Content-04:16*、Content-04:16、Content-[04:16]
-    pattern = r"\*?Content-(?:\[(\d{2}):(\d{2})\]|(\d{2}):(\d{2}))\*?"
+    pattern = rf"\*?Content-(?:\[({TIMESTAMP_PATTERN})\]|({TIMESTAMP_PATTERN})(?![\d:]))\*?"
 
     safe_video_id = video_id
 
     def replacer(match):
-        mm = match.group(1) or match.group(3)
-        ss = match.group(2) or match.group(4)
-        total_seconds = int(mm) * 60 + int(ss)
+        timestamp = match.group(1) or match.group(2)
+        total_seconds = parse_timestamp(timestamp)
 
         if platform == 'bilibili':
             parsed_video_id = safe_video_id.replace("_p", "?p=")
@@ -53,11 +52,11 @@ def replace_content_markers(markdown: str, video_id: str, platform: str = 'bilib
             url = f"https://www.youtube.com/watch?v={safe_video_id}&t={total_seconds}s"
         elif platform == 'douyin':
             url = f"https://www.douyin.com/video/{safe_video_id}"
-            return f"[原片 @ {mm}:{ss}]({url})"
+            return f"[原片 @ {timestamp}]({url})"
         else:
-            return f"({mm}:{ss})"
+            return f"({timestamp})"
 
-        return f"[原片 @ {mm}:{ss}]({url})"
+        return f"[原片 @ {timestamp}]({url})"
 
     # Models sometimes put a timestamp inside a TOC link label. Drop that wrapper
     # before expanding the timestamp, otherwise the output contains nested links.

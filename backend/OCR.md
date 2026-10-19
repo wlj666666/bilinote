@@ -63,11 +63,7 @@ python scripts/check_hard_subtitles.py /path/to/video.mp4 --output /tmp/ocr-chec
 
 诊断文件包含位置模型、各窗口的候选区域、逐帧状态、复查区间、空缺分类、质量拒绝原因、各阶段耗时和提取文本。线上任务保存到 `note_results/<task_id>_ocr_diagnostics.json`。质量存疑时保留部分文本供排查，但不发送给总结模型。算法版本仍为 4；本次复用优化不会使已有 OCR 原文缓存失效。
 
-```bash
-PYTHONPATH=. python -m pytest tests/test_hard_subtitles.py tests/test_subtitle_layout.py tests/test_ocr_runtime.py -q
-```
-
-详细测试范围见 [OCR_VALIDATION.md](OCR_VALIDATION.md)。
+历史验证记录见 [OCR_VALIDATION.md](OCR_VALIDATION.md)。
 
 ## 当前边界
 

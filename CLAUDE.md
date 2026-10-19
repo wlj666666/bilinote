@@ -13,8 +13,6 @@ BiliNote is an AI video note generation tool. It extracts content from video lin
 cd backend
 pip install -r requirements.txt
 python main.py                    # Starts on 0.0.0.0:8483
-pytest                            # Run tests in backend/tests/
-pytest tests/test_request_chunker.py::test_name   # Run a single test
 ```
 
 ### Frontend (React 19 + Vite + TypeScript)
@@ -45,8 +43,6 @@ pnpm install
 pnpm dev          # watch mode → ./extension/
 pnpm build        # production build → ./extension/
 pnpm typecheck
-pnpm test         # Vitest unit tests
-pnpm test:e2e     # Playwright e2e
 ```
 Load unpacked at `chrome://extensions/` → select `BillNote_extension/extension/`. Talks to the same backend at `http://localhost:8483` (configurable in the options page). CORS in `backend/main.py` already accepts `chrome-extension://` and `moz-extension://` via regex.
 

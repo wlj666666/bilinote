@@ -108,14 +108,17 @@ class WhisperTranscriber(Transcriber):
         return is_cuda_available()
 
     @timeit
-    def transcript(self, file_path: str) -> TranscriptResult:
+    def transcript(self, file_path: str, progress=None) -> TranscriptResult:
         started = time.perf_counter()
         try:
 
             segments_raw, info = self.model.transcribe(file_path)
+            if progress:
+                progress('audio_ready', 0.)
 
             segments = []
             full_text = ""
+            processed_end = 0.
 
             for seg in segments_raw:
                 text = seg.text.strip()
@@ -125,6 +128,10 @@ class WhisperTranscriber(Transcriber):
                     end=seg.end,
                     text=text
                 ))
+                if seg.end > processed_end:
+                    processed_end = seg.end
+                    if progress:
+                        progress('transcribe', processed_end)
 
             result= TranscriptResult(
                 language=info.language,

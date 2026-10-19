@@ -113,7 +113,7 @@ function createMarkdownComponents(baseURL: string) {
         (children[0] as string).startsWith('原片 @')
 
       if (isOriginLink) {
-        const timeMatch = (children[0] as string).match(/原片 @ (\d{2}:\d{2})/)
+        const timeMatch = (children[0] as string).match(/原片 @ (\d{2,}:\d{2}(?::\d{2})?)/)
         const timeText = timeMatch ? timeMatch[1] : '原片'
 
         return (

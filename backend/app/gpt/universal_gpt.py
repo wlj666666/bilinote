@@ -12,6 +12,9 @@ from pathlib import Path
 from app.gpt.prompt import BASE_PROMPT, AI_SUM, SCREENSHOT, LINK, MERGE_PROMPT
 from app.gpt.utils import fix_markdown
 from app.gpt.request_chunker import RequestChunker
+from app.gpt.timestamp_markers import (
+    SOURCE_TIME_PROMPT, marker_seconds, resolve_timestamp_markers, source_seconds,
+)
 from app.models.transcriber_model import TranscriptSegment
 from app.utils.timestamps import format_timestamp
 from typing import List
@@ -39,7 +42,7 @@ class UniversalGPT(GPT):
 
     def _build_segment_text(self, segments: List[TranscriptSegment]) -> str:
         return "\n".join(
-            f"{self._format_time(seg.start)} - {seg.text.strip()}"
+            f"{self._format_time(seg.start)} [t={max(0, int(seg.start))}] - {seg.text.strip()}"
             for seg in segments
         )
 
@@ -56,6 +59,7 @@ class UniversalGPT(GPT):
             style=kwargs.get('style'),
             extras=kwargs.get('extras'),
         )
+        content_text += '\n' + SOURCE_TIME_PROMPT
 
         video_img_urls = kwargs.get('video_img_urls', [])
 
@@ -92,7 +96,7 @@ class UniversalGPT(GPT):
         return len(json.dumps(messages, ensure_ascii=False).encode("utf-8"))
 
     def _build_merge_messages(self, partials: list) -> list:
-        merge_text = MERGE_PROMPT + "\n\n" + "\n\n---\n\n".join(partials)
+        merge_text = MERGE_PROMPT + '\n' + SOURCE_TIME_PROMPT + "\n\n" + "\n\n---\n\n".join(partials)
         # 合并阶段没有图片，直接用 string content 兼容非多模态模型（issue #282）
         return [{
             "role": "user",
@@ -106,7 +110,7 @@ class UniversalGPT(GPT):
     def _build_source_signature(self, source: GPTSource) -> str:
         from app.services.task_context import summary_revision
         payload = {
-            "timestamp_format": "elapsed-hms-v1",
+            "timestamp_format": "source-seconds-v2",
             "model": self.model,
             "provider_endpoint": str(getattr(self.client, "base_url", "")),
             "generation_revision": summary_revision.get(),
@@ -284,6 +288,22 @@ class UniversalGPT(GPT):
             raise last_exc
         raise RuntimeError("chat completion failed without exception")
 
+    def _request_markdown(self, messages: list, allowed_seconds: set[int], require_content: bool = False) -> str:
+        # A malformed timestamp must never become a successful cached note.
+        # Retry generation once; network/API retries remain independently bounded.
+        for attempt in range(2):
+            response = self._chat_completion_create(messages)
+            markdown = response.choices[0].message.content.strip()
+            try:
+                resolve_timestamp_markers(markdown, allowed_seconds)
+                if require_content and 'Content-[t=' not in markdown:
+                    raise ValueError('模型未返回原片跳转时间编号')
+                return markdown
+            except ValueError:
+                if attempt:
+                    raise
+                logger.warning('模型未保留原片时间编号，重新生成一次')
+
     def _merge_partials(self, partials: list, checkpoint_key: str | None, source_signature: str | None) -> str:
         def build_messages(texts, *_args, **_kwargs):
             return self._build_merge_messages(texts)
@@ -301,13 +321,16 @@ class UniversalGPT(GPT):
             for group_idx, group in enumerate(groups):
                 messages = build_messages(group)
                 try:
-                    response = self._chat_completion_create(messages)
+                    group_text = '\n'.join(group)
+                    markdown = self._request_markdown(
+                        messages, marker_seconds(group_text), require_content='Content-[t=' in group_text,
+                    )
                 except Exception as exc:
                     if checkpoint_key and source_signature:
                         self._save_checkpoint(checkpoint_key, source_signature, current_partials, "merge")
                     raise
 
-                new_partials.append(response.choices[0].message.content.strip())
+                new_partials.append(markdown)
 
                 if checkpoint_key and source_signature:
                     remaining_partials = []
@@ -373,21 +396,26 @@ class UniversalGPT(GPT):
                 extras=source.extras
             )
             try:
-                response = self._chat_completion_create(messages)
+                markdown = self._request_markdown(
+                    messages, source_seconds(chunk.segments),
+                    require_content=bool(chunk.segments) and (source.link or 'link' in (source._format or [])),
+                )
             except Exception as exc:
                 if checkpoint_key and source_signature:
                     self._save_checkpoint(checkpoint_key, source_signature, partials, "summarize")
                 raise
 
-            partials.append(response.choices[0].message.content.strip())
+            partials.append(markdown)
             if checkpoint_key and source_signature:
                 self._save_checkpoint(checkpoint_key, source_signature, partials, "summarize")
 
         if len(partials) == 1:
+            markdown = resolve_timestamp_markers(partials[0], source_seconds(source.segment))
             if checkpoint_key:
                 self._clear_checkpoint(checkpoint_key)
-            return partials[0]
+            return markdown
         merged = self._merge_partials(partials, checkpoint_key, source_signature)
+        markdown = resolve_timestamp_markers(merged, source_seconds(source.segment))
         if checkpoint_key:
             self._clear_checkpoint(checkpoint_key)
-        return merged
+        return markdown

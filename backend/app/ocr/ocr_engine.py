@@ -18,7 +18,7 @@ class OCREngine:
     # extractor may reuse a recent result when every channel changes by <= 3.
     supports_visual_reuse = True
 
-    def __init__(self):
+    def __init__(self, *, profile_dir=None, use_cls=True, params_override=None):
         try:
             from rapidocr import RapidOCR
         except ImportError as exc:
@@ -26,6 +26,7 @@ class OCREngine:
         import cv2
         from app.ocr.runtime import requested_device, prepare_runtime, verify_runtime
         self.device = requested_device()
+        self.use_cls = use_cls
         prepare_runtime(self.device)
         cv2.setNumThreads(1)  # Avoid competing native thread pools with FFmpeg/ORT.
         from app.utils.path_helper import get_model_dir
@@ -49,6 +50,8 @@ class OCREngine:
             # thousands of pixels wide. Bound detection size; recognition still
             # receives crops from the original input image.
             "Det.limit_type": "max",
+            # RapidOCR 3.9.2 may choose a dynamic size tier in max mode;
+            # verify effective input shapes rather than assuming this is a cap.
             "Det.limit_side_len": 1280,
             "EngineConfig.onnxruntime.intra_op_num_threads": int(os.getenv("OCR_THREADS", "1")),
             "EngineConfig.onnxruntime.inter_op_num_threads": 1,
@@ -59,7 +62,13 @@ class OCREngine:
             "EngineConfig.onnxruntime.cuda_ep_cfg.cudnn_conv_algo_search": "HEURISTIC",
             "EngineConfig.onnxruntime.cuda_ep_cfg.cudnn_conv_use_max_workspace": False,
         }
-        self.engine = RapidOCR(params=params)
+        if params_override:
+            params.update(params_override)
+        if profile_dir is not None:
+            from app.ocr.profiling import build_profiled_rapidocr
+            self.engine = build_profiled_rapidocr(params, profile_dir)
+        else:
+            self.engine = RapidOCR(params=params)
         self.runtime_info = verify_runtime(self.engine, self.device)
 
     def read(self, image) -> list[TextBox]:
@@ -67,7 +76,7 @@ class OCREngine:
         # PyAV emits RGB; RapidOCR's ndarray input follows OpenCV's BGR convention.
         # RapidOCR's call flags persist on the instance. Restore them after a
         # detection-only review, otherwise subsequent reads silently omit text.
-        result = self.engine(np.ascontiguousarray(image[:, :, ::-1]), use_det=True, use_cls=True, use_rec=True)
+        result = self.engine(np.ascontiguousarray(image[:, :, ::-1]), use_det=True, use_cls=self.use_cls, use_rec=True)
         if result.boxes is None or result.txts is None:
             return []
         height, width = image.shape[:2]

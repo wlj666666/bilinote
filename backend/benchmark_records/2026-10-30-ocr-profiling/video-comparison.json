@@ -1,0 +1,4371 @@
+{
+  "baseline_segments": 358,
+  "optimized_segments": 365,
+  "all_segment_tuples_equal": false,
+  "full_text_equal": false,
+  "character_sequence_similarity": 0.9885950620378493,
+  "positionwise_differences": [
+    {
+      "index": 39,
+      "baseline": {
+        "start": 58.2,
+        "end": 59.400000000000006,
+        "text": "本套95的优势的话就是"
+      },
+      "optimized": {
+        "start": 58.2,
+        "end": 59.4,
+        "text": "本套95的优势的话就是"
+      }
+    },
+    {
+      "index": 40,
+      "baseline": {
+        "start": 60.6,
+        "end": 61.6,
+        "text": "可以看到我们的c位"
+      },
+      "optimized": {
+        "start": 59.4,
+        "end": 60.6,
+        "text": "前期过渡比较顺滑"
+      }
+    },
+    {
+      "index": 41,
+      "baseline": {
+        "start": 61.6,
+        "end": 62.4,
+        "text": "有大龙和拉露恩"
+      },
+      "optimized": {
+        "start": 60.6,
+        "end": 61.6,
+        "text": "可以看到我们的c位"
+      }
+    },
+    {
+      "index": 42,
+      "baseline": {
+        "start": 62.4,
+        "end": 63.0,
+        "text": "一张物理卡"
+      },
+      "optimized": {
+        "start": 61.6,
+        "end": 62.4,
+        "text": "有大龙和拉露恩"
+      }
+    },
+    {
+      "index": 43,
+      "baseline": {
+        "start": 63.0,
+        "end": 64.0,
+        "text": "一张法系卡"
+      },
+      "optimized": {
+        "start": 62.4,
+        "end": 63.0,
+        "text": "一张物理卡"
+      }
+    },
+    {
+      "index": 44,
+      "baseline": {
+        "start": 64.0,
+        "end": 66.0,
+        "text": "然后前排的话蓝buff也是特别肉的"
+      },
+      "optimized": {
+        "start": 63.0,
+        "end": 64.0,
+        "text": "一张法系卡"
+      }
+    },
+    {
+      "index": 45,
+      "baseline": {
+        "start": 66.0,
+        "end": 67.8,
+        "text": "纳尔也可以承担一个物理装备"
+      },
+      "optimized": {
+        "start": 64.0,
+        "end": 66.0,
+        "text": "然后前排的话蓝buff也是特别肉的"
+      }
+    },
+    {
+      "index": 46,
+      "baseline": {
+        "start": 68.0,
+        "end": 69.6,
+        "text": "无论是ad还是AP95都"
+      },
+      "optimized": {
+        "start": 66.0,
+        "end": 67.8,
+        "text": "纳尔也可以承担一个物理装备"
+      }
+    },
+    {
+      "index": 47,
+      "baseline": {
+        "start": 69.6,
+        "end": 70.8,
+        "text": "能够过渡到这一套"
+      },
+      "optimized": {
+        "start": 68.0,
+        "end": 69.6,
+        "text": "无论是ad还是AP95都"
+      }
+    },
+    {
+      "index": 48,
+      "baseline": {
+        "start": 70.8,
+        "end": 73.4,
+        "text": "且四重它能够提供一个高额的坦度"
+      },
+      "optimized": {
+        "start": 69.6,
+        "end": 70.8,
+        "text": "能够过渡到这一套"
+      }
+    },
+    {
+      "index": 49,
+      "baseline": {
+        "start": 73.4,
+        "end": 75.0,
+        "text": "而且造价也比较便宜"
+      },
+      "optimized": {
+        "start": 70.8,
+        "end": 73.4,
+        "text": "且四重它能够提供一个高额的坦度"
+      }
+    },
+    {
+      "index": 50,
+      "baseline": {
+        "start": 75.2,
+        "end": 76.4,
+        "text": "特別有性价比"
+      },
+      "optimized": {
+        "start": 73.4,
+        "end": 75.0,
+        "text": "而且造价也比较便宜"
+      }
+    },
+    {
+      "index": 51,
+      "baseline": {
+        "start": 76.4,
+        "end": 79.0,
+        "text": "本阵容的话控制组合是特别好用的"
+      },
+      "optimized": {
+        "start": 75.2,
+        "end": 76.4,
+        "text": "特別有性价比"
+      }
+    },
+    {
+      "index": 52,
+      "baseline": {
+        "start": 79.0,
+        "end": 80.8,
+        "text": "如果你用的好是有奇效的"
+      },
+      "optimized": {
+        "start": 76.4,
+        "end": 79.0,
+        "text": "本阵容的话控制组合是特别好用的"
+      }
+    },
+    {
+      "index": 53,
+      "baseline": {
+        "start": 81.0,
+        "end": 82.2,
+        "text": "然后PS的话这边就是"
+      },
+      "optimized": {
+        "start": 79.0,
+        "end": 80.8,
+        "text": "如果你用的好是有奇效的"
+      }
+    },
+    {
+      "index": 54,
+      "baseline": {
+        "start": 82.2,
+        "end": 83.2,
+        "text": "大龙一定要有装备"
+      },
+      "optimized": {
+        "start": 81.0,
+        "end": 82.2,
+        "text": "然后PS的话这边就是"
+      }
+    },
+    {
+      "index": 55,
+      "baseline": {
+        "start": 83.2,
+        "end": 84.4,
+        "text": "大龙是一个大核"
+      },
+      "optimized": {
+        "start": 82.2,
+        "end": 83.2,
+        "text": "大龙一定要有装备"
+      }
+    },
+    {
+      "index": 56,
+      "baseline": {
+        "start": 84.4,
+        "end": 86.4,
+        "text": "不能让他捡破烂控制流"
+      },
+      "optimized": {
+        "start": 83.2,
+        "end": 84.4,
+        "text": "大龙是一个大核"
+      }
+    },
+    {
+      "index": 57,
+      "baseline": {
+        "start": 86.8,
+        "end": 88.8,
+        "text": "像石皮树大蓝纳尔龙"
+      },
+      "optimized": {
+        "start": 84.4,
+        "end": 86.4,
+        "text": "不能让他捡破烂控制流"
+      }
+    },
+    {
+      "index": 58,
+      "baseline": {
+        "start": 88.8,
+        "end": 89.6,
+        "text": "还有牛头"
+      },
+      "optimized": {
+        "start": 86.8,
+        "end": 88.8,
+        "text": "像石皮树大蓝纳尔龙"
+      }
+    },
+    {
+      "index": 59,
+      "baseline": {
+        "start": 89.6,
+        "end": 90.4,
+        "text": "还有人马"
+      },
+      "optimized": {
+        "start": 88.8,
+        "end": 89.6,
+        "text": "还有牛头"
+      }
+    },
+    {
+      "index": 60,
+      "baseline": {
+        "start": 90.6,
+        "end": 93.0,
+        "text": "动物园组合控制流用好是有奇效的"
+      },
+      "optimized": {
+        "start": 89.6,
+        "end": 90.4,
+        "text": "还有人马"
+      }
+    },
+    {
+      "index": 61,
+      "baseline": {
+        "start": 93.0,
+        "end": 96.0,
+        "text": "打剑圣这种战士的对位特别重要"
+      },
+      "optimized": {
+        "start": 90.6,
+        "end": 93.0,
+        "text": "动物园组合控制流用好是有奇效的"
+      }
+    },
+    {
+      "index": 62,
+      "baseline": {
+        "start": 96.0,
+        "end": 97.0,
+        "text": "如果你一直控住他"
+      },
+      "optimized": {
+        "start": 93.0,
+        "end": 96.0,
+        "text": "打剑圣这种战士的对位特别重要"
+      }
+    },
+    {
+      "index": 63,
+      "baseline": {
+        "start": 97.0,
+        "end": 98.2,
+        "text": "他没出免控"
+      },
+      "optimized": {
+        "start": 96.0,
+        "end": 97.0,
+        "text": "如果你一直控住他"
+      }
+    },
+    {
+      "index": 64,
+      "baseline": {
+        "start": 98.2,
+        "end": 99.8,
+        "text": "那你就可以直接秒他了"
+      },
+      "optimized": {
+        "start": 97.0,
+        "end": 98.2,
+        "text": "他没出免控"
+      }
+    },
+    {
+      "index": 65,
+      "baseline": {
+        "start": 100.4,
+        "end": 102.2,
+        "text": "然后第二套的话就是一个冰龙95"
+      },
+      "optimized": {
+        "start": 98.2,
+        "end": 99.8,
+        "text": "那你就可以直接秒他了"
+      }
+    },
+    {
+      "index": 66,
+      "baseline": {
+        "start": 102.2,
+        "end": 103.4,
+        "text": "这套是一个八级的构筑"
+      },
+      "optimized": {
+        "start": 100.4,
+        "end": 102.2,
+        "text": "然后第二套的话就是一个冰龙95"
+      }
+    },
+    {
+      "index": 67,
+      "baseline": {
+        "start": 103.4,
+        "end": 105.0,
+        "text": "在你没钱或者没血的时候"
+      },
+      "optimized": {
+        "start": 102.2,
+        "end": 103.4,
+        "text": "这套是一个八级的构筑"
+      }
+    },
+    {
+      "index": 68,
+      "baseline": {
+        "start": 105.0,
+        "end": 107.0,
+        "text": "可以八级去玩这一套"
+      },
+      "optimized": {
+        "start": 103.4,
+        "end": 105.0,
+        "text": "在你没钱或者没血的时候"
+      }
+    },
+    {
+      "index": 69,
+      "baseline": {
+        "start": 107.2,
+        "end": 109.0,
+        "text": "就你还有一个灵活位"
+      },
+      "optimized": {
+        "start": 105.0,
+        "end": 107.0,
+        "text": "可以八级去玩这一套"
+      }
+    },
+    {
+      "index": 70,
+      "baseline": {
+        "start": 109.0,
+        "end": 110.6,
+        "text": "如果你没有5费卡的话"
+      },
+      "optimized": {
+        "start": 107.2,
+        "end": 109.0,
+        "text": "就你还有一个灵活位"
+      }
+    },
+    {
+      "index": 71,
+      "baseline": {
+        "start": 110.6,
+        "end": 111.8,
+        "text": "就可以挂一个猎手"
+      },
+      "optimized": {
+        "start": 109.0,
+        "end": 110.6,
+        "text": "如果你没有5费卡的话"
+      }
+    },
+    {
+      "index": 72,
+      "baseline": {
+        "start": 111.8,
+        "end": 112.8,
+        "text": "如果你有5费的话"
+      },
+      "optimized": {
+        "start": 110.6,
+        "end": 111.8,
+        "text": "就可以挂一个猎手"
+      }
+    },
+    {
+      "index": 73,
+      "baseline": {
+        "start": 114.4,
+        "end": 117.4,
+        "text": "或者可以去挂一个大树这种发育卡"
+      },
+      "optimized": {
+        "start": 111.8,
+        "end": 112.8,
+        "text": "如果你有5费的话"
+      }
+    },
+    {
+      "index": 74,
+      "baseline": {
+        "start": 118.4,
+        "end": 120.0,
+        "text": "然后这是一个完全体"
+      },
+      "optimized": {
+        "start": 112.8,
+        "end": 114.4,
+        "text": "可以挂寒冰或者翠神"
+      }
+    },
+    {
+      "index": 75,
+      "baseline": {
+        "start": 120.0,
+        "end": 121.0,
+        "text": "完全体的话就是"
+      },
+      "optimized": {
+        "start": 114.4,
+        "end": 117.4,
+        "text": "或者可以去挂一个大树这种发育卡"
+      }
+    },
+    {
+      "index": 76,
+      "baseline": {
+        "start": 121.0,
+        "end": 122.2,
+        "text": "左边的卡是一定要的"
+      },
+      "optimized": {
+        "start": 118.4,
+        "end": 120.0,
+        "text": "然后这是一个完全体"
+      }
+    },
+    {
+      "index": 77,
+      "baseline": {
+        "start": 122.2,
+        "end": 124.2,
+        "text": "右边的这几张卡都是灵活位"
+      },
+      "optimized": {
+        "start": 120.0,
+        "end": 121.0,
+        "text": "完全体的话就是"
+      }
+    },
+    {
+      "index": 78,
+      "baseline": {
+        "start": 124.2,
+        "end": 126.6,
+        "text": "像这个月神拉克斯"
+      },
+      "optimized": {
+        "start": 121.0,
+        "end": 122.2,
+        "text": "左边的卡是一定要的"
+      }
+    },
+    {
+      "index": 79,
+      "baseline": {
+        "start": 126.6,
+        "end": 127.4,
+        "text": "地狱火拉克斯"
+      },
+      "optimized": {
+        "start": 122.2,
+        "end": 124.2,
+        "text": "右边的这几张卡都是灵活位"
+      }
+    },
+    {
+      "index": 80,
+      "baseline": {
+        "start": 127.4,
+        "end": 128.79999999999998,
+        "text": "还有野兽的拉克斯"
+      },
+      "optimized": {
+        "start": 124.2,
+        "end": 126.6,
+        "text": "像这个月神拉克斯"
+      }
+    },
+    {
+      "index": 81,
+      "baseline": {
+        "start": 128.8,
+        "end": 130.39999999999998,
+        "text": "包括一个黑荆棘拉克斯"
+      },
+      "optimized": {
+        "start": 126.6,
+        "end": 127.4,
+        "text": "地狱火拉克斯"
+      }
+    },
+    {
+      "index": 82,
+      "baseline": {
+        "start": 130.4,
+        "end": 133.0,
+        "text": "然后艾温还有凯南都是可以上的"
+      },
+      "optimized": {
+        "start": 127.4,
+        "end": 128.79999999999998,
+        "text": "还有野兽的拉克斯"
+      }
+    },
+    {
+      "index": 83,
+      "baseline": {
+        "start": 133.4,
+        "end": 134.6,
+        "text": "本套95的优势的话"
+      },
+      "optimized": {
+        "start": 128.8,
+        "end": 130.39999999999998,
+        "text": "包括一个黑荆棘拉克斯"
+      }
+    },
+    {
+      "index": 84,
+      "baseline": {
+        "start": 134.6,
+        "end": 135.6,
+        "text": "就是只需要一个破抗"
+      },
+      "optimized": {
+        "start": 130.4,
+        "end": 133.0,
+        "text": "然后艾温还有凯南都是可以上的"
+      }
+    },
+    {
+      "index": 85,
+      "baseline": {
+        "start": 135.6,
+        "end": 136.39999999999998,
+        "text": "因为都是物理伤害"
+      },
+      "optimized": {
+        "start": 133.4,
+        "end": 134.6,
+        "text": "本套95的优势的话"
+      }
+    },
+    {
+      "index": 86,
+      "baseline": {
+        "start": 136.4,
+        "end": 138.79999999999998,
+        "text": "大龙和95有很强的过前排能力"
+      },
+      "optimized": {
+        "start": 134.6,
+        "end": 135.6,
+        "text": "就是只需要一个破抗"
+      }
+    },
+    {
+      "index": 87,
+      "baseline": {
+        "start": 138.8,
+        "end": 139.6,
+        "text": "这是第二个点"
+      },
+      "optimized": {
+        "start": 135.6,
+        "end": 136.39999999999998,
+        "text": "因为都是物理伤害"
+      }
+    },
+    {
+      "index": 88,
+      "baseline": {
+        "start": 139.8,
+        "end": 141.0,
+        "text": "AOE能力也很足"
+      },
+      "optimized": {
+        "start": 136.4,
+        "end": 138.79999999999998,
+        "text": "大龙和95有很强的过前排能力"
+      }
+    },
+    {
+      "index": 89,
+      "baseline": {
+        "start": 141.2,
+        "end": 142.39999999999998,
+        "text": "他可以直接跃前打后"
+      },
+      "optimized": {
+        "start": 138.8,
+        "end": 139.6,
+        "text": "这是第二个点"
+      }
+    },
+    {
+      "index": 90,
+      "baseline": {
+        "start": 142.4,
+        "end": 144.39999999999998,
+        "text": "把对面后排直接去AOE打死"
+      },
+      "optimized": {
+        "start": 139.8,
+        "end": 141.0,
+        "text": "AOE能力也很足"
+      }
+    },
+    {
+      "index": 91,
+      "baseline": {
+        "start": 144.4,
+        "end": 145.6,
+        "text": "然后第三个点的话就是"
+      },
+      "optimized": {
+        "start": 141.2,
+        "end": 142.39999999999998,
+        "text": "他可以直接跃前打后"
+      }
+    },
+    {
+      "index": 92,
+      "baseline": {
+        "start": 145.6,
+        "end": 147.6,
+        "text": "可以去迫降一个主宰猎手"
+      },
+      "optimized": {
+        "start": 142.4,
+        "end": 144.39999999999998,
+        "text": "把对面后排直接去AOE打死"
+      }
+    },
+    {
+      "index": 93,
+      "baseline": {
+        "start": 147.6,
+        "end": 149.39999999999998,
+        "text": "就是我们刚刚讲的8级那一套"
+      },
+      "optimized": {
+        "start": 144.4,
+        "end": 145.6,
+        "text": "然后第三个点的话就是"
+      }
+    },
+    {
+      "index": 94,
+      "baseline": {
+        "start": 149.6,
+        "end": 151.79999999999998,
+        "text": "第四个的话就是9人口的Flex比较多"
+      },
+      "optimized": {
+        "start": 145.6,
+        "end": 147.6,
+        "text": "可以去迫降一个主宰猎手"
+      }
+    },
+    {
+      "index": 95,
+      "baseline": {
+        "start": 151.8,
+        "end": 153.2,
+        "text": "这些卡右边那个拉克斯"
+      },
+      "optimized": {
+        "start": 147.6,
+        "end": 149.39999999999998,
+        "text": "就是我们刚刚讲的8级那一套"
+      }
+    },
+    {
+      "index": 96,
+      "baseline": {
+        "start": 153.2,
+        "end": 155.39999999999998,
+        "text": "包括艾翁还有凯南都是可以上的"
+      },
+      "optimized": {
+        "start": 149.6,
+        "end": 151.79999999999998,
+        "text": "第四个的话就是9人口的Flex比较多"
+      }
+    },
+    {
+      "index": 97,
+      "baseline": {
+        "start": 155.6,
+        "end": 157.6,
+        "text": "然后且红蓝buff等功能装"
+      },
+      "optimized": {
+        "start": 151.8,
+        "end": 153.2,
+        "text": "这些卡右边那个拉克斯"
+      }
+    },
+    {
+      "index": 98,
+      "baseline": {
+        "start": 157.6,
+        "end": 159.0,
+        "text": "对主c来说都是好装备"
+      },
+      "optimized": {
+        "start": 153.2,
+        "end": 155.39999999999998,
+        "text": "包括艾翁还有凯南都是可以上的"
+      }
+    },
+    {
+      "index": 99,
+      "baseline": {
+        "start": 159.0,
+        "end": 159.79999999999998,
+        "text": "蓝buff的大龙"
+      },
+      "optimized": {
+        "start": 155.6,
+        "end": 157.6,
+        "text": "然后且红蓝buff等功能装"
+      }
+    },
+    {
+      "index": 100,
+      "baseline": {
+        "start": 159.8,
+        "end": 160.6,
+        "text": "红buff的艾希"
+      },
+      "optimized": {
+        "start": 157.6,
+        "end": 159.0,
+        "text": "对主c来说都是好装备"
+      }
+    },
+    {
+      "index": 101,
+      "baseline": {
+        "start": 160.6,
+        "end": 162.39999999999998,
+        "text": "包括红buff的大龙也是好装备"
+      },
+      "optimized": {
+        "start": 159.0,
+        "end": 159.79999999999998,
+        "text": "蓝buff的大龙"
+      }
+    },
+    {
+      "index": 102,
+      "baseline": {
+        "start": 162.6,
+        "end": 163.79999999999998,
+        "text": "装备压力会比较小"
+      },
+      "optimized": {
+        "start": 159.8,
+        "end": 160.6,
+        "text": "红buff的艾希"
+      }
+    },
+    {
+      "index": 103,
+      "baseline": {
+        "start": 163.8,
+        "end": 165.39999999999998,
+        "text": "功能装可以随便合而且"
+      },
+      "optimized": {
+        "start": 160.6,
+        "end": 162.39999999999998,
+        "text": "包括红buff的大龙也是好装备"
+      }
+    },
+    {
+      "index": 104,
+      "baseline": {
+        "start": 165.8,
+        "end": 167.2,
+        "text": "直接给主c就行了"
+      },
+      "optimized": {
+        "start": 162.6,
+        "end": 163.79999999999998,
+        "text": "装备压力会比较小"
+      }
+    },
+    {
+      "index": 105,
+      "baseline": {
+        "start": 167.2,
+        "end": 168.2,
+        "text": "不需要去给副c"
+      },
+      "optimized": {
+        "start": 163.8,
+        "end": 165.39999999999998,
+        "text": "功能装可以随便合而且"
+      }
+    },
+    {
+      "index": 106,
+      "baseline": {
+        "start": 168.2,
+        "end": 169.39999999999998,
+        "text": "过渡会比较轻松"
+      },
+      "optimized": {
+        "start": 165.8,
+        "end": 167.2,
+        "text": "直接给主c就行了"
+      }
+    },
+    {
+      "index": 107,
+      "baseline": {
+        "start": 169.8,
+        "end": 171.6,
+        "text": "劣势的话就是比较怕战士对脸"
+      },
+      "optimized": {
+        "start": 167.2,
+        "end": 168.2,
+        "text": "不需要去给副c"
+      }
+    },
+    {
+      "index": 108,
+      "baseline": {
+        "start": 171.6,
+        "end": 173.79999999999998,
+        "text": "如果打狮子狗或者打一个剑圣的话"
+      },
+      "optimized": {
+        "start": 168.2,
+        "end": 169.39999999999998,
+        "text": "过渡会比较轻松"
+      }
+    },
+    {
+      "index": 109,
+      "baseline": {
+        "start": 173.8,
+        "end": 175.39999999999998,
+        "text": "如果把大龙直接秒了会输"
+      },
+      "optimized": {
+        "start": 169.8,
+        "end": 171.6,
+        "text": "劣势的话就是比较怕战士对脸"
+      }
+    },
+    {
+      "index": 110,
+      "baseline": {
+        "start": 176.4,
+        "end": 178.39999999999998,
+        "text": "第三套的话就是一个德莱文巨龙95"
+      },
+      "optimized": {
+        "start": 171.6,
+        "end": 173.79999999999998,
+        "text": "如果打狮子狗或者打一个剑圣的话"
+      }
+    },
+    {
+      "index": 111,
+      "baseline": {
+        "start": 178.4,
+        "end": 179.6,
+        "text": "本套95的优势的话"
+      },
+      "optimized": {
+        "start": 173.8,
+        "end": 175.39999999999998,
+        "text": "如果把大龙直接秒了会输"
+      }
+    },
+    {
+      "index": 112,
+      "baseline": {
+        "start": 179.6,
+        "end": 180.79999999999998,
+        "text": "就是羊刀过渡比较顺"
+      },
+      "optimized": {
+        "start": 176.4,
+        "end": 178.39999999999998,
+        "text": "第三套的话就是一个德莱文巨龙95"
+      }
+    },
+    {
+      "index": 113,
+      "baseline": {
+        "start": 180.8,
+        "end": 181.79999999999998,
+        "text": "劣势的话就是当前"
+      },
+      "optimized": {
+        "start": 178.4,
+        "end": 179.6,
+        "text": "本套95的优势的话"
+      }
+    },
+    {
+      "index": 114,
+      "baseline": {
+        "start": 181.8,
+        "end": 183.6,
+        "text": "德莱文他的数值不是很够啊"
+      },
+      "optimized": {
+        "start": 179.6,
+        "end": 180.79999999999998,
+        "text": "就是羊刀过渡比较顺"
+      }
+    },
+    {
+      "index": 115,
+      "baseline": {
+        "start": 183.6,
+        "end": 184.79999999999998,
+        "text": "需要较长的发育周期"
+      },
+      "optimized": {
+        "start": 180.8,
+        "end": 181.79999999999998,
+        "text": "劣势的话就是当前"
+      }
+    },
+    {
+      "index": 116,
+      "baseline": {
+        "start": 184.8,
+        "end": 186.39999999999998,
+        "text": "比较适合虐菜炸鱼"
+      },
+      "optimized": {
+        "start": 181.8,
+        "end": 183.6,
+        "text": "德莱文他的数值不是很够啊"
+      }
+    },
+    {
+      "index": 117,
+      "baseline": {
+        "start": 186.4,
+        "end": 187.79999999999998,
+        "text": "如果你的段位压力大的话"
+      },
+      "optimized": {
+        "start": 183.6,
+        "end": 184.79999999999998,
+        "text": "需要较长的发育周期"
+      }
+    },
+    {
+      "index": 118,
+      "baseline": {
+        "start": 187.8,
+        "end": 189.0,
+        "text": "就不推荐这一套"
+      },
+      "optimized": {
+        "start": 184.8,
+        "end": 186.39999999999998,
+        "text": "比较适合虐菜炸鱼"
+      }
+    },
+    {
+      "index": 119,
+      "baseline": {
+        "start": 189.0,
+        "end": 190.79999999999998,
+        "text": "因为一波启动就发育不起来"
+      },
+      "optimized": {
+        "start": 186.4,
+        "end": 187.79999999999998,
+        "text": "如果你的段位压力大的话"
+      }
+    },
+    {
+      "index": 120,
+      "baseline": {
+        "start": 191.0,
+        "end": 193.39999999999998,
+        "text": "最好是能够嫖到德莱文去玩"
+      },
+      "optimized": {
+        "start": 187.8,
+        "end": 189.0,
+        "text": "就不推荐这一套"
+      }
+    },
+    {
+      "index": 121,
+      "baseline": {
+        "start": 193.4,
+        "end": 194.39999999999998,
+        "text": "当前版本是不推荐的"
+      },
+      "optimized": {
+        "start": 189.0,
+        "end": 190.79999999999998,
+        "text": "因为一波启动就发育不起来"
+      }
+    },
+    {
+      "index": 122,
+      "baseline": {
+        "start": 194.4,
+        "end": 195.79999999999998,
+        "text": "等后面数值加强嘛"
+      },
+      "optimized": {
+        "start": 191.0,
+        "end": 193.39999999999998,
+        "text": "最好是能够嫖到德莱文去玩"
+      }
+    },
+    {
+      "index": 123,
+      "baseline": {
+        "start": 196.4,
+        "end": 198.0,
+        "text": "然后第四套的话就是一个森林95"
+      },
+      "optimized": {
+        "start": 193.4,
+        "end": 194.39999999999998,
+        "text": "当前版本是不推荐的"
+      }
+    },
+    {
+      "index": 124,
+      "baseline": {
+        "start": 198.0,
+        "end": 199.39999999999998,
+        "text": "本套95的优势的话就是"
+      },
+      "optimized": {
+        "start": 194.4,
+        "end": 195.79999999999998,
+        "text": "等后面数值加强嘛"
+      }
+    },
+    {
+      "index": 125,
+      "baseline": {
+        "start": 199.4,
+        "end": 200.6,
+        "text": "羊刀过渡会比较舒服"
+      },
+      "optimized": {
+        "start": 196.4,
+        "end": 198.0,
+        "text": "然后第四套的话就是一个森林95"
+      }
+    },
+    {
+      "index": 126,
+      "baseline": {
+        "start": 200.8,
+        "end": 202.0,
+        "text": "而且你开5森林的话"
+      },
+      "optimized": {
+        "start": 198.0,
+        "end": 199.39999999999998,
+        "text": "本套95的优势的话就是"
+      }
+    },
+    {
+      "index": 127,
+      "baseline": {
+        "start": 202.0,
+        "end": 202.79999999999998,
+        "text": "也是有一个前排"
+      },
+      "optimized": {
+        "start": 199.4,
+        "end": 200.6,
+        "text": "羊刀过渡会比较舒服"
+      }
+    },
+    {
+      "index": 128,
+      "baseline": {
+        "start": 202.8,
+        "end": 203.79999999999998,
+        "text": "跟前面的四重有"
+      },
+      "optimized": {
+        "start": 200.8,
+        "end": 202.0,
+        "text": "而且你开5森林的话"
+      }
+    },
+    {
+      "index": 129,
+      "baseline": {
+        "start": 203.8,
+        "end": 205.2,
+        "text": "一个异曲同工之处啊"
+      },
+      "optimized": {
+        "start": 202.0,
+        "end": 202.79999999999998,
+        "text": "也是有一个前排"
+      }
+    },
+    {
+      "index": 130,
+      "baseline": {
+        "start": 205.4,
+        "end": 206.79999999999998,
+        "text": "而且大树如果你8级"
+      },
+      "optimized": {
+        "start": 202.8,
+        "end": 203.79999999999998,
+        "text": "跟前面的四重有"
+      }
+    },
+    {
+      "index": 131,
+      "baseline": {
+        "start": 206.8,
+        "end": 208.0,
+        "text": "能够嫖到或者抽到的话"
+      },
+      "optimized": {
+        "start": 203.8,
+        "end": 205.2,
+        "text": "一个异曲同工之处啊"
+      }
+    },
+    {
+      "index": 132,
+      "baseline": {
+        "start": 208.0,
+        "end": 209.0,
+        "text": "可以一直叠生命"
+      },
+      "optimized": {
+        "start": 205.4,
+        "end": 206.79999999999998,
+        "text": "而且大树如果你8级"
+      }
+    },
+    {
+      "index": 133,
+      "baseline": {
+        "start": 209.0,
+        "end": 210.79999999999998,
+        "text": "叠到1,000滴血就特别肉了"
+      },
+      "optimized": {
+        "start": 206.8,
+        "end": 208.0,
+        "text": "能够嫖到或者抽到的话"
+      }
+    },
+    {
+      "index": 134,
+      "baseline": {
+        "start": 210.8,
+        "end": 213.2,
+        "text": "大树如果没有没有500滴血的话"
+      },
+      "optimized": {
+        "start": 208.0,
+        "end": 209.0,
+        "text": "可以一直叠生命"
+      }
+    },
+    {
+      "index": 135,
+      "baseline": {
+        "start": 213.2,
+        "end": 213.79999999999998,
+        "text": "就是不当主坦"
+      },
+      "optimized": {
+        "start": 209.0,
+        "end": 210.79999999999998,
+        "text": "叠到1,000滴血就特别肉了"
+      }
+    },
+    {
+      "index": 136,
+      "baseline": {
+        "start": 213.8,
+        "end": 214.79999999999998,
+        "text": "让阿木木当主坦"
+      },
+      "optimized": {
+        "start": 210.8,
+        "end": 213.2,
+        "text": "大树如果没有没有500滴血的话"
+      }
+    },
+    {
+      "index": 137,
+      "baseline": {
+        "start": 214.8,
+        "end": 216.0,
+        "text": "有500滴血就可以尝试"
+      },
+      "optimized": {
+        "start": 213.2,
+        "end": 213.79999999999998,
+        "text": "就是不当主坦"
+      }
+    },
+    {
+      "index": 138,
+      "baseline": {
+        "start": 216.0,
+        "end": 217.39999999999998,
+        "text": "两星大树当主坦了"
+      },
+      "optimized": {
+        "start": 213.8,
+        "end": 214.79999999999998,
+        "text": "让阿木木当主坦"
+      }
+    },
+    {
+      "index": 139,
+      "baseline": {
+        "start": 217.4,
+        "end": 218.39999999999998,
+        "text": "然后有1,000滴血的话"
+      },
+      "optimized": {
+        "start": 214.8,
+        "end": 216.0,
+        "text": "有500滴血就可以尝试"
+      }
+    },
+    {
+      "index": 140,
+      "baseline": {
+        "start": 218.4,
+        "end": 220.0,
+        "text": "就是一定是大树主坦"
+      },
+      "optimized": {
+        "start": 216.0,
+        "end": 217.39999999999998,
+        "text": "两星大树当主坦了"
+      }
+    },
+    {
+      "index": 141,
+      "baseline": {
+        "start": 220.8,
+        "end": 222.0,
+        "text": "而且这一套的话就是"
+      },
+      "optimized": {
+        "start": 217.4,
+        "end": 218.39999999999998,
+        "text": "然后有1,000滴血的话"
+      }
+    },
+    {
+      "index": 142,
+      "baseline": {
+        "start": 222.0,
+        "end": 223.6,
+        "text": "第二个点就是8级可以小d啊"
+      },
+      "optimized": {
+        "start": 218.4,
+        "end": 220.0,
+        "text": "就是一定是大树主坦"
+      }
+    },
+    {
+      "index": 143,
+      "baseline": {
+        "start": 223.6,
+        "end": 225.0,
+        "text": "如果你可以有钱的话"
+      },
+      "optimized": {
+        "start": 220.8,
+        "end": 222.0,
+        "text": "而且这一套的话就是"
+      }
+    },
+    {
+      "index": 144,
+      "baseline": {
+        "start": 225.0,
+        "end": 226.39999999999998,
+        "text": "或者你在连胜"
+      },
+      "optimized": {
+        "start": 222.0,
+        "end": 223.6,
+        "text": "第二个点就是8级可以小d啊"
+      }
+    },
+    {
+      "index": 145,
+      "baseline": {
+        "start": 226.4,
+        "end": 228.39999999999998,
+        "text": "你可以稍微低个10块到20块这样子"
+      },
+      "optimized": {
+        "start": 223.6,
+        "end": 225.0,
+        "text": "如果你可以有钱的话"
+      }
+    },
+    {
+      "index": 146,
+      "baseline": {
+        "start": 228.4,
+        "end": 230.6,
+        "text": "去摇奖一个雅菲翠神德莱文大树"
+      },
+      "optimized": {
+        "start": 225.0,
+        "end": 226.39999999999998,
+        "text": "或者你在连胜"
+      }
+    },
+    {
+      "index": 147,
+      "baseline": {
+        "start": 230.6,
+        "end": 232.39999999999998,
+        "text": "这四张出一张都是比较好的"
+      },
+      "optimized": {
+        "start": 226.4,
+        "end": 228.39999999999998,
+        "text": "你可以稍微低个10块到20块这样子"
+      }
+    },
+    {
+      "index": 148,
+      "baseline": {
+        "start": 232.4,
+        "end": 233.79999999999998,
+        "text": "可以保血或者去发育"
+      },
+      "optimized": {
+        "start": 228.4,
+        "end": 230.6,
+        "text": "去摇奖一个雅菲翠神德莱文大树"
+      }
+    },
+    {
+      "index": 149,
+      "baseline": {
+        "start": 234.0,
+        "end": 235.2,
+        "text": "后面三张5费都可以发育"
+      },
+      "optimized": {
+        "start": 230.6,
+        "end": 232.39999999999998,
+        "text": "这四张出一张都是比较好的"
+      }
+    },
+    {
+      "index": 150,
+      "baseline": {
+        "start": 235.2,
+        "end": 236.79999999999998,
+        "text": "然后雅菲的话肯定是比你"
+      },
+      "optimized": {
+        "start": 232.4,
+        "end": 233.79999999999998,
+        "text": "可以保血或者去发育"
+      }
+    },
+    {
+      "index": 151,
+      "baseline": {
+        "start": 236.8,
+        "end": 239.39999999999998,
+        "text": "一星两星一费的这种霞去"
+      },
+      "optimized": {
+        "start": 234.0,
+        "end": 235.2,
+        "text": "后面三张5费都可以发育"
+      }
+    },
+    {
+      "index": 152,
+      "baseline": {
+        "start": 239.4,
+        "end": 241.0,
+        "text": "过渡会比较更加舒服一点"
+      },
+      "optimized": {
+        "start": 235.2,
+        "end": 236.79999999999998,
+        "text": "然后雅菲的话肯定是比你"
+      }
+    },
+    {
+      "index": 153,
+      "baseline": {
+        "start": 241.4,
+        "end": 242.0,
+        "text": "第四个的话就是"
+      },
+      "optimized": {
+        "start": 236.8,
+        "end": 239.39999999999998,
+        "text": "一星两星一费的这种霞去"
+      }
+    },
+    {
+      "index": 154,
+      "baseline": {
+        "start": 242.0,
+        "end": 243.2,
+        "text": "转职接受度比较高啊"
+      },
+      "optimized": {
+        "start": 239.4,
+        "end": 241.0,
+        "text": "过渡会比较更加舒服一点"
+      }
+    },
+    {
+      "index": 155,
+      "baseline": {
+        "start": 243.2,
+        "end": 244.79999999999998,
+        "text": "森林转可以开一个7永森"
+      },
+      "optimized": {
+        "start": 241.4,
+        "end": 242.0,
+        "text": "第四个的话就是"
+      }
+    },
+    {
+      "index": 156,
+      "baseline": {
+        "start": 244.8,
+        "end": 246.6,
+        "text": "裁決的德莱文是比较强的"
+      },
+      "optimized": {
+        "start": 242.0,
+        "end": 243.2,
+        "text": "转职接受度比较高啊"
+      }
+    },
+    {
+      "index": 157,
+      "baseline": {
+        "start": 246.6,
+        "end": 248.39999999999998,
+        "text": "重装的大树也是一个大提升"
+      },
+      "optimized": {
+        "start": 243.2,
+        "end": 244.79999999999998,
+        "text": "森林转可以开一个7永森"
+      }
+    },
+    {
+      "index": 158,
+      "baseline": {
+        "start": 248.4,
+        "end": 249.79999999999998,
+        "text": "劣势的话就是上限不足"
+      },
+      "optimized": {
+        "start": 244.8,
+        "end": 246.6,
+        "text": "裁決的德莱文是比较强的"
+      }
+    },
+    {
+      "index": 159,
+      "baseline": {
+        "start": 249.8,
+        "end": 252.2,
+        "text": "因为没有大龙就爆发不够"
+      },
+      "optimized": {
+        "start": 246.6,
+        "end": 248.39999999999998,
+        "text": "重装的大树也是一个大提升"
+      }
+    },
+    {
+      "index": 160,
+      "baseline": {
+        "start": 252.2,
+        "end": 253.39999999999998,
+        "text": "然后对位压力比较大"
+      },
+      "optimized": {
+        "start": 248.4,
+        "end": 249.79999999999998,
+        "text": "劣势的话就是上限不足"
+      }
+    },
+    {
+      "index": 161,
+      "baseline": {
+        "start": 253.4,
+        "end": 254.2,
+        "text": "德莱文要跟对面的"
+      },
+      "optimized": {
+        "start": 249.8,
+        "end": 252.2,
+        "text": "因为没有大龙就爆发不够"
+      }
+    },
+    {
+      "index": 162,
+      "baseline": {
+        "start": 254.2,
+        "end": 255.39999999999998,
+        "text": "c位去站一个对角"
+      },
+      "optimized": {
+        "start": 252.2,
+        "end": 253.39999999999998,
+        "text": "然后对位压力比较大"
+      }
+    },
+    {
+      "index": 163,
+      "baseline": {
+        "start": 255.4,
+        "end": 257.2,
+        "text": "如果站同侧的话容易打假赛"
+      },
+      "optimized": {
+        "start": 253.4,
+        "end": 254.2,
+        "text": "德莱文要跟对面的"
+      }
+    },
+    {
+      "index": 164,
+      "baseline": {
+        "start": 258.4,
+        "end": 260.2,
+        "text": "然后讲一下过渡推荐啊"
+      },
+      "optimized": {
+        "start": 254.2,
+        "end": 255.39999999999998,
+        "text": "c位去站一个对角"
+      }
+    },
+    {
+      "index": 165,
+      "baseline": {
+        "start": 260.6,
+        "end": 262.2,
+        "text": "首先第一个的话就是法系过渡"
+      },
+      "optimized": {
+        "start": 255.4,
+        "end": 257.2,
+        "text": "如果站同侧的话容易打假赛"
+      }
+    },
+    {
+      "index": 166,
+      "baseline": {
+        "start": 262.2,
+        "end": 263.4,
+        "text": "我推荐用提莫过渡"
+      },
+      "optimized": {
+        "start": 258.4,
+        "end": 260.2,
+        "text": "然后讲一下过渡推荐啊"
+      }
+    },
+    {
+      "index": 167,
+      "baseline": {
+        "start": 263.6,
+        "end": 264.8,
+        "text": "然后下面的话就是一些"
+      },
+      "optimized": {
+        "start": 260.6,
+        "end": 262.2,
+        "text": "首先第一个的话就是法系过渡"
+      }
+    },
+    {
+      "index": 168,
+      "baseline": {
+        "start": 264.8,
+        "end": 267.2,
+        "text": "8级的一些中间的8级过渡"
+      },
+      "optimized": {
+        "start": 262.2,
+        "end": 263.4,
+        "text": "我推荐用提莫过渡"
+      }
+    },
+    {
+      "index": 169,
+      "baseline": {
+        "start": 267.6,
+        "end": 269.4,
+        "text": "然后对我们第一个的话就是狐狸"
+      },
+      "optimized": {
+        "start": 263.6,
+        "end": 264.8,
+        "text": "然后下面的话就是一些"
+      }
+    },
+    {
+      "index": 170,
+      "baseline": {
+        "start": 270.0,
+        "end": 271.2,
+        "text": "第一个想到的就是法师"
+      },
+      "optimized": {
+        "start": 264.8,
+        "end": 267.2,
+        "text": "8级的一些中间的8级过渡"
+      }
+    },
+    {
+      "index": 171,
+      "baseline": {
+        "start": 271.2,
+        "end": 273.0,
+        "text": "然后第二个想到的话就是莲华"
+      },
+      "optimized": {
+        "start": 267.6,
+        "end": 269.4,
+        "text": "然后对我们第一个的话就是狐狸"
+      }
+    },
+    {
+      "index": 172,
+      "baseline": {
+        "start": 273.2,
+        "end": 274.8,
+        "text": "莲华的话一般是用瑟提嘛"
+      },
+      "optimized": {
+        "start": 269.4,
+        "end": 270.0,
+        "text": "狐狸的话我们"
+      }
+    },
+    {
+      "index": 173,
+      "baseline": {
+        "start": 274.8,
+        "end": 276.0,
+        "text": "色体跟狐狸凑一个两莲华"
+      },
+      "optimized": {
+        "start": 270.0,
+        "end": 271.2,
+        "text": "第一个想到的就是法师"
+      }
+    },
+    {
+      "index": 174,
+      "baseline": {
+        "start": 276.0,
+        "end": 278.0,
+        "text": "那有瑟提我们就会想到一个斗士"
+      },
+      "optimized": {
+        "start": 271.2,
+        "end": 273.0,
+        "text": "然后第二个想到的话就是莲华"
+      }
+    },
+    {
+      "index": 175,
+      "baseline": {
+        "start": 278.4,
+        "end": 279.59999999999997,
+        "text": "斗士的话可以开一个石甲虫"
+      },
+      "optimized": {
+        "start": 273.2,
+        "end": 274.8,
+        "text": "莲华的话一般是用瑟提嘛"
+      }
+    },
+    {
+      "index": 176,
+      "baseline": {
+        "start": 279.6,
+        "end": 280.8,
+        "text": "那既然开了石甲虫就"
+      },
+      "optimized": {
+        "start": 274.8,
+        "end": 276.0,
+        "text": "色体跟狐狸凑一个两莲华"
+      }
+    },
+    {
+      "index": 177,
+      "baseline": {
+        "start": 280.8,
+        "end": 282.0,
+        "text": "可以开一个三野怪"
+      },
+      "optimized": {
+        "start": 276.0,
+        "end": 278.0,
+        "text": "那有瑟提我们就会想到一个斗士"
+      }
+    },
+    {
+      "index": 178,
+      "baseline": {
+        "start": 282.0,
+        "end": 283.59999999999997,
+        "text": "然后把印记给到石甲虫"
+      },
+      "optimized": {
+        "start": 278.4,
+        "end": 279.59999999999997,
+        "text": "斗士的话可以开一个石甲虫"
+      }
+    },
+    {
+      "index": 179,
+      "baseline": {
+        "start": 283.8,
+        "end": 284.59999999999997,
+        "text": "如果你没有血"
+      },
+      "optimized": {
+        "start": 279.6,
+        "end": 280.8,
+        "text": "那既然开了石甲虫就"
+      }
+    },
+    {
+      "index": 180,
+      "baseline": {
+        "start": 284.6,
+        "end": 285.59999999999997,
+        "text": "或者你钱不够"
+      },
+      "optimized": {
+        "start": 280.8,
+        "end": 282.0,
+        "text": "可以开一个三野怪"
+      }
+    },
+    {
+      "index": 181,
+      "baseline": {
+        "start": 285.6,
+        "end": 287.59999999999997,
+        "text": "你就可以八级这样子去迫降"
+      },
+      "optimized": {
+        "start": 282.0,
+        "end": 283.59999999999997,
+        "text": "然后把印记给到石甲虫"
+      }
+    },
+    {
+      "index": 182,
+      "baseline": {
+        "start": 287.8,
+        "end": 288.8,
+        "text": "这是一个思路"
+      },
+      "optimized": {
+        "start": 283.8,
+        "end": 284.59999999999997,
+        "text": "如果你没有血"
+      }
+    },
+    {
+      "index": 183,
+      "baseline": {
+        "start": 288.8,
+        "end": 289.8,
+        "text": "大家可以学习一下"
+      },
+      "optimized": {
+        "start": 284.6,
+        "end": 285.59999999999997,
+        "text": "或者你钱不够"
+      }
+    },
+    {
+      "index": 184,
+      "baseline": {
+        "start": 289.8,
+        "end": 291.2,
+        "text": "第二个的话就是一个杰拉"
+      },
+      "optimized": {
+        "start": 285.6,
+        "end": 287.59999999999997,
+        "text": "你就可以八级这样子去迫降"
+      }
+    },
+    {
+      "index": 185,
+      "baseline": {
+        "start": 291.4,
+        "end": 293.0,
+        "text": "杰拉的话它本身是个召唤师啊"
+      },
+      "optimized": {
+        "start": 287.8,
+        "end": 288.8,
+        "text": "这是一个思路"
+      }
+    },
+    {
+      "index": 186,
+      "baseline": {
+        "start": 293.0,
+        "end": 295.0,
+        "text": "那我们首先想到的就是一个掘墓"
+      },
+      "optimized": {
+        "start": 288.8,
+        "end": 289.8,
+        "text": "大家可以学习一下"
+      }
+    },
+    {
+      "index": 187,
+      "baseline": {
+        "start": 295.0,
+        "end": 296.2,
+        "text": "掘墓可以开一个主宰"
+      },
+      "optimized": {
+        "start": 289.8,
+        "end": 291.2,
+        "text": "第二个的话就是一个杰拉"
+      }
+    },
+    {
+      "index": 188,
+      "baseline": {
+        "start": 296.2,
+        "end": 297.59999999999997,
+        "text": "那开主宰的话有两种"
+      },
+      "optimized": {
+        "start": 291.4,
+        "end": 293.0,
+        "text": "杰拉的话它本身是个召唤师啊"
+      }
+    },
+    {
+      "index": 189,
+      "baseline": {
+        "start": 297.6,
+        "end": 299.0,
+        "text": "一个是开河蟹"
+      },
+      "optimized": {
+        "start": 293.0,
+        "end": 295.0,
+        "text": "那我们首先想到的就是一个掘墓"
+      }
+    },
+    {
+      "index": 190,
+      "baseline": {
+        "start": 299.0,
+        "end": 300.2,
+        "text": "河蟹的话跟前面一样"
+      },
+      "optimized": {
+        "start": 295.0,
+        "end": 296.2,
+        "text": "掘墓可以开一个主宰"
+      }
+    },
+    {
+      "index": 191,
+      "baseline": {
+        "start": 300.2,
+        "end": 301.2,
+        "text": "可以开一个三野怪"
+      },
+      "optimized": {
+        "start": 296.2,
+        "end": 297.59999999999997,
+        "text": "那开主宰的话有两种"
+      }
+    },
+    {
+      "index": 192,
+      "baseline": {
+        "start": 301.2,
+        "end": 303.0,
+        "text": "然后印记去给到河蟹有个回血"
+      },
+      "optimized": {
+        "start": 297.6,
+        "end": 299.0,
+        "text": "一个是开河蟹"
+      }
+    },
+    {
+      "index": 193,
+      "baseline": {
+        "start": 303.4,
+        "end": 304.4,
+        "text": "然后第二种的话就是"
+      },
+      "optimized": {
+        "start": 299.0,
+        "end": 300.2,
+        "text": "河蟹的话跟前面一样"
+      }
+    },
+    {
+      "index": 194,
+      "baseline": {
+        "start": 304.4,
+        "end": 305.4,
+        "text": "你可以开一个木木"
+      },
+      "optimized": {
+        "start": 300.2,
+        "end": 301.2,
+        "text": "可以开一个三野怪"
+      }
+    },
+    {
+      "index": 195,
+      "baseline": {
+        "start": 305.4,
+        "end": 306.59999999999997,
+        "text": "木木有个地狱火嘛"
+      },
+      "optimized": {
+        "start": 301.2,
+        "end": 303.0,
+        "text": "然后印记去给到河蟹有个回血"
+      }
+    },
+    {
+      "index": 196,
+      "baseline": {
+        "start": 306.6,
+        "end": 308.2,
+        "text": "地狱火可以开一个重伤"
+      },
+      "optimized": {
+        "start": 303.4,
+        "end": 304.4,
+        "text": "然后第二种的话就是"
+      }
+    },
+    {
+      "index": 197,
+      "baseline": {
+        "start": 308.4,
+        "end": 310.4,
+        "text": "第三种的话就是你嫖到了奶妈"
+      },
+      "optimized": {
+        "start": 304.4,
+        "end": 305.4,
+        "text": "你可以开一个木木"
+      }
+    },
+    {
+      "index": 198,
+      "baseline": {
+        "start": 310.4,
+        "end": 312.2,
+        "text": "这些4费的话一般都是嫖到"
+      },
+      "optimized": {
+        "start": 305.4,
+        "end": 306.59999999999997,
+        "text": "木木有个地狱火嘛"
+      }
+    },
+    {
+      "index": 199,
+      "baseline": {
+        "start": 312.2,
+        "end": 313.8,
+        "text": "或者你没有血量去破降的"
+      },
+      "optimized": {
+        "start": 306.6,
+        "end": 308.2,
+        "text": "地狱火可以开一个重伤"
+      }
+    },
+    {
+      "index": 200,
+      "baseline": {
+        "start": 313.8,
+        "end": 315.0,
+        "text": "不会说去递干"
+      },
+      "optimized": {
+        "start": 308.4,
+        "end": 310.4,
+        "text": "第三种的话就是你嫖到了奶妈"
+      }
+    },
+    {
+      "index": 201,
+      "baseline": {
+        "start": 315.6,
+        "end": 316.8,
+        "text": "除非你实在没血了"
+      },
+      "optimized": {
+        "start": 310.4,
+        "end": 312.2,
+        "text": "这些4费的话一般都是嫖到"
+      }
+    },
+    {
+      "index": 202,
+      "baseline": {
+        "start": 316.8,
+        "end": 319.4,
+        "text": "然后奶妈这边的话就是开一个裁决"
+      },
+      "optimized": {
+        "start": 312.2,
+        "end": 313.8,
+        "text": "或者你没有血量去破降的"
+      }
+    },
+    {
+      "index": 203,
+      "baseline": {
+        "start": 319.4,
+        "end": 320.2,
+        "text": "裁决的话我们一般"
+      },
+      "optimized": {
+        "start": 313.8,
+        "end": 315.0,
+        "text": "不会说去递干"
+      }
+    },
+    {
+      "index": 204,
+      "baseline": {
+        "start": 320.2,
+        "end": 321.4,
+        "text": "想到的是一个沙皇"
+      },
+      "optimized": {
+        "start": 315.6,
+        "end": 316.8,
+        "text": "除非你实在没血了"
+      }
+    },
+    {
+      "index": 205,
+      "baseline": {
+        "start": 321.6,
+        "end": 323.2,
+        "text": "沙皇有个黑荆棘的一个羁绊"
+      },
+      "optimized": {
+        "start": 316.8,
+        "end": 319.4,
+        "text": "然后奶妈这边的话就是开一个裁决"
+      }
+    },
+    {
+      "index": 206,
+      "baseline": {
+        "start": 323.2,
+        "end": 324.2,
+        "text": "那就可以用前期"
+      },
+      "optimized": {
+        "start": 319.4,
+        "end": 320.2,
+        "text": "裁决的话我们一般"
+      }
+    },
+    {
+      "index": 207,
+      "baseline": {
+        "start": 324.2,
+        "end": 325.4,
+        "text": "过渡的一个两星挖机"
+      },
+      "optimized": {
+        "start": 320.2,
+        "end": 321.4,
+        "text": "想到的是一个沙皇"
+      }
+    },
+    {
+      "index": 208,
+      "baseline": {
+        "start": 325.4,
+        "end": 326.8,
+        "text": "或者你嫖到的一个"
+      },
+      "optimized": {
+        "start": 321.6,
+        "end": 323.2,
+        "text": "沙皇有个黑荆棘的一个羁绊"
+      }
+    },
+    {
+      "index": 209,
+      "baseline": {
+        "start": 326.8,
+        "end": 329.2,
+        "text": "石头人去开一个两黑荆棘"
+      },
+      "optimized": {
+        "start": 323.2,
+        "end": 324.2,
+        "text": "那就可以用前期"
+      }
+    },
+    {
+      "index": 210,
+      "baseline": {
+        "start": 329.6,
+        "end": 331.4,
+        "text": "然后或者你是EZ的话"
+      },
+      "optimized": {
+        "start": 324.2,
+        "end": 325.4,
+        "text": "过渡的一个两星挖机"
+      }
+    },
+    {
+      "index": 211,
+      "baseline": {
+        "start": 331.4,
+        "end": 333.2,
+        "text": "可以用一个森林那边的过渡"
+      },
+      "optimized": {
+        "start": 325.4,
+        "end": 326.8,
+        "text": "或者你嫖到的一个"
+      }
+    },
+    {
+      "index": 212,
+      "baseline": {
+        "start": 333.2,
+        "end": 334.2,
+        "text": "开个3森林"
+      },
+      "optimized": {
+        "start": 326.8,
+        "end": 329.2,
+        "text": "石头人去开一个两黑荆棘"
+      }
+    },
+    {
+      "index": 213,
+      "baseline": {
+        "start": 334.2,
+        "end": 335.4,
+        "text": "然后凑一个两裁决"
+      },
+      "optimized": {
+        "start": 329.6,
+        "end": 331.4,
+        "text": "然后或者你是EZ的话"
+      }
+    },
+    {
+      "index": 214,
+      "baseline": {
+        "start": 335.8,
+        "end": 337.8,
+        "text": "然后我们前面开了一个黑荆棘的话"
+      },
+      "optimized": {
+        "start": 331.4,
+        "end": 333.2,
+        "text": "可以用一个森林那边的过渡"
+      }
+    },
+    {
+      "index": 215,
+      "baseline": {
+        "start": 337.8,
+        "end": 339.2,
+        "text": "祭品的血量会比较高一点嘛"
+      },
+      "optimized": {
+        "start": 333.2,
+        "end": 334.2,
+        "text": "开个3森林"
+      }
+    },
+    {
+      "index": 216,
+      "baseline": {
+        "start": 339.2,
+        "end": 341.8,
+        "text": "就是血会比平常的怪高一点"
+      },
+      "optimized": {
+        "start": 334.2,
+        "end": 335.4,
+        "text": "然后凑一个两裁决"
+      }
+    },
+    {
+      "index": 217,
+      "baseline": {
+        "start": 341.8,
+        "end": 343.4,
+        "text": "那我们就可以开一个花妖"
+      },
+      "optimized": {
+        "start": 335.8,
+        "end": 337.8,
+        "text": "然后我们前面开了一个黑荆棘的话"
+      }
+    },
+    {
+      "index": 218,
+      "baseline": {
+        "start": 343.6,
+        "end": 345.4,
+        "text": "因为花妖这边是百分比回血"
+      },
+      "optimized": {
+        "start": 337.8,
+        "end": 339.2,
+        "text": "祭品的血量会比较高一点嘛"
+      }
+    },
+    {
+      "index": 219,
+      "baseline": {
+        "start": 345.4,
+        "end": 346.8,
+        "text": "我们从高血量这边就"
+      },
+      "optimized": {
+        "start": 339.2,
+        "end": 341.8,
+        "text": "就是血会比平常的怪高一点"
+      }
+    },
+    {
+      "index": 220,
+      "baseline": {
+        "start": 346.8,
+        "end": 348.0,
+        "text": "联想到了一个花妖"
+      },
+      "optimized": {
+        "start": 341.8,
+        "end": 343.4,
+        "text": "那我们就可以开一个花妖"
+      }
+    },
+    {
+      "index": 221,
+      "baseline": {
+        "start": 348.0,
+        "end": 349.4,
+        "text": "那就带一张稻草人"
+      },
+      "optimized": {
+        "start": 343.6,
+        "end": 345.4,
+        "text": "因为花妖这边是百分比回血"
+      }
+    },
+    {
+      "index": 222,
+      "baseline": {
+        "start": 349.4,
+        "end": 350.8,
+        "text": "那既然带了稻草人的话"
+      },
+      "optimized": {
+        "start": 345.4,
+        "end": 346.8,
+        "text": "我们从高血量这边就"
+      }
+    },
+    {
+      "index": 223,
+      "baseline": {
+        "start": 350.8,
+        "end": 352.0,
+        "text": "他有一个护卫"
+      },
+      "optimized": {
+        "start": 346.8,
+        "end": 348.0,
+        "text": "联想到了一个花妖"
+      }
+    },
+    {
+      "index": 224,
+      "baseline": {
+        "start": 352.0,
+        "end": 353.0,
+        "text": "我们可以带一张慎"
+      },
+      "optimized": {
+        "start": 348.0,
+        "end": 349.4,
+        "text": "那就带一张稻草人"
+      }
+    },
+    {
+      "index": 225,
+      "baseline": {
+        "start": 353.0,
+        "end": 354.59999999999997,
+        "text": "带慎去开一个两护卫"
+      },
+      "optimized": {
+        "start": 349.4,
+        "end": 350.8,
+        "text": "那既然带了稻草人的话"
+      }
+    },
+    {
+      "index": 226,
+      "baseline": {
+        "start": 355.2,
+        "end": 355.8,
+        "text": "带了慎的话"
+      },
+      "optimized": {
+        "start": 350.8,
+        "end": 352.0,
+        "text": "他有一个护卫"
+      }
+    },
+    {
+      "index": 227,
+      "baseline": {
+        "start": 355.8,
+        "end": 357.8,
+        "text": "你就可以带木木再去开一个地狱火"
+      },
+      "optimized": {
+        "start": 352.0,
+        "end": 353.0,
+        "text": "我们可以带一张慎"
+      }
+    },
+    {
+      "index": 228,
+      "baseline": {
+        "start": 357.8,
+        "end": 360.2,
+        "text": "或者带一个凯南去开地狱火"
+      },
+      "optimized": {
+        "start": 353.0,
+        "end": 354.59999999999997,
+        "text": "带慎去开一个两护卫"
+      }
+    },
+    {
+      "index": 229,
+      "baseline": {
+        "start": 360.2,
+        "end": 362.2,
+        "text": "这些是我们一个推导的思路"
+      },
+      "optimized": {
+        "start": 355.2,
+        "end": 355.8,
+        "text": "带了慎的话"
+      }
+    },
+    {
+      "index": 230,
+      "baseline": {
+        "start": 363.2,
+        "end": 364.2,
+        "text": "然后我们来讲一下"
+      },
+      "optimized": {
+        "start": 355.8,
+        "end": 357.8,
+        "text": "你就可以带木木再去开一个地狱火"
+      }
+    },
+    {
+      "index": 231,
+      "baseline": {
+        "start": 364.2,
+        "end": 365.59999999999997,
+        "text": "访"
+      },
+      "optimized": {
+        "start": 357.8,
+        "end": 360.2,
+        "text": "或者带一个凯南去开地狱火"
+      }
+    },
+    {
+      "index": 232,
+      "baseline": {
+        "start": 367.2,
+        "end": 368.2,
+        "text": "首先第一个的话就是"
+      },
+      "optimized": {
+        "start": 360.2,
+        "end": 362.2,
+        "text": "这些是我们一个推导的思路"
+      }
+    },
+    {
+      "index": 233,
+      "baseline": {
+        "start": 368.2,
+        "end": 370.0,
+        "text": "这个霞的羊刀流派"
+      },
+      "optimized": {
+        "start": 363.2,
+        "end": 364.2,
+        "text": "然后我们来讲一下"
+      }
+    },
+    {
+      "index": 234,
+      "baseline": {
+        "start": 370.0,
+        "end": 370.8,
+        "text": "第二的话就是"
+      },
+      "optimized": {
+        "start": 364.2,
+        "end": 365.59999999999997,
+        "text": "过渡推荐物理这边"
+      }
+    },
+    {
+      "index": 235,
+      "baseline": {
+        "start": 370.8,
+        "end": 372.2,
+        "text": "维鲁斯这边的技能流派"
+      },
+      "optimized": {
+        "start": 365.6,
+        "end": 367.2,
+        "text": "物理这边的话有两种流派"
+      }
+    },
+    {
+      "index": 236,
+      "baseline": {
+        "start": 372.4,
+        "end": 373.2,
+        "text": "我们一个个来讲"
+      },
+      "optimized": {
+        "start": 367.2,
+        "end": 368.2,
+        "text": "首先第一个的话就是"
+      }
+    },
+    {
+      "index": 237,
+      "baseline": {
+        "start": 373.4,
+        "end": 375.2,
+        "text": "然后狮子狗这张卡特别超模啊"
+      },
+      "optimized": {
+        "start": 368.2,
+        "end": 370.0,
+        "text": "这个霞的羊刀流派"
+      }
+    },
+    {
+      "index": 238,
+      "baseline": {
+        "start": 375.2,
+        "end": 376.59999999999997,
+        "text": "它本身强度很够"
+      },
+      "optimized": {
+        "start": 370.0,
+        "end": 370.8,
+        "text": "第二的话就是"
+      }
+    },
+    {
+      "index": 239,
+      "baseline": {
+        "start": 376.6,
+        "end": 378.4,
+        "text": "而且它杀怪可以爆钱"
+      },
+      "optimized": {
+        "start": 370.8,
+        "end": 372.2,
+        "text": "维鲁斯这边的技能流派"
+      }
+    },
+    {
+      "index": 240,
+      "baseline": {
+        "start": 378.6,
+        "end": 379.8,
+        "text": "特别契合一个95啊"
+      },
+      "optimized": {
+        "start": 372.4,
+        "end": 373.2,
+        "text": "我们一个个来讲"
+      }
+    },
+    {
+      "index": 241,
+      "baseline": {
+        "start": 379.8,
+        "end": 381.0,
+        "text": "因为95比较缺钱嘛"
+      },
+      "optimized": {
+        "start": 373.4,
+        "end": 375.2,
+        "text": "然后狮子狗这张卡特别超模啊"
+      }
+    },
+    {
+      "index": 242,
+      "baseline": {
+        "start": 381.0,
+        "end": 383.0,
+        "text": "而且狮子狗的话像羊刀或者"
+      },
+      "optimized": {
+        "start": 375.2,
+        "end": 376.59999999999997,
+        "text": "它本身强度很够"
+      }
+    },
+    {
+      "index": 243,
+      "baseline": {
+        "start": 383.0,
+        "end": 385.2,
+        "text": "无尽血手这种面板都能带不挑"
+      },
+      "optimized": {
+        "start": 376.6,
+        "end": 378.4,
+        "text": "而且它杀怪可以爆钱"
+      }
+    },
+    {
+      "index": 244,
+      "baseline": {
+        "start": 385.8,
+        "end": 387.2,
+        "text": "啊如果我们是羊刀流派的话"
+      },
+      "optimized": {
+        "start": 378.6,
+        "end": 379.8,
+        "text": "特别契合一个95啊"
+      }
+    },
+    {
+      "index": 245,
+      "baseline": {
+        "start": 387.2,
+        "end": 389.59999999999997,
+        "text": "可以走到8级可以小d一下亚飞"
+      },
+      "optimized": {
+        "start": 379.8,
+        "end": 381.0,
+        "text": "因为95比较缺钱嘛"
+      }
+    },
+    {
+      "index": 246,
+      "baseline": {
+        "start": 389.6,
+        "end": 391.2,
+        "text": "如果你血量够就不d啊"
+      },
+      "optimized": {
+        "start": 381.0,
+        "end": 383.0,
+        "text": "而且狮子狗的话像羊刀或者"
+      }
+    },
+    {
+      "index": 247,
+      "baseline": {
+        "start": 391.2,
+        "end": 392.4,
+        "text": "血量够如就不d"
+      },
+      "optimized": {
+        "start": 383.0,
+        "end": 385.2,
+        "text": "无尽血手这种面板都能带不挑"
+      }
+    },
+    {
+      "index": 248,
+      "baseline": {
+        "start": 392.4,
+        "end": 393.8,
+        "text": "然后亚飞这边的话就是"
+      },
+      "optimized": {
+        "start": 385.8,
+        "end": 387.2,
+        "text": "啊如果我们是羊刀流派的话"
+      }
+    },
+    {
+      "index": 249,
+      "baseline": {
+        "start": 393.8,
+        "end": 395.8,
+        "text": "迅射带霞开一个森林"
+      },
+      "optimized": {
+        "start": 387.2,
+        "end": 389.59999999999997,
+        "text": "可以走到8级可以小d一下亚飞"
+      }
+    },
+    {
+      "index": 250,
+      "baseline": {
+        "start": 395.8,
+        "end": 398.0,
+        "text": "或者带鸟去开一个野怪"
+      },
+      "optimized": {
+        "start": 389.6,
+        "end": 391.2,
+        "text": "如果你血量够就不d啊"
+      }
+    },
+    {
+      "index": 251,
+      "baseline": {
+        "start": 398.0,
+        "end": 399.2,
+        "text": "野怪的话我们可以选择"
+      },
+      "optimized": {
+        "start": 391.2,
+        "end": 392.4,
+        "text": "血量够如就不d"
+      }
+    },
+    {
+      "index": 252,
+      "baseline": {
+        "start": 399.2,
+        "end": 401.2,
+        "text": "石头人加一个斗士去开一个"
+      },
+      "optimized": {
+        "start": 392.4,
+        "end": 393.8,
+        "text": "然后亚飞这边的话就是"
+      }
+    },
+    {
+      "index": 253,
+      "baseline": {
+        "start": 402.4,
+        "end": 404.2,
+        "text": "3野怪然后把印记给到石头人"
+      },
+      "optimized": {
+        "start": 393.8,
+        "end": 395.8,
+        "text": "迅射带霞开一个森林"
+      }
+    },
+    {
+      "index": 254,
+      "baseline": {
+        "start": 404.2,
+        "end": 405.59999999999997,
+        "text": "或者你如果能嫖到大蓝"
+      },
+      "optimized": {
+        "start": 395.8,
+        "end": 398.0,
+        "text": "或者带鸟去开一个野怪"
+      }
+    },
+    {
+      "index": 255,
+      "baseline": {
+        "start": 405.6,
+        "end": 406.4,
+        "text": "递到大蓝的话"
+      },
+      "optimized": {
+        "start": 398.0,
+        "end": 399.2,
+        "text": "野怪的话我们可以选择"
+      }
+    },
+    {
+      "index": 256,
+      "baseline": {
+        "start": 406.4,
+        "end": 408.4,
+        "text": "你就可以带大蓝加一个人马"
+      },
+      "optimized": {
+        "start": 399.2,
+        "end": 401.2,
+        "text": "石头人加一个斗士去开一个"
+      }
+    },
+    {
+      "index": 257,
+      "baseline": {
+        "start": 408.4,
+        "end": 410.59999999999997,
+        "text": "然后把印记去给到石甲虫"
+      },
+      "optimized": {
+        "start": 402.4,
+        "end": 404.2,
+        "text": "3野怪然后把印记给到石头人"
+      }
+    },
+    {
+      "index": 258,
+      "baseline": {
+        "start": 410.6,
+        "end": 412.0,
+        "text": "或者给到一个鸟"
+      },
+      "optimized": {
+        "start": 404.2,
+        "end": 405.59999999999997,
+        "text": "或者你如果能嫖到大蓝"
+      }
+    },
+    {
+      "index": 259,
+      "baseline": {
+        "start": 412.0,
+        "end": 413.2,
+        "text": "也可以给到一个河蟹"
+      },
+      "optimized": {
+        "start": 405.6,
+        "end": 406.4,
+        "text": "递到大蓝的话"
+      }
+    },
+    {
+      "index": 260,
+      "baseline": {
+        "start": 413.2,
+        "end": 415.0,
+        "text": "就主要看你第三只野怪是啥"
+      },
+      "optimized": {
+        "start": 406.4,
+        "end": 408.4,
+        "text": "你就可以带大蓝加一个人马"
+      }
+    },
+    {
+      "index": 261,
+      "baseline": {
+        "start": 415.4,
+        "end": 416.8,
+        "text": "然后如果你是轮子妈的话"
+      },
+      "optimized": {
+        "start": 408.4,
+        "end": 410.59999999999997,
+        "text": "然后把印记去给到石甲虫"
+      }
+    },
+    {
+      "index": 262,
+      "baseline": {
+        "start": 416.8,
+        "end": 419.0,
+        "text": "你就可以带一个物理装"
+      },
+      "optimized": {
+        "start": 410.6,
+        "end": 412.0,
+        "text": "或者给到一个鸟"
+      }
+    },
+    {
+      "index": 263,
+      "baseline": {
+        "start": 419.0,
+        "end": 420.8,
+        "text": "这边青龙无尽给轮子妈或者豹女"
+      },
+      "optimized": {
+        "start": 412.0,
+        "end": 413.2,
+        "text": "也可以给到一个河蟹"
+      }
+    },
+    {
+      "index": 264,
+      "baseline": {
+        "start": 420.8,
+        "end": 422.0,
+        "text": "然后去开一个猎手"
+      },
+      "optimized": {
+        "start": 413.2,
+        "end": 415.0,
+        "text": "就主要看你第三只野怪是啥"
+      }
+    },
+    {
+      "index": 265,
+      "baseline": {
+        "start": 422.0,
+        "end": 423.59999999999997,
+        "text": "猎手的话最好是小红啊"
+      },
+      "optimized": {
+        "start": 415.4,
+        "end": 416.8,
+        "text": "然后如果你是轮子妈的话"
+      }
+    },
+    {
+      "index": 266,
+      "baseline": {
+        "start": 423.8,
+        "end": 425.59999999999997,
+        "text": "小红也跟前面一样去开"
+      },
+      "optimized": {
+        "start": 416.8,
+        "end": 419.0,
+        "text": "你就可以带一个物理装"
+      }
+    },
+    {
+      "index": 267,
+      "baseline": {
+        "start": 425.6,
+        "end": 427.59999999999997,
+        "text": "一个印记给河蟹或者石甲虫"
+      },
+      "optimized": {
+        "start": 419.0,
+        "end": 420.8,
+        "text": "这边青龙无尽给轮子妈或者豹女"
+      }
+    },
+    {
+      "index": 268,
+      "baseline": {
+        "start": 427.8,
+        "end": 429.59999999999997,
+        "text": "然后也可以带蔚去开一个主宰"
+      },
+      "optimized": {
+        "start": 420.8,
+        "end": 422.0,
+        "text": "然后去开一个猎手"
+      }
+    },
+    {
+      "index": 269,
+      "baseline": {
+        "start": 429.6,
+        "end": 432.2,
+        "text": "那主宰的话也可以带一个木木嘛"
+      },
+      "optimized": {
+        "start": 422.0,
+        "end": 423.59999999999997,
+        "text": "猎手的话最好是小红啊"
+      }
+    },
+    {
+      "index": 270,
+      "baseline": {
+        "start": 432.4,
+        "end": 434.0,
+        "text": "这些是一个推导思路啊"
+      },
+      "optimized": {
+        "start": 423.8,
+        "end": 425.59999999999997,
+        "text": "小红也跟前面一样去开"
+      }
+    },
+    {
+      "index": 271,
+      "baseline": {
+        "start": 434.8,
+        "end": 436.2,
+        "text": "然后我们来讲一下迫降"
+      },
+      "optimized": {
+        "start": 425.6,
+        "end": 427.59999999999997,
+        "text": "一个印记给河蟹或者石甲虫"
+      }
+    },
+    {
+      "index": 272,
+      "baseline": {
+        "start": 436.2,
+        "end": 438.0,
+        "text": "破降的话物理迫降这边有3套啊"
+      },
+      "optimized": {
+        "start": 427.8,
+        "end": 429.59999999999997,
+        "text": "然后也可以带蔚去开一个主宰"
+      }
+    },
+    {
+      "index": 273,
+      "baseline": {
+        "start": 438.0,
+        "end": 439.4,
+        "text": "大家可以截屏保存一下"
+      },
+      "optimized": {
+        "start": 429.6,
+        "end": 432.2,
+        "text": "那主宰的话也可以带一个木木嘛"
+      }
+    },
+    {
+      "index": 274,
+      "baseline": {
+        "start": 439.4,
+        "end": 441.0,
+        "text": "厂"
+      },
+      "optimized": {
+        "start": 432.4,
+        "end": 434.0,
+        "text": "这些是一个推导思路啊"
+      }
+    },
+    {
+      "index": 275,
+      "baseline": {
+        "start": 441.0,
+        "end": 442.4,
+        "text": "第一套是重装亚飞"
+      },
+      "optimized": {
+        "start": 434.8,
+        "end": 436.2,
+        "text": "然后我们来讲一下迫降"
+      }
+    },
+    {
+      "index": 276,
+      "baseline": {
+        "start": 442.4,
+        "end": 444.2,
+        "text": "第二套是一个主宰的希维尔"
+      },
+      "optimized": {
+        "start": 436.2,
+        "end": 438.0,
+        "text": "破降的话物理迫降这边有3套啊"
+      }
+    },
+    {
+      "index": 277,
+      "baseline": {
+        "start": 444.2,
+        "end": 446.8,
+        "text": "第三套是一个豹女轮子"
+      },
+      "optimized": {
+        "start": 438.0,
+        "end": 439.4,
+        "text": "大家可以截屏保存一下"
+      }
+    },
+    {
+      "index": 278,
+      "baseline": {
+        "start": 447.2,
+        "end": 448.4,
+        "text": "讲一下法系破降"
+      },
+      "optimized": {
+        "start": 439.4,
+        "end": 441.0,
+        "text": "我就不过多赘述了"
+      }
+    },
+    {
+      "index": 279,
+      "baseline": {
+        "start": 448.4,
+        "end": 449.4,
+        "text": "法系破降有两套啊"
+      },
+      "optimized": {
+        "start": 441.0,
+        "end": 442.4,
+        "text": "第一套是重装亚飞"
+      }
+    },
+    {
+      "index": 280,
+      "baseline": {
+        "start": 449.4,
+        "end": 451.2,
+        "text": "首先第一个的话就是花妖石头"
+      },
+      "optimized": {
+        "start": 442.4,
+        "end": 444.2,
+        "text": "第二套是一个主宰的希维尔"
+      }
+    },
+    {
+      "index": 281,
+      "baseline": {
+        "start": 451.2,
+        "end": 452.59999999999997,
+        "text": "第二套的话就是一个"
+      },
+      "optimized": {
+        "start": 444.2,
+        "end": 446.8,
+        "text": "第三套是一个豹女轮子"
+      }
+    },
+    {
+      "index": 282,
+      "baseline": {
+        "start": 453.6,
+        "end": 454.8,
+        "text": "这边的一个莲花阿狸"
+      },
+      "optimized": {
+        "start": 447.2,
+        "end": 448.4,
+        "text": "讲一下法系破降"
+      }
+    },
+    {
+      "index": 283,
+      "baseline": {
+        "start": 454.8,
+        "end": 456.2,
+        "text": "莲花阿狸这套没那么强啊"
+      },
+      "optimized": {
+        "start": 448.4,
+        "end": 449.4,
+        "text": "法系破降有两套啊"
+      }
+    },
+    {
+      "index": 284,
+      "baseline": {
+        "start": 456.2,
+        "end": 457.59999999999997,
+        "text": "在花妖石头特别卷的时候"
+      },
+      "optimized": {
+        "start": 449.4,
+        "end": 451.2,
+        "text": "首先第一个的话就是花妖石头"
+      }
+    },
+    {
+      "index": 285,
+      "baseline": {
+        "start": 457.6,
+        "end": 459.59999999999997,
+        "text": "再去破将这个神域阿狸吧"
+      },
+      "optimized": {
+        "start": 451.2,
+        "end": 452.59999999999997,
+        "text": "第二套的话就是一个"
+      }
+    },
+    {
+      "index": 286,
+      "baseline": {
+        "start": 467.6,
+        "end": 468.59999999999997,
+        "text": "提莫妖姬师"
+      },
+      "optimized": {
+        "start": 453.6,
+        "end": 454.8,
+        "text": "这边的一个莲花阿狸"
+      }
+    },
+    {
+      "index": 287,
+      "baseline": {
+        "start": 489.8,
+        "end": 491.0,
+        "text": "狮子狗的话我们前面讲了"
+      },
+      "optimized": {
+        "start": 454.8,
+        "end": 456.2,
+        "text": "莲花阿狸这套没那么强啊"
+      }
+    },
+    {
+      "index": 288,
+      "baseline": {
+        "start": 500.4,
+        "end": 501.8,
+        "text": "第二的话就是必须连胜的玩95神吃启动。"
+      },
+      "optimized": {
+        "start": 456.2,
+        "end": 457.59999999999997,
+        "text": "在花妖石头特别卷的时候"
+      }
+    },
+    {
+      "index": 289,
+      "baseline": {
+        "start": 511.8,
+        "end": 513.2,
+        "text": "然后84的话其实数值也挺够的 神吃启动。"
+      },
+      "optimized": {
+        "start": 457.6,
+        "end": 459.59999999999997,
+        "text": "再去破将这个神域阿狸吧"
+      }
+    },
+    {
+      "index": 290,
+      "baseline": {
+        "start": 536.4,
+        "end": 539.8000000000001,
+        "text": "血手杀人剑巨杀蓝buff红buff破防正义"
+      },
+      "optimized": {
+        "start": 467.6,
+        "end": 468.59999999999997,
+        "text": "提莫妖姬师"
+      }
+    },
+    {
+      "index": 291,
+      "baseline": {
+        "start": 540.0,
+        "end": 541.8000000000001,
+        "text": "甚至差点冰甲也可以当启动神吃启动。"
+      },
+      "optimized": {
+        "start": 489.8,
+        "end": 491.0,
+        "text": "狮子狗的话我们前面讲了"
+      }
+    },
+    {
+      "index": 292,
+      "baseline": {
+        "start": 566.8,
+        "end": 568.6,
+        "text": "因为他那个满月放的很慢嘛 翠神吃启动。"
+      },
+      "optimized": {
+        "start": 500.4,
+        "end": 501.8,
+        "text": "第二的话就是必须连胜的玩95神吃启动。"
+      }
+    },
+    {
+      "index": 293,
+      "baseline": {
+        "start": 581.6,
+        "end": 583.6,
+        "text": "然后翠神的话一般就是吃启动装 吃启动。"
+      },
+      "optimized": {
+        "start": 511.8,
+        "end": 513.2,
+        "text": "然后84的话其实数值也挺够的 神吃启动。"
+      }
+    },
+    {
+      "index": 294,
+      "baseline": {
+        "start": 584.8,
+        "end": 586.2,
+        "text": "我们来讲一下对位"
+      },
+      "optimized": {
+        "start": 536.4,
+        "end": 539.8000000000001,
+        "text": "血手杀人剑巨杀蓝buff红buff破防正义"
+      }
+    },
+    {
+      "index": 295,
+      "baseline": {
+        "start": 586.2,
+        "end": 588.6,
+        "text": "对位篇与敌方c位的一个关系啊"
+      },
+      "optimized": {
+        "start": 540.0,
+        "end": 541.8000000000001,
+        "text": "甚至差点冰甲也可以当启动神吃启动。"
+      }
+    },
+    {
+      "index": 296,
+      "baseline": {
+        "start": 588.6,
+        "end": 590.2,
+        "text": "第四季就是对位勤换"
+      },
+      "optimized": {
+        "start": 566.8,
+        "end": 568.6,
+        "text": "因为他那个满月放的很慢嘛 翠神吃启动。"
+      }
+    },
+    {
+      "index": 297,
+      "baseline": {
+        "start": 590.2,
+        "end": 591.0,
+        "text": "不可轻敌"
+      },
+      "optimized": {
+        "start": 581.6,
+        "end": 583.6,
+        "text": "然后翠神的话一般就是吃启动装 吃启动。"
+      }
+    },
+    {
+      "index": 298,
+      "baseline": {
+        "start": 591.2,
+        "end": 593.4,
+        "text": "对角的话有大蓝以及"
+      },
+      "optimized": {
+        "start": 584.8,
+        "end": 586.2,
+        "text": "我们来讲一下对位"
+      }
+    },
+    {
+      "index": 299,
+      "baseline": {
+        "start": 593.4,
+        "end": 595.4,
+        "text": "寒冰拉克丝德莱文大龙"
+      },
+      "optimized": {
+        "start": 586.2,
+        "end": 588.6,
+        "text": "对位篇与敌方c位的一个关系啊"
+      }
+    },
+    {
+      "index": 300,
+      "baseline": {
+        "start": 595.4,
+        "end": 596.6,
+        "text": "这五张卡都是要跟对面"
+      },
+      "optimized": {
+        "start": 588.6,
+        "end": 590.2,
+        "text": "第四季就是对位勤换"
+      }
+    },
+    {
+      "index": 301,
+      "baseline": {
+        "start": 596.6,
+        "end": 598.2,
+        "text": "的c位去一个对角的"
+      },
+      "optimized": {
+        "start": 590.2,
+        "end": 591.0,
+        "text": "不可轻敌"
+      }
+    },
+    {
+      "index": 302,
+      "baseline": {
+        "start": 598.2,
+        "end": 600.0,
+        "text": "对角可以去直接偷对方的c位"
+      },
+      "optimized": {
+        "start": 591.2,
+        "end": 593.4,
+        "text": "对角的话有大蓝以及"
+      }
+    },
+    {
+      "index": 303,
+      "baseline": {
+        "start": 600.0,
+        "end": 601.2,
+        "text": "或者去控对方的c位"
+      },
+      "optimized": {
+        "start": 593.4,
+        "end": 595.4,
+        "text": "寒冰拉克丝德莱文大龙"
+      }
+    },
+    {
+      "index": 304,
+      "baseline": {
+        "start": 601.6,
+        "end": 603.4,
+        "text": "然后同侧的话有阿狸"
+      },
+      "optimized": {
+        "start": 595.4,
+        "end": 596.6,
+        "text": "这五张卡都是要跟对面"
+      }
+    },
+    {
+      "index": 305,
+      "baseline": {
+        "start": 603.4,
+        "end": 604.8,
+        "text": "凯南这些是要同侧的"
+      },
+      "optimized": {
+        "start": 596.6,
+        "end": 598.2,
+        "text": "的c位去一个对角的"
+      }
+    },
+    {
+      "index": 306,
+      "baseline": {
+        "start": 604.8,
+        "end": 606.0,
+        "text": "那既然讲到拉克丝"
+      },
+      "optimized": {
+        "start": 598.2,
+        "end": 600.0,
+        "text": "对角可以去直接偷对方的c位"
+      }
+    },
+    {
+      "index": 307,
+      "baseline": {
+        "start": 606.0,
+        "end": 607.2,
+        "text": "我们就给大家一起讲了吧"
+      },
+      "optimized": {
+        "start": 600.0,
+        "end": 601.2,
+        "text": "或者去控对方的c位"
+      }
+    },
+    {
+      "index": 308,
+      "baseline": {
+        "start": 607.2,
+        "end": 609.2,
+        "text": "像黑荆棘月神还有野兽"
+      },
+      "optimized": {
+        "start": 601.6,
+        "end": 603.4,
+        "text": "然后同侧的话有阿狸"
+      }
+    },
+    {
+      "index": 309,
+      "baseline": {
+        "start": 609.2,
+        "end": 610.4,
+        "text": "拉克丝都是可以无脑挂的"
+      },
+      "optimized": {
+        "start": 603.4,
+        "end": 604.8,
+        "text": "凯南这些是要同侧的"
+      }
+    },
+    {
+      "index": 310,
+      "baseline": {
+        "start": 610.4,
+        "end": 611.6,
+        "text": "你比较缺前排的时候"
+      },
+      "optimized": {
+        "start": 604.8,
+        "end": 606.0,
+        "text": "那既然讲到拉克丝"
+      }
+    },
+    {
+      "index": 311,
+      "baseline": {
+        "start": 611.6,
+        "end": 613.2,
+        "text": "野兽可以选一个灵龟"
+      },
+      "optimized": {
+        "start": 606.0,
+        "end": 607.2,
+        "text": "我们就给大家一起讲了吧"
+      }
+    },
+    {
+      "index": 312,
+      "baseline": {
+        "start": 613.4,
+        "end": 614.2,
+        "text": "缺伤害的话"
+      },
+      "optimized": {
+        "start": 607.2,
+        "end": 609.2,
+        "text": "像黑荆棘月神还有野兽"
+      }
+    },
+    {
+      "index": 313,
+      "baseline": {
+        "start": 614.2,
+        "end": 615.2,
+        "text": "或者你是德莱文的话"
+      },
+      "optimized": {
+        "start": 609.2,
+        "end": 610.4,
+        "text": "拉克丝都是可以无脑挂的"
+      }
+    },
+    {
+      "index": 314,
+      "baseline": {
+        "start": 615.2,
+        "end": 616.8000000000001,
+        "text": "可以选一个加攻速的"
+      },
+      "optimized": {
+        "start": 610.4,
+        "end": 611.6,
+        "text": "你比较缺前排的时候"
+      }
+    },
+    {
+      "index": 315,
+      "baseline": {
+        "start": 617.0,
+        "end": 618.6,
+        "text": "第五的话就是一个海克斯篇"
+      },
+      "optimized": {
+        "start": 611.6,
+        "end": 613.2,
+        "text": "野兽可以选一个灵龟"
+      }
+    },
+    {
+      "index": 316,
+      "baseline": {
+        "start": 618.6,
+        "end": 619.4000000000001,
+        "text": "这个也很重要"
+      },
+      "optimized": {
+        "start": 613.4,
+        "end": 614.2,
+        "text": "缺伤害的话"
+      }
+    },
+    {
+      "index": 317,
+      "baseline": {
+        "start": 619.6,
+        "end": 621.6,
+        "text": "第一个海克斯的话是就不做要求"
+      },
+      "optimized": {
+        "start": 614.2,
+        "end": 615.2,
+        "text": "或者你是德莱文的话"
+      }
+    },
+    {
+      "index": 318,
+      "baseline": {
+        "start": 621.6,
+        "end": 623.4,
+        "text": "你只要拿了能打出连胜都行"
+      },
+      "optimized": {
+        "start": 615.2,
+        "end": 616.8000000000001,
+        "text": "可以选一个加攻速的"
+      }
+    },
+    {
+      "index": 319,
+      "baseline": {
+        "start": 623.4,
+        "end": 625.6,
+        "text": "拿钱或者拿战力拿装备都可以"
+      },
+      "optimized": {
+        "start": 617.0,
+        "end": 618.6,
+        "text": "第五的话就是一个海克斯篇"
+      }
+    },
+    {
+      "index": 320,
+      "baseline": {
+        "start": 625.8,
+        "end": 628.0,
+        "text": "第二个的话就是装备一定大于战力"
+      },
+      "optimized": {
+        "start": 618.6,
+        "end": 619.4000000000001,
+        "text": "这个也很重要"
+      }
+    },
+    {
+      "index": 321,
+      "baseline": {
+        "start": 628.0,
+        "end": 629.6,
+        "text": "因为你前期有质量的话"
+      },
+      "optimized": {
+        "start": 619.6,
+        "end": 621.6,
+        "text": "第一个海克斯的话是就不做要求"
+      }
+    },
+    {
+      "index": 322,
+      "baseline": {
+        "start": 629.6,
+        "end": 631.2,
+        "text": "有装备是更有用的"
+      },
+      "optimized": {
+        "start": 621.6,
+        "end": 623.4,
+        "text": "你只要拿了能打出连胜都行"
+      }
+    },
+    {
+      "index": 323,
+      "baseline": {
+        "start": 631.4,
+        "end": 633.2,
+        "text": "装备去给两星两费或者两星"
+      },
+      "optimized": {
+        "start": 623.4,
+        "end": 625.6,
+        "text": "拿钱或者拿战力拿装备都可以"
+      }
+    },
+    {
+      "index": 324,
+      "baseline": {
+        "start": 633.2,
+        "end": 635.6,
+        "text": "一费这种卡的话就提升很大"
+      },
+      "optimized": {
+        "start": 625.8,
+        "end": 628.0,
+        "text": "第二个的话就是装备一定大于战力"
+      }
+    },
+    {
+      "index": 325,
+      "baseline": {
+        "start": 635.8,
+        "end": 637.0,
+        "text": "一定是不拿经济的"
+      },
+      "optimized": {
+        "start": 628.0,
+        "end": 629.6,
+        "text": "因为你前期有质量的话"
+      }
+    },
+    {
+      "index": 326,
+      "baseline": {
+        "start": 637.0,
+        "end": 637.8000000000001,
+        "text": "一定不拿经济"
+      },
+      "optimized": {
+        "start": 629.6,
+        "end": 631.2,
+        "text": "有装备是更有用的"
+      }
+    },
+    {
+      "index": 327,
+      "baseline": {
+        "start": 638.0,
+        "end": 639.8,
+        "text": "第三个的话就是必须经济"
+      },
+      "optimized": {
+        "start": 631.4,
+        "end": 633.2,
+        "text": "装备去给两星两费或者两星"
+      }
+    },
+    {
+      "index": 328,
+      "baseline": {
+        "start": 639.8,
+        "end": 641.8,
+        "text": "因为大家在4-2都启动了"
+      },
+      "optimized": {
+        "start": 633.2,
+        "end": 635.6,
+        "text": "一费这种卡的话就提升很大"
+      }
+    },
+    {
+      "index": 329,
+      "baseline": {
+        "start": 641.8,
+        "end": 642.8,
+        "text": "就算你拿了战力或者"
+      },
+      "optimized": {
+        "start": 635.8,
+        "end": 637.0,
+        "text": "一定是不拿经济的"
+      }
+    },
+    {
+      "index": 330,
+      "baseline": {
+        "start": 642.8,
+        "end": 644.0,
+        "text": "装备也一定是输的"
+      },
+      "optimized": {
+        "start": 637.0,
+        "end": 637.8000000000001,
+        "text": "一定不拿经济"
+      }
+    },
+    {
+      "index": 331,
+      "baseline": {
+        "start": 644.0,
+        "end": 647.0,
+        "text": "所以你不如拿经济去五阶段启动"
+      },
+      "optimized": {
+        "start": 638.0,
+        "end": 639.8,
+        "text": "第三个的话就是必须经济"
+      }
+    },
+    {
+      "index": 332,
+      "baseline": {
+        "start": 647.2,
+        "end": 650.0,
+        "text": "第一个的话就是彩经济尽量不要拿"
+      },
+      "optimized": {
+        "start": 639.8,
+        "end": 641.8,
+        "text": "因为大家在4-2都启动了"
+      }
+    },
+    {
+      "index": 333,
+      "baseline": {
+        "start": 650.4,
+        "end": 651.6,
+        "text": "因为版本压力比较大"
+      },
+      "optimized": {
+        "start": 641.8,
+        "end": 642.8,
+        "text": "就算你拿了战力或者"
+      }
+    },
+    {
+      "index": 334,
+      "baseline": {
+        "start": 651.6,
+        "end": 652.8,
+        "text": "让个彩很难连胜"
+      },
+      "optimized": {
+        "start": 642.8,
+        "end": 644.0,
+        "text": "装备也一定是输的"
+      }
+    },
+    {
+      "index": 335,
+      "baseline": {
+        "start": 652.8,
+        "end": 654.2,
+        "text": "你连败就没有血量"
+      },
+      "optimized": {
+        "start": 644.0,
+        "end": 647.0,
+        "text": "所以你不如拿经济去五阶段启动"
+      }
+    },
+    {
+      "index": 336,
+      "baseline": {
+        "start": 655.8,
+        "end": 657.0,
+        "text": "烂魔杖就容易死"
+      },
+      "optimized": {
+        "start": 647.2,
+        "end": 650.0,
+        "text": "第一个的话就是彩经济尽量不要拿"
+      }
+    },
+    {
+      "index": 337,
+      "baseline": {
+        "start": 657.0,
+        "end": 659.6,
+        "text": "所以第一个第一个彩就是尽量不拿"
+      },
+      "optimized": {
+        "start": 650.4,
+        "end": 651.6,
+        "text": "因为版本压力比较大"
+      }
+    },
+    {
+      "index": 338,
+      "baseline": {
+        "start": 659.8,
+        "end": 662.4,
+        "text": "然后这四个是超模必拿的海克斯"
+      },
+      "optimized": {
+        "start": 651.6,
+        "end": 652.8,
+        "text": "让个彩很难连胜"
+      }
+    },
+    {
+      "index": 339,
+      "baseline": {
+        "start": 662.4,
+        "end": 663.2,
+        "text": "给大家讲一下"
+      },
+      "optimized": {
+        "start": 652.8,
+        "end": 654.2,
+        "text": "你连败就没有血量"
+      }
+    },
+    {
+      "index": 340,
+      "baseline": {
+        "start": 663.4,
+        "end": 665.0,
+        "text": "首先的话就是一个男爵幻域"
+      },
+      "optimized": {
+        "start": 654.2,
+        "end": 655.8,
+        "text": "连败没血就容易烂魔杖"
+      }
+    },
+    {
+      "index": 341,
+      "baseline": {
+        "start": 665.0,
+        "end": 666.0,
+        "text": "然后是一个灵魂唤醒"
+      },
+      "optimized": {
+        "start": 655.8,
+        "end": 657.0,
+        "text": "烂魔杖就容易死"
+      }
+    },
+    {
+      "index": 342,
+      "baseline": {
+        "start": 666.0,
+        "end": 667.0,
+        "text": "还有个羁绊天梯"
+      },
+      "optimized": {
+        "start": 657.0,
+        "end": 659.6,
+        "text": "所以第一个第一个彩就是尽量不拿"
+      }
+    },
+    {
+      "index": 343,
+      "baseline": {
+        "start": 667.2,
+        "end": 669.4,
+        "text": "羁绊天梯这个是要一定的熟练度的"
+      },
+      "optimized": {
+        "start": 659.8,
+        "end": 662.4,
+        "text": "然后这四个是超模必拿的海克斯"
+      }
+    },
+    {
+      "index": 344,
+      "baseline": {
+        "start": 669.4,
+        "end": 671.0,
+        "text": "所以大家可以多拿多练"
+      },
+      "optimized": {
+        "start": 662.4,
+        "end": 663.2,
+        "text": "给大家讲一下"
+      }
+    },
+    {
+      "index": 345,
+      "baseline": {
+        "start": 671.4,
+        "end": 673.2,
+        "text": "第四个的话就是连胜连败才能吃鸡"
+      },
+      "optimized": {
+        "start": 663.4,
+        "end": 665.0,
+        "text": "首先的话就是一个男爵幻域"
+      }
+    },
+    {
+      "index": 346,
+      "baseline": {
+        "start": 673.2,
+        "end": 673.8,
+        "text": "这个东西的话"
+      },
+      "optimized": {
+        "start": 665.0,
+        "end": 666.0,
+        "text": "然后是一个灵魂唤醒"
+      }
+    },
+    {
+      "index": 347,
+      "baseline": {
+        "start": 673.8,
+        "end": 675.0,
+        "text": "3连就等于6连"
+      },
+      "optimized": {
+        "start": 666.0,
+        "end": 667.0,
+        "text": "还有个羁绊天梯"
+      }
+    },
+    {
+      "index": 348,
+      "baseline": {
+        "start": 676.8,
+        "end": 677.8,
+        "text": "所以特別强"
+      },
+      "optimized": {
+        "start": 667.2,
+        "end": 669.4,
+        "text": "羁绊天梯这个是要一定的熟练度的"
+      }
+    },
+    {
+      "index": 349,
+      "baseline": {
+        "start": 677.8,
+        "end": 679.6,
+        "text": "大家看见就无脑拿就行了"
+      },
+      "optimized": {
+        "start": 669.4,
+        "end": 671.0,
+        "text": "所以大家可以多拿多练"
+      }
+    },
+    {
+      "index": 350,
+      "baseline": {
+        "start": 679.6,
+        "end": 681.8,
+        "text": "好的这是本期视频的一个全部内容"
+      },
+      "optimized": {
+        "start": 671.4,
+        "end": 673.2,
+        "text": "第四个的话就是连胜连败才能吃鸡"
+      }
+    },
+    {
+      "index": 351,
+      "baseline": {
+        "start": 681.8,
+        "end": 683.2,
+        "text": "如果大家喜欢本期视频的话"
+      },
+      "optimized": {
+        "start": 673.2,
+        "end": 673.8,
+        "text": "这个东西的话"
+      }
+    },
+    {
+      "index": 352,
+      "baseline": {
+        "start": 683.2,
+        "end": 684.4000000000001,
+        "text": "别忘了多多点赞关注"
+      },
+      "optimized": {
+        "start": 673.8,
+        "end": 675.0,
+        "text": "3连就等于6连"
+      }
+    },
+    {
+      "index": 353,
+      "baseline": {
+        "start": 685.6,
+        "end": 687.8,
+        "text": "你的关注和3连是对我莫大的鼓励"
+      },
+      "optimized": {
+        "start": 675.0,
+        "end": 676.8,
+        "text": "3连胜3连败等于6连胜6连败"
+      }
+    },
+    {
+      "index": 354,
+      "baseline": {
+        "start": 687.8,
+        "end": 689.0,
+        "text": "如果大家有问题的话"
+      },
+      "optimized": {
+        "start": 676.8,
+        "end": 677.8,
+        "text": "所以特別强"
+      }
+    },
+    {
+      "index": 355,
+      "baseline": {
+        "start": 689.0,
+        "end": 690.2,
+        "text": "也可以在视频下方留言"
+      },
+      "optimized": {
+        "start": 677.8,
+        "end": 679.6,
+        "text": "大家看见就无脑拿就行了"
+      }
+    },
+    {
+      "index": 356,
+      "baseline": {
+        "start": 690.2,
+        "end": 691.6,
+        "text": "我会给大家——解答"
+      },
+      "optimized": {
+        "start": 679.6,
+        "end": 681.8,
+        "text": "好的这是本期视频的一个全部内容"
+      }
+    },
+    {
+      "index": 357,
+      "baseline": {
+        "start": 691.6,
+        "end": 692.8,
+        "text": "我们下期再见"
+      },
+      "optimized": {
+        "start": 681.8,
+        "end": 683.2,
+        "text": "如果大家喜欢本期视频的话"
+      }
+    }
+  ],
+  "unmatched_tail_baseline": [],
+  "unmatched_tail_optimized": [
+    {
+      "start": 683.2,
+      "end": 684.4,
+      "text": "别忘了多多点赞关注"
+    },
+    {
+      "start": 684.4,
+      "end": 685.6,
+      "text": "3连支持下up主"
+    },
+    {
+      "start": 685.6,
+      "end": 687.8,
+      "text": "你的关注和3连是对我莫大的鼓励"
+    },
+    {
+      "start": 687.8,
+      "end": 689.0,
+      "text": "如果大家有问题的话"
+    },
+    {
+      "start": 689.0,
+      "end": 690.2,
+      "text": "也可以在视频下方留言"
+    },
+    {
+      "start": 690.2,
+      "end": 691.6,
+      "text": "我会给大家——解答"
+    },
+    {
+      "start": 691.6,
+      "end": 692.8,
+      "text": "我们下期再见"
+    }
+  ],
+  "aligned_changed_regions": [
+    {
+      "operation": "insert",
+      "baseline_range": [
+        40,
+        40
+      ],
+      "optimized_range": [
+        40,
+        41
+      ],
+      "baseline": [],
+      "optimized": [
+        {
+          "start": 59.4,
+          "end": 60.6,
+          "text": "前期过渡比较顺滑"
+        }
+      ]
+    },
+    {
+      "operation": "insert",
+      "baseline_range": [
+        73,
+        73
+      ],
+      "optimized_range": [
+        74,
+        75
+      ],
+      "baseline": [],
+      "optimized": [
+        {
+          "start": 112.8,
+          "end": 114.4,
+          "text": "可以挂寒冰或者翠神"
+        }
+      ]
+    },
+    {
+      "operation": "insert",
+      "baseline_range": [
+        170,
+        170
+      ],
+      "optimized_range": [
+        172,
+        173
+      ],
+      "baseline": [],
+      "optimized": [
+        {
+          "start": 269.4,
+          "end": 270.0,
+          "text": "狐狸的话我们"
+        }
+      ]
+    },
+    {
+      "operation": "replace",
+      "baseline_range": [
+        231,
+        232
+      ],
+      "optimized_range": [
+        234,
+        236
+      ],
+      "baseline": [
+        {
+          "start": 364.2,
+          "end": 365.59999999999997,
+          "text": "访"
+        }
+      ],
+      "optimized": [
+        {
+          "start": 364.2,
+          "end": 365.59999999999997,
+          "text": "过渡推荐物理这边"
+        },
+        {
+          "start": 365.6,
+          "end": 367.2,
+          "text": "物理这边的话有两种流派"
+        }
+      ]
+    },
+    {
+      "operation": "replace",
+      "baseline_range": [
+        274,
+        275
+      ],
+      "optimized_range": [
+        278,
+        279
+      ],
+      "baseline": [
+        {
+          "start": 439.4,
+          "end": 441.0,
+          "text": "厂"
+        }
+      ],
+      "optimized": [
+        {
+          "start": 439.4,
+          "end": 441.0,
+          "text": "我就不过多赘述了"
+        }
+      ]
+    },
+    {
+      "operation": "insert",
+      "baseline_range": [
+        336,
+        336
+      ],
+      "optimized_range": [
+        340,
+        341
+      ],
+      "baseline": [],
+      "optimized": [
+        {
+          "start": 654.2,
+          "end": 655.8,
+          "text": "连败没血就容易烂魔杖"
+        }
+      ]
+    },
+    {
+      "operation": "insert",
+      "baseline_range": [
+        348,
+        348
+      ],
+      "optimized_range": [
+        353,
+        354
+      ],
+      "baseline": [],
+      "optimized": [
+        {
+          "start": 675.0,
+          "end": 676.8,
+          "text": "3连胜3连败等于6连胜6连败"
+        }
+      ]
+    },
+    {
+      "operation": "insert",
+      "baseline_range": [
+        353,
+        353
+      ],
+      "optimized_range": [
+        359,
+        360
+      ],
+      "baseline": [],
+      "optimized": [
+        {
+          "start": 684.4,
+          "end": 685.6,
+          "text": "3连支持下up主"
+        }
+      ]
+    }
+  ],
+  "tf32_only": {
+    "segments": 359,
+    "full_text_equal_to_baseline": false,
+    "all_segments_equal_to_baseline": false,
+    "text_similarity_to_baseline": 0.9988609036830781
+  }
+}

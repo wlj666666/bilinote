@@ -1,0 +1,33 @@
+{
+  "python": "3.11.16 (main, Aug 27 2026, 14:44:21) [GCC 14.3.0]",
+  "executable": "/home/unbekannter/miniconda3/envs/bilinote/bin/python",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "cpu_count": 32,
+  "packages": {
+    "onnxruntime-gpu": "1.21.0",
+    "rapidocr": "3.9.2",
+    "numpy": "2.2.4",
+    "opencv-python": "4.11.0.86",
+    "av": "14.2.0",
+    "nvidia-cublas-cu12": "12.8.4.1",
+    "nvidia-cudnn-cu12": "9.8.0.87"
+  },
+  "available_providers": [
+    "TensorrtExecutionProvider",
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "gpu": "name, driver_version, memory.total [MiB], power.limit [W]\nNVIDIA GeForce RTX 5060 Laptop GPU, 573.24, 8151 MiB, [N/A]",
+  "nsys": null,
+  "ncu": null,
+  "code_sha256": {
+    "scripts/profile_ocr.py": "2b5bdf1d194a577e1665618e7dc9172b4232ef01fd19b5904c7b4de9b0d647d3",
+    "app/ocr/profiling.py": "abd12c68c79075579868e7a6437bae62a789f2abb0ff6052615f593dcaa5c2b8",
+    "app/ocr/ocr_engine.py": "98e15b44e5a558086579348929b5fe2b57e82b539723799fd85524887a1b1963"
+  },
+  "model_sha256": {
+    "ch_ppocr_mobile_v2.0_cls_mobile.onnx": "e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c",
+    "PP-OCRv6_det_small.onnx": "090f04abcd9d9a7498bc4ebf677e4cb9bdce1fe4197ddb7e529f1ef44e1ff94f",
+    "PP-OCRv6_rec_small.onnx": "6f327246b50388f3c176ae304bd95767ea6dc0c9ae92153ef8cbe210b3c14884"
+  }
+}

@@ -1,0 +1,320 @@
+{
+  "runtime": {
+    "device": "cuda",
+    "providers": {
+      "text_det": [
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ],
+      "text_cls": [
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ],
+      "text_rec": [
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ]
+    }
+  },
+  "tf32": false,
+  "scope": "identical pixels and ROI, only direction classification toggled",
+  "rows": [
+    {
+      "target": 59.4,
+      "actual_time": 59.4,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-00.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.9992172718048096
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [],
+      "without_cls": [
+        {
+          "text": "前期过渡比较顺滑",
+          "score": 0.99988
+        }
+      ]
+    },
+    {
+      "target": 112.8,
+      "actual_time": 112.8,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-01.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.9784370064735413
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [],
+      "without_cls": [
+        {
+          "text": "可以挂寒冰或者翠神",
+          "score": 0.99637
+        }
+      ]
+    },
+    {
+      "target": 269.4,
+      "actual_time": 269.4,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-02.png",
+      "angles": [
+        {
+          "label": "0",
+          "score": 1.0
+        },
+        {
+          "label": "0",
+          "score": 1.0
+        },
+        {
+          "label": "180",
+          "score": 0.9966899156570435
+        },
+        {
+          "label": "0",
+          "score": 1.0
+        },
+        {
+          "label": "0",
+          "score": 1.0
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [
+        {
+          "text": "木可以开地狱火",
+          "score": 0.90953
+        },
+        {
+          "text": "开护卫。",
+          "score": 0.95717
+        },
+        {
+          "text": "③护卫选慎，带",
+          "score": 0.99938
+        },
+        {
+          "text": "木木开地狱火",
+          "score": 0.99969
+        }
+      ],
+      "without_cls": [
+        {
+          "text": "木可以开地狱火",
+          "score": 0.90953
+        },
+        {
+          "text": "开护卫。",
+          "score": 0.95717
+        },
+        {
+          "text": "狐狸的话我们",
+          "score": 0.99619
+        },
+        {
+          "text": "③护卫选慎，带",
+          "score": 0.99938
+        },
+        {
+          "text": "木木开地狱火",
+          "score": 0.99969
+        }
+      ]
+    },
+    {
+      "target": 364.2,
+      "actual_time": 364.2,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-03.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.8416679501533508
+        },
+        {
+          "label": "180",
+          "score": 0.9011170864105225
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [
+        {
+          "text": "访",
+          "score": 0.7121
+        }
+      ],
+      "without_cls": [
+        {
+          "text": "过渡推荐物理这边",
+          "score": 0.99992
+        }
+      ]
+    },
+    {
+      "target": 365.6,
+      "actual_time": 365.6,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-04.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.8130062222480774
+        },
+        {
+          "label": "180",
+          "score": 0.9222308397293091
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [],
+      "without_cls": [
+        {
+          "text": "物理这边的话有两种流派",
+          "score": 0.99945
+        }
+      ]
+    },
+    {
+      "target": 439.4,
+      "actual_time": 439.4,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-05.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.9039582014083862
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [
+        {
+          "text": "厂",
+          "score": 0.82907
+        }
+      ],
+      "without_cls": [
+        {
+          "text": "我就不过多赘述了",
+          "score": 0.99958
+        }
+      ]
+    },
+    {
+      "target": 654.2,
+      "actual_time": 654.2,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-06.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.9737366437911987
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [],
+      "without_cls": [
+        {
+          "text": "连败没血就容易烂魔杖",
+          "score": 0.99949
+        }
+      ]
+    },
+    {
+      "target": 675.0,
+      "actual_time": 675.0,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-07.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.9629024863243103
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [],
+      "without_cls": [
+        {
+          "text": "3连胜3连败等于6连胜6连败",
+          "score": 0.99984
+        }
+      ]
+    },
+    {
+      "target": 684.4,
+      "actual_time": 684.4,
+      "roi": [
+        0.0,
+        0.803888888888889,
+        1.0,
+        0.9238888888888889
+      ],
+      "image": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/quality-review/angle-review-08.png",
+      "angles": [
+        {
+          "label": "180",
+          "score": 0.9365538358688354
+        }
+      ],
+      "classification_threshold": 0.9,
+      "with_cls": [
+        {
+          "text": "Edn#车",
+          "score": 0.64224
+        }
+      ],
+      "without_cls": [
+        {
+          "text": "3连支持下up主",
+          "score": 0.99985
+        }
+      ]
+    }
+  ]
+}

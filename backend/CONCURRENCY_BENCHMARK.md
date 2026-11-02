@@ -62,6 +62,15 @@
 
 GPU 独立对比只覆盖同一份 30 秒语音的 Whisper 推理，未比较多个 OCR 同时计算、ASR 与 OCR 同时计算或不同批处理方案。混合任务测试则是在 GPU 名额为 1 的前提下比较工作流数量。故当前值结合了已测 Whisper 结果、已验证的混合调度路径及单卡推理架构，不能外推为所有 GPU 应用都应串行。并发 2/3/4 的耗时差异较大，足以支持本轮选择；每个档位仅跑一组、并发 1 另复测一次，未计算统计置信区间。
 
+### 与 2026-10-30 OCR profiling 的关系
+
+[OCR profiling 报告](OCR_PROFILING_REPORT_2026-10-30.md)显示，独立 OCR 进程的吞吐随并发提高（全画面1→4为2.38→4.94图/s，字幕ROI 1→8为19.19→35.80图/s）。这与本文“GPU 并发1最快”不冲突，因为**并发单位不同**：
+
+- 本文实验是同一个 faster-whisper 实例内增加 `num_workers`（CTranslate2 `inter_threads`），多个线程共享权重、CUDA context 和解释器。
+- OCR 实验是 N 个独立进程，每进程一套 OCR 引擎和独立 CUDA context，只共享同一块 GPU。
+
+两者都没有测混合负载：OCR 实验全程独占 GPU，本文混合工作流固定名额为1。加上 `inference_runtime.serve()` 的 `accept()` 串行、全后端只有一个 `ModelOwner` 持有 Whisper，名额大于1只会允许 OCR 与 Whisper、或 OCR 与 OCR 重叠。这些组合未测，且 8 GiB 卡上全画面 OCR 并发4峰值已达 7111 MiB。所以**两轮结果都不能直接用来调整 `TASK_GPU_SLOTS`**，该值保持1；OCR 的并发收益属于“若将来把 OCR 做成可并发服务形态”时的候选档位。
+
 当前 `TaskLimits.from_env()` 还要求 `TASK_GPU_SLOTS=1`；独立 GPU 实验不经过这个正式调度限制。以后若要研究其他 GPU 并行策略，需要同时调整推理服务的生命周期和资源管理，并重新验证吞吐、显存及识别结果，不能仅修改环境变量。
 
 ### 三个任务都需要 GPU 时如何执行

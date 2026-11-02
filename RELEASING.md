@@ -71,7 +71,7 @@ push tag **会自动触发 [`.github/workflows/release-extension.yml`](.github/w
 
 CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 release notes：
 
-1. 打开 https://github.com/JefferyHcool/BiliNote/releases/new
+1. 打开 https://github.com/wlj666666/bilinote/releases/new
 2. Tag: 选 `vX.Y.Z`
 3. Title: `vX.Y.Z`
 4. Body: 直接贴 [`CHANGELOG.md`](./CHANGELOG.md) 的对应段
@@ -121,7 +121,7 @@ git branch -d release/X.Y.Z
 
 `.github/workflows/release-extension.yml` 末尾有三段商店自动发布的 job 注释。要启用：
 
-1. 在 https://github.com/JefferyHcool/BiliNote/settings/secrets/actions 加 secrets：
+1. 在 https://github.com/wlj666666/bilinote/settings/secrets/actions 加 secrets：
 
 | 商店 | 需要的 secret |
 |---|---|
@@ -154,6 +154,8 @@ git checkout -b hotfix/<scope>-<事项>
 ---
 
 ## 历史发布快查
+
+> 以下 tag 位于上游仓库，本仓库尚未发布过这些版本。
 
 | Version | Date | Tag |
 |---|---|---|

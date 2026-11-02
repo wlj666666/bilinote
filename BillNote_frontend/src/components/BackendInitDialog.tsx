@@ -118,7 +118,7 @@ function BackendInitDialog({ open, failed = false, lastError = null, onRetry }: 
             <p className="text-xs text-muted-foreground pt-2">
               仍然无法解决？复制日志去&nbsp;
               <a
-                href="https://github.com/JefferyHcool/BiliNote/issues"
+                href="https://github.com/wlj666666/bilinote/issues"
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary underline"

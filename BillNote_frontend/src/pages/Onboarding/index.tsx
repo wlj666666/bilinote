@@ -341,7 +341,7 @@ const Onboarding = () => {
               YouTube 一般不需要 cookie。先跳过也没问题，到时再去配。
             </p>
             <div className="rounded bg-gray-50 p-3 text-xs text-gray-600">
-              提示：插件版（<a className="text-primary underline" href="https://github.com/JefferyHcool/BiliNote/tree/develop/BillNote_extension" target="_blank" rel="noreferrer">BillNote_extension</a>）支持一键 cookie 同步；桌面版需手动复制。
+              提示：插件版（<a className="text-primary underline" href="https://github.com/wlj666666/bilinote/tree/main/BillNote_extension" target="_blank" rel="noreferrer">BillNote_extension</a>）支持一键 cookie 同步；桌面版需手动复制。
             </div>
             <div className="flex gap-2 justify-between">
               <button className="text-sm text-gray-500 hover:text-gray-800" onClick={prev}>上一步</button>

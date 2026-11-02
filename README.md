@@ -1,208 +1,188 @@
 <div style="display: flex; justify-content: center; align-items: center; gap: 10px;
 ">
     <p align="center">
-  <img src="./doc/icon.svg" alt="BiliNote Banner" width="50" height="50"  />
+  <img src="./BillNote_frontend/src/assets/icon.svg" alt="BiliNote Banner" width="50" height="50" />
 </p>
-<h1 align="center" > BiliNote v2.4.4</h1>
+<h1 align="center">BiliNote</h1>
 </div>
 
-<p align="center"><i>AI 视频笔记生成工具 让 AI 为你的视频做笔记</i></p>
+<p align="center"><i>AI 视频笔记生成工具 —— 让 AI 为你的视频做笔记</i></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
   <img src="https://img.shields.io/badge/frontend-react%2019-blue" />
   <img src="https://img.shields.io/badge/backend-fastapi-green" />
-  <img src="https://img.shields.io/badge/GPT-openai%20%7C%20deepseek%20%7C%20qwen-ff69b4" />
+  <img src="https://img.shields.io/badge/LLM-openai%20%7C%20deepseek%20%7C%20qwen-ff69b4" />
   <img src="https://img.shields.io/badge/docker-ghcr.io-blue" />
-  <img src="https://img.shields.io/badge/status-active-success" />
-  <img src="https://img.shields.io/github/stars/jefferyhcool/BiliNote?style=social" />
 </p>
 
-<p align="center">
-  <a href="https://www.bilinote.app/"><b>🚀 BiliNote Pro · 在线版</b></a>
-</p>
-
-<p align="center">
-  <b>不想折腾部署？</b>访问 <a href="https://www.bilinote.app/"><b>www.bilinote.app</b></a> 即开即用 —— 免安装、免配置环境、免下模型，注册即可把视频转成笔记。
-  <br/>
-  本地部署遇到的依赖、代理、模型下载这些坑，云端版统统不用管。
-</p>
-
-<p align="center">
-  <a href="https://www.bilinote.app/">
-    <img src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E4%BD%93%E9%AA%8C-BiliNote%20Pro-ff5c5c?style=for-the-badge" alt="立即体验 BiliNote Pro" />
-  </a>
-</p>
 
 
 
 ## ✨ 项目简介
 
-BiliNote 是一个开源的 AI 视频笔记助手，支持通过哔哩哔哩、YouTube、抖音等视频链接，自动提取内容并生成结构清晰、重点明确的 Markdown 格式笔记。支持插入截图、原片跳转、AI 问答等功能。
+BiliNote 是一个 AI 视频笔记助手：给定一个视频链接，它会自动下载视频、提取音频、转写文字（或直接从画面里 OCR 出硬字幕），再交给大模型生成结构清晰、重点明确的 Markdown 笔记，并可插入视频截图与原片时间戳跳转。
 
-> 💡 **想直接用、不想本地部署？** —— [BiliNote Pro 在线版 www.bilinote.app](https://www.bilinote.app/) 已上线，云端托管、开箱即用，省去依赖安装 / 代理配置 / 模型下载的全部麻烦。
+支持哔哩哔哩、YouTube、抖音、TikTok、快手与本地视频文件。
 
-## 🌐 在线使用（推荐）
+### 本分支的主要改动
 
-直接访问 **[www.bilinote.app](https://www.bilinote.app/)** 即可使用 BiliNote Pro 在线版，无需本地部署。
+本仓库基于上游 [JefferyHcool/BiliNote](https://github.com/JefferyHcool/BiliNote) 二次开发，核心改动集中在**多用户部署**与**本地推理能力**两块：
 
-## 💼 企业AI落地咨询服务
-
-帮助团队将开源能力转化为商业价值。免费15分钟诊断 → 加微信 JefferyHJW
-
-## 📝 使用文档
-详细文档可以查看[这里](https://docs.bilinote.app/)
-
-本分支已加入管理员／客户登录。首次运行请先按[管理员登录与凭据保护](understanding/管理员登录与凭据保护.md)初始化管理员账号；现有模型与 Cookie 配置沿用。
-
-笔记、文件、聊天和检索已按用户隔离，旧数据归原管理员。迁移和使用说明见[用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)。
-## 📦 桌面版下载
-本项目提供了 Windows 和 macOS 桌面客户端，可在 [Releases](https://github.com/JefferyHcool/BiliNote/releases) 页面下载最新版本。
-
-> Windows 用户请注意：一定要在没有中文路径的环境下运行。
-
-## 💎 BiliNote AI笔记系统一对一搭建服务
-
-提供 **BiliNote AI笔记系统一对一搭建服务**：专人一对一远程协助，从环境部署、模型配置到上手使用全程陪跑，帮你快速跑通整套系统。扫码添加微信，备注「搭建服务」即可咨询：
-
-<table align="center">
-  <tr>
-    <td align="center"><img src="./doc/remote-install-wechat.png" alt="BiliNote AI笔记系统一对一搭建服务" width="220" /><br/>BiliNote AI笔记系统一对一搭建服务</td>
-  </tr>
-</table>
+- **管理员 / 多用户登录与数据隔离**：模型供应商、转写器配置、系统监控等管理功能收敛到管理员；笔记、上传文件、聊天记录、向量索引按用户隔离。旧数据自动归入原管理员。详见 [管理员登录与凭据保护](understanding/管理员登录与凭据保护.md) 与 [用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)。
+- **硬字幕 OCR 提取**：视频没有可用字幕时，直接对画面做 OCR 提取硬字幕，支持 CPU / GPU 双路径，GPU 下实测约 6 倍加速。详见 [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md)。
+- **多用户任务调度与资源限额**：全站并发、单用户并发、排队长度、GPU / CPU / API 分阶段槽位统一由 `TaskLimits` 管控，任务可取消、可从中断处恢复。详见 [任务调度说明](backend/TASK_SCHEDULING.md)。
 
 ## 🔧 功能特性
 
-- 支持多平台：Bilibili、YouTube、本地视频、抖音、快手
-- 支持返回笔记格式选择
-- 支持笔记风格选择
-- 支持多模态视频理解
-- 支持多版本记录保留
-- 支持自行配置 GPT 大模型（OpenAI、DeepSeek、Qwen 等）
-- 本地模型音频转写（支持 Fast-Whisper、MLX-Whisper、Groq、BCut）
-- GPT 大模型总结视频内容
-- 自动生成结构化 Markdown 笔记
-- 可选插入截图（自动截取）
-- 可选内容跳转链接（关联原视频）
-- 任务记录与历史回看
-- 基于 RAG 的笔记内容 AI 问答（支持 Function Calling）
-- 笔记顶部视频封面 Banner 展示
-- 工作区和生成历史面板支持折叠/展开
+### 内容生成
 
-### v2.3.0 新增
+- 多平台支持：Bilibili、YouTube、抖音、TikTok、快手、本地视频文件
+- 自动下载 → 提取音频 → 转写 → 大模型总结的完整流水线
+- 笔记格式与风格可选，支持多版本保留与对比
+- 可选插入视频截图（自动按时间戳截取）
+- 可选原片时间戳跳转链接
+- 笔记顶部视频封面 Banner
+- 多模态视频理解（画面采样拼图后交给多模态模型）
 
-- 全局代理：一处配置同时作用于 AI 模型接口、转写接口（Groq 等）、YouTube 下载（设置 → 下载配置页），支持 `HTTP_PROXY` 环境变量兜底
-- 转写模型就绪门禁：本地引擎模型没下载好时拦截视频任务，引导先去下载，不再静默卡在首次下载
-- 桌面端后端健康监控韧性：退出自动清理 sidecar、启动失败展示原因 + 日志、不再无限「加载中」
-- whisper 模型损坏自愈：`model.bin` 截断时自动删除重下；空 API Key / 新模型 temperature 不兼容给出清晰提示
-- Docker 部署韧性：`BASE_REGISTRY` 可换国内镜像源、restart 策略修正、`.env.example` 端口与默认模型修正、新增部署 FAQ
+### 转写与字幕
 
-### v2.2.3 修订
+- 本地转写：Fast-Whisper、MLX-Whisper（仅 Apple Silicon）
+- 在线转写：Groq、必剪（BCut）、快手
+- YouTube / Bilibili 优先复用平台字幕，命中时跳过音频下载
+- 硬字幕 OCR：RapidOCR，支持 CPU / CUDA 双路径
 
-- 修：vite build 在 CI 中报 'Rollup failed to resolve import @tauri-apps/api/event'（缺直接依赖声明）
+### 模型与配置
 
-### v2.2.2 修订
+- 自行配置任意 OpenAI 兼容供应商（OpenAI、DeepSeek、Qwen 等）
+- 全局代理：一处配置同时作用于模型接口、转写接口与视频下载，支持 `HTTP_PROXY` 兜底
+- 转写模型就绪门禁：本地模型未下载完成时拦截任务并引导下载
+- Whisper 模型损坏自愈：`model.bin` 截断时自动删除重下
 
-- 修复 v2.2.0 桌面端 Tauri 构建失败（main.yml 的 pnpm 版本没 pin，pnpm 11 不兼容 Node 20）
+### 问答与检索
 
-### v2.2.1 修订
+- 基于 RAG 的笔记内容 AI 问答，支持 Function Calling
+- 向量索引包含视频元信息（标题、作者、简介、标签）
+- 半屏 / 全屏两种问答视图
 
-- 修复 v2.2.0 ghcr.io 镜像构建失败（pnpm@latest 拉到 11，与 Node 20 不兼容；pin 到 pnpm 9.15.0）
+### 多用户与运维
 
-### v2.2.0 新增
+- 管理员 / 普通用户两级角色，密码以 PBKDF2-SHA256 存储
+- 笔记、文件、聊天、向量索引按用户隔离
+- 任务调度：全站并发、单用户并发、排队、分阶段资源槽位
+- 系统监控页：CUDA 状态、FFmpeg、数据库、Whisper 模型就绪情况
 
-- **浏览器插件**笔记选项与 web 端完整对齐：style 9 个预设下拉、format 4 个 checkbox、extras 文本框、多模态视频理解开关
-- **桌面客户端**首启 4 步引导（连通自检 → 供应商/模型 → 转写引擎 → Cookie 提示）
-- **桌面客户端**右下角后端运行状态指示，点开看日志、一键重启
-- **桌面客户端**启动期主动检测中文 / 空格 / 不可写安装路径，弹横幅告警
-- Whisper 默认 size 从 medium（~1.5GB）改为 tiny（~75MB）；切大模型时显式 confirm
-- 修：whisper 半成品模型目录死循环；`/deploy_status` 在没装 torch 的部署 500
-- 详见 [CHANGELOG.md](./CHANGELOG.md)
+## 🏗️ 技术架构
 
-### v2.1.4 修订
+**后端**（Python 3.11 + FastAPI，端口 8483）
 
-- CI：桌面端 Tauri 构建去掉 Linux（17m+ 慢线退役；Linux 用户继续走 Docker 镜像）
-- CI：commitlint workflow 修复 + 规范 release merge commit 标题约定
+| 目录 | 职责 |
+| --- | --- |
+| `app/routers/` | HTTP 路由：`note`（生成）、`auth`（登录）、`provider` / `model`（供应商）、`config`、`chat`（RAG 问答）、`history`、`files` |
+| `app/services/` | 业务逻辑：`note.py` 编排完整流水线；`task_scheduler.py` + `task_limits.py` 任务调度；`auth.py` 鉴权；`storage_scope.py` 任务级存储隔离；`vector_store.py` 向量检索 |
+| `app/downloaders/` | 平台适配器：bilibili / youtube / douyin / kuaishou / local |
+| `app/transcriber/` | 语音转写引擎，工厂在 `transcriber_provider.py` |
+| `app/ocr/` | 硬字幕 OCR：RapidOCR 封装、字幕布局学习、时序合并、CUDA 运行时 |
+| `app/gpt/` | 大模型集成，工厂模式 + 长文本分块 |
+| `app/db/` | SQLite + SQLAlchemy，DAO 模式 |
 
-### v2.1.3 修订
+**前端**（React 19 + Vite + TypeScript，开发端口 3015）
 
-- 修复 DeepSeek 等非多模态供应商被 400 拒绝的问题（issue #282）：`UniversalGPT` 的 message builder 按是否带图切换 string / 多模态数组形态
-- 感谢 @voidborne-d (#345)
+- `pages/HomePage/` —— 主工作区：输入表单、Markdown 预览、思维导图
+- `pages/SettingPage/` —— 设置页：模型、转写器、下载配置、提示词、系统监控、用户管理
+- `pages/Login/`、`pages/Onboarding/` —— 登录与首启引导
+- `store/` —— Zustand（`taskStore` / `authStore` / `modelStore` / `providerStore` / `configStore` / `chatStore`）
+- 设计语言：Tailwind v4 + Radix UI + antd / `@ant-design/x`，主色 sage 绿 `#6e7f64`，明暗双主题
 
-### v2.1.2 修订
+**其它**
 
-- 修复 v2.1.1 触发的 ghcr.io Docker 镜像构建失败（Node 18 + Tailwind v4 不兼容、缺 lockfile）
-- README 补上微信群二维码
-
-### v2.1.1 修订
-
-- 工程化与文档收尾：CONTRIBUTING.md / RELEASING.md / issue + PR 模板 / commitlint CI / 插件发版工作流
-- 关于页群聊二维码：换成最新版，改为 import 本地资源，不再依赖 CDN
-- 关于页移除 QQ 群入口（仅保留微信群）
-- 详见 [CHANGELOG.md](./CHANGELOG.md)
-
-### v2.1.0 新增
-
-- 浏览器插件（Chrome / Edge / Firefox MV3）—— 工具栏 popup、视频页悬浮按钮、右键菜单、侧边栏（Markdown / 思维导图 / AI 问答）四件套
-- 插件设置页五大块：模型供应商 CRUD、音频转写配置、下载配置（含浏览器 Cookie 一键同步）、部署监控
-- B 站字幕优先：插件在用户浏览器里直接抓字幕（带本地登录态 cookie），跳过后端音频转写
-- 后端 `BilibiliSubtitleFetcher`：非插件场景下走 player API 拿字幕，作为 yt-dlp 兜底
-- mlx-whisper 仓库 ID 修正（修复模型 404）
-- 后端 CORS 改用 regex，兼容浏览器扩展源
-- 详见 [CHANGELOG.md](./CHANGELOG.md)
-
-### v2.0.0 新增
-
-- 基于 RAG 的笔记内容 AI 问答功能，支持半屏/全屏模式
-- AI 问答支持 Function Calling，模型可主动查询原文数据
-- RAG 索引支持视频元信息（标题、作者、简介、标签等）
-- AI 回复支持 Markdown 渲染
-- 笔记顶部新增视频封面 Banner
-- 工作区和生成历史面板支持折叠/展开
-- 笔记开头添加来源链接功能
-- YouTube 字幕优先获取，有字幕时跳过音频下载
-- 性能优化与转写器配置改进
+- `BillNote_extension/` —— 浏览器扩展（Vue 3 + MV3，Chrome / Edge / Firefox）
+- `BillNote_frontend/src-tauri/` —— 桌面端打包（Tauri 2）
 
 ## 📸 截图预览
-![screenshot](./doc/image1.png)
-![screenshot](./doc/image3.png)
-![screenshot](./doc/image.png)
-![screenshot](./doc/image4.png)
-![screenshot](./doc/image5.png)
+
+> 待补充：旧版截图（蓝色主题）已清理，需按当前 sage 绿主题重新截图后放回 `doc/` 并在此引用。
+
+## 📦 桌面版下载
+
+桌面客户端（Windows / macOS）可在 [Releases](https://github.com/wlj666666/bilinote/releases) 页面下载。
+
+> Windows 用户请注意：请勿在含中文的路径下运行。
 
 ## 🚀 快速开始
 
 ### 方式一：Docker 部署（推荐）
 
-确保已安装 Docker，直接拉取预构建镜像运行：
+确保已安装 Docker（含 Compose v2，即 `docker compose` 子命令），直接拉取预构建镜像运行：
 
 ```bash
-docker pull ghcr.io/jefferyhcool/bilinote:latest
+docker pull ghcr.io/wlj666666/bilinote:latest
 
 docker run -d -p 80:80 \
   -v bilinote-data:/app/backend/data \
   -v bilinote-config:/app/backend/config \
   -v bilinote-static:/app/backend/static \
+  -v bilinote-uploads:/app/backend/uploads \
+  -v bilinote-vector-db:/app/backend/vector_db \
   -v bilinote-models:/app/backend/models \
   --name bilinote \
-  ghcr.io/jefferyhcool/bilinote:latest
+  ghcr.io/wlj666666/bilinote:latest
 ```
 
-上面四个卷分别持久化：`data`（SQLite 数据库 + 生成的笔记）、`config`（LLM 供应商配置 / Cookie / 转写设置）、`static`（笔记引用的视频截图）、`models`（Whisper 模型缓存，可选，避免每次重新下载）。这样 `docker pull` 升级新镜像、删旧容器重建后，配置和历史都不会丢。
+六个卷分别持久化：
+
+| 卷 | 容器内路径 | 内容 |
+| --- | --- | --- |
+| `bilinote-data` | `/app/backend/data` | SQLite 数据库（含 LLM 供应商配置、笔记历史）+ 生成的笔记 + 任务运行时缓存 |
+| `bilinote-config` | `/app/backend/config` | 平台 Cookie、转写器运行时设置、任务超时覆盖 |
+| `bilinote-static` | `/app/backend/static` | 笔记引用的视频截图 |
+| `bilinote-uploads` | `/app/backend/uploads` | 用户上传的本地视频 |
+| `bilinote-vector-db` | `/app/backend/vector_db` | RAG 问答的向量索引（**不挂会每次重建**） |
+| `bilinote-models` | `/app/backend/models` | Whisper 模型缓存（可选，避免每次重新下载） |
+
+这样 `docker pull` 升级新镜像、删旧容器重建后，配置和历史都不会丢。
 
 > ⚠️ **不要**用 `-v 卷名:/app/backend` 挂整个后端目录——命名卷会用首次启动时的镜像内容固化，之后 `docker pull` 升级也会被旧代码盖住，导致「升级不生效」。只挂上面这些数据子目录即可。
 
-访问：`http://localhost`
+#### 🔑 首次部署必须创建管理员账号
 
-也可以使用 docker-compose 本地构建：
+**这一步不能跳过。** 新版加入了登录与多用户隔离：模型供应商、转写器配置、系统监控等页面都要求**管理员**权限，而前端注册接口只能创建**普通用户**。管理员只能通过命令行创建：
 
 ```bash
-cp .env.example .env       # 第一次部署务必先创建 .env，否则 BACKEND_PORT/APP_PORT 等变量为空会启动失败
-docker-compose up --build -d
+# 单镜像（上面的 docker run 方式）
+docker exec -it bilinote python scripts/manage_users.py init-admin admin
 
-# GPU 加速部署（需要 NVIDIA GPU + NVIDIA Container Toolkit）
-docker-compose -f docker-compose.gpu.yml up --build -d
+# docker compose 方式
+docker compose exec backend python scripts/manage_users.py init-admin admin
 ```
+
+命令会交互式要求输入密码（**12–128 字符**，输入时不回显，需输入两次）。
+
+完成后访问 `http://localhost`，用该账号登录即可进入「设置」页配置模型供应商。
+
+其它账号管理命令：
+
+```bash
+docker exec -it bilinote python scripts/manage_users.py create-user alice   # 创建普通用户
+docker exec -it bilinote python scripts/manage_users.py reset-password admin # 重置密码
+```
+
+> 普通用户账号也可以由管理员在前端「用户管理」页创建，无需进容器。
+
+访问：`http://localhost`
+
+也可以使用 docker compose 本地构建：
+
+```bash
+cp .env.example .env            # 第一次部署务必先创建 .env
+docker compose up --build -d
+docker compose exec backend python scripts/manage_users.py init-admin admin
+
+# GPU 加速部署（需要 NVIDIA GPU + NVIDIA Container Toolkit，详见下方「CUDA / GPU 加速」）
+docker compose -f docker-compose.gpu.yml up --build -d
+```
+
+> 老版本 Docker 只有独立的 `docker-compose`（v1）命令，把上面的 `docker compose` 换成 `docker-compose` 即可，参数完全一致。
 
 #### Docker 部署常见问题（FAQ）
 
@@ -210,20 +190,20 @@ docker-compose -f docker-compose.gpu.yml up --build -d
 
 **0. 国内拉不到 docker.io（build 阶段报 `dial tcp ... i/o timeout`）**
 
-`docker-compose build` 拉 `python:3.11-slim` / `node:20-alpine` / `nginx:1.25-alpine` 时连 `auth.docker.io` 超时。三种解法，按推荐顺序：
+`docker compose build` 拉 `python:3.11-slim` / `node:20-alpine` / `nginx:1.25-alpine` 时连 `auth.docker.io` 超时。三种解法，按推荐顺序：
 
-- **方法 A：直接用预构建镜像（最省事）**——不要本地 build，跳到上面的 `docker pull ghcr.io/jefferyhcool/bilinote:latest` 路径，ghcr.io 在国内通常比 docker.io 顺。
-- **方法 B：配置 Docker daemon 镜像加速器**——编辑 `~/.docker/daemon.json`（Linux 在 `/etc/docker/daemon.json`），加：
+- **方法 A：直接用预构建镜像（最省事）**——不要本地 build，跳到上面的 `docker pull ghcr.io/wlj666666/bilinote:latest` 路径，ghcr.io 在国内通常比 docker.io 顺。
+- **方法 B：配置 Docker daemon 镜像加速器**——编辑 `/etc/docker/daemon.json`（Docker Desktop 在设置 → Docker Engine 里改），加：
   ```json
   {
-    "registry-mirrors": ["https://docker.m.daocloud.io"]
+    "registry-mirrors": ["https://docker.m.daocloud.io", "https://docker.1panel.live"]
   }
   ```
   然后重启 Docker Desktop / `sudo systemctl restart docker`。这是一劳永逸的做法。
 - **方法 C：临时切换 base image 镜像源**——本项目所有 Dockerfile 都暴露了 `BASE_REGISTRY` build-arg：
   ```bash
-  BASE_REGISTRY=docker.m.daocloud.io docker-compose build
-  docker-compose up -d
+  BASE_REGISTRY=docker.m.daocloud.io docker compose build
+  docker compose up -d
   ```
   或永久写到 `.env`：`echo 'BASE_REGISTRY=docker.m.daocloud.io' >> .env`。
 
@@ -237,25 +217,33 @@ docker logs -f bilinote-backend
 ```
 后端启动会按顺序打印 `[startup 1/5] ... [startup 5/5] 启动完成`。若日志卡在某一步或出现 `[startup FAILED]`，就是那一步的问题，常见：
 - **卡在 `[startup 3/5]`**：转写器配置读不到。检查 `.env` 里 `TRANSCRIBER_TYPE` 是否写错，`mlx-whisper` 只能在 Apple Silicon 用，Linux/Docker 请用 `fast-whisper` 或 `groq`。
-- **首次跑视频时容器被 kill**：whisper 模型下载触发 OOM。先把 `.env` 里 `WHISPER_MODEL_SIZE` 改成 `tiny`，跑通后再去前端「音频转写配置」里逐档升。
+- **首次跑视频时容器被 kill**：whisper 模型下载触发 OOM。先把 `.env` 里 `WHISPER_MODEL_SIZE` 改成 `tiny`，跑通后再去前端「音频转写配置」里逐档升。同时注意 `TASK_MAX_WORKERS`（默认 6）与 `mem_limit` 的匹配关系。
+
+健康检查说明：compose 的 healthcheck 打的是公开端点 `/api/sys_check`（返回 200 即健康）。**不要**改成 `/api/sys_health`——后者需要管理员 Bearer token，容器内匿名 curl 会恒 401，导致容器永远 `unhealthy`、nginx 永远不启动。
 
 **2. 改了 `.env` 没生效**
 
 区分两类变量：
-- `VITE_*` 是**构建时**变量（前端 bundle 里硬编码），改完必须 `docker-compose build frontend && docker-compose up -d`。只 `restart` 不会重新打包。
-- 其他后端变量（`TRANSCRIBER_TYPE`、`WHISPER_MODEL_SIZE`、`FFMPEG_BIN_PATH` 等）是**运行时**变量，改完 `docker-compose up -d` 即可。
+- `VITE_*` 是**构建时**变量（会被烘进前端 JS bundle）。不过 Docker 部署下前端固定走 nginx 的 `/api` 反代，**不需要设置 `VITE_API_BASE_URL`**；改了它也不会生效，除非重新 build 前端。
+- 其他后端变量（`TRANSCRIBER_TYPE`、`WHISPER_MODEL_SIZE`、`FFMPEG_BIN_PATH`、`OCR_DEVICE`、`TASK_*` 等）是**运行时**变量，改完 `docker compose up -d` 即可。
 
 注意：**LLM API key 不要写 `.env`**，从前端「模型供应商」页面录入，会保存到 SQLite 数据库并持久化。
 
 **3. 数据存在哪？删容器会丢吗？**
 
-`docker-compose` 用的是 `./backend:/app` 绑挂，下面这些文件都在宿主机的 `./backend/` 目录里、删容器不会丢：
-- `./backend/bili_note.db` —— SQLite 库（含 LLM 供应商配置、笔记历史）
-- `./backend/config/transcriber.json` —— 转写器运行时配置
-- `./backend/static/screenshots/` —— 视频截图
-- `./backend/uploads/` —— 上传的本地视频
+`docker compose` 把宿主机的 `./backend` 绑挂到容器的 `/legacy`（不是 `/app`，`/app` 保持镜像内代码，避免升级被旧代码盖住）。以下内容都在宿主机 `./backend/` 下、删容器不会丢：
 
-要彻底重置就 `docker-compose down && rm backend/bili_note.db backend/config/transcriber.json`。
+- `./backend/bili_note.db` —— SQLite 库（含账号、LLM 供应商配置、笔记历史）
+- `./backend/config/` —— Cookie、转写器设置、任务超时覆盖
+- `./backend/static/` —— 视频截图
+- `./backend/uploads/` —— 上传的本地视频
+- `./backend/vector_db/` —— RAG 向量索引
+- `./backend/data/` —— 任务运行时缓存、源文件缓存、笔记输出
+- `./backend/models/` —— Whisper 模型缓存
+
+要彻底重置就 `docker compose down && rm -rf backend/bili_note.db backend/config backend/vector_db`。
+
+> 单镜像（`docker run`）方式请对照上面六个命名卷的表格。
 
 **4. 前端打开是空白页 / 报 502**
 
@@ -265,13 +253,21 @@ docker logs -f bilinote-backend
 
 如果你 fork 后改过 compose 文件、把 restart 策略改成了 `on-failure:3`：任何 3 次连续崩溃都会让容器永远不再启动，之后改 `.env` 也没用。本项目自带的 compose 已经统一用 `unless-stopped`。
 
+**6. 上传大文件失败 / 长任务返回 504**
+
+nginx 默认 `proxy_read_timeout` 是 60 秒，长 LLM 调用会被掐断。本项目的 `nginx/default.conf` 与 `nginx/standalone.conf` 已配置 `proxy_read_timeout 300s` 和 `proxy_request_buffering off`（大文件直通后端，不先落盘）。若你自建反代，请同步这两项。
+
+**7. 多人同时登录时第 11 个人报 429**
+
+后端登录限流按客户端 IP 计数（10 次/分钟）。若反代没透传真实 IP，所有用户会被算成同一个来源。本项目 nginx 已设置 `X-Forwarded-For`，compose 里也设了 `FORWARDED_ALLOW_IPS=*`（仅 Docker 内网可达）。若你把后端直接暴露到公网，请把 `FORWARDED_ALLOW_IPS` 置空，否则外部可伪造该头绕过限流。
+
 ### 方式二：源码部署
 
 #### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/JefferyHcool/BiliNote.git
-cd BiliNote
+git clone https://github.com/wlj666666/bilinote.git
+cd bilinote
 mv .env.example .env
 ```
 
@@ -280,7 +276,22 @@ mv .env.example .env
 ```bash
 cd backend
 pip install -r requirements.txt
+pip install -r requirements-ocr.txt   # 硬字幕 OCR 依赖；不做 OCR 可跳过
 python main.py
+```
+
+> 想用 GPU 加速（转写 + OCR），Linux/WSL 上额外装：
+> ```bash
+> pip install -r requirements-gpu.txt      # faster-whisper 的 CUDA 运行时
+> pip uninstall -y onnxruntime
+> pip install -r requirements-ocr-gpu.txt  # OCR 的 CUDA 运行时
+> ```
+> 然后用 `./start-gpu.sh` 启动（会自动注入 `LD_LIBRARY_PATH` 并设 `OCR_DEVICE=cuda`），不要直接 `python main.py`。
+
+首次启动后同样需要创建管理员账号（模型供应商等页面要求管理员权限）：
+
+```bash
+python scripts/manage_users.py init-admin admin
 ```
 
 #### 3. 启动前端（Vite + React）
@@ -313,14 +324,15 @@ sudo apt install ffmpeg
 
 ### 🚀 CUDA / GPU 加速（可选）
 
-本地 **Faster Whisper** 转写可用 NVIDIA GPU 加速（在线引擎 Groq / 必剪 / 快手 与 GPU 无关）。仓库已自带 GPU 镜像与编排，**无需改代码、无需手动配置 device**——后端会自动检测 CUDA，可用就走 GPU，否则回退 CPU。
+本地 **Faster Whisper** 转写与**硬字幕 OCR** 可用 NVIDIA GPU 加速（在线引擎 Groq / 必剪 / 快手 与 GPU 无关）。仓库已自带 GPU 镜像与编排，**无需改代码**。
 
 **1. 宿主机前提**
 
-- NVIDIA 显卡 + 较新驱动（CUDA ≥ 12.4），宿主机 `nvidia-smi` 能正常输出；
+- NVIDIA 显卡 + 较新驱动（需支持 CUDA 12.x），宿主机 `nvidia-smi` 能正常输出；
 - 安装 [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)（最易漏的一步，没它 Docker 进不去 GPU）。装完验证：
   ```bash
-  docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
+  # 用一个任意带 CUDA 的镜像测透传；也可以直接用本项目的 GPU 镜像
+  docker run --rm --gpus all python:3.11-slim nvidia-smi
   ```
   能列出显卡即 OK。
 
@@ -329,102 +341,73 @@ sudo apt install ffmpeg
 CPU 与 GPU 两套 compose 用了相同的容器名，先停掉当前栈再起 GPU 栈：
 
 ```bash
-docker-compose down                                     # 停掉当前（CPU）栈
-docker-compose -f docker-compose.gpu.yml up --build -d   # 用 GPU 栈重建
+docker compose down                                       # 停掉当前（CPU）栈
+docker compose -f docker-compose.gpu.yml up --build -d    # 用 GPU 栈重建
 ```
 
-- GPU 栈用 `backend/Dockerfile.gpu`（CUDA 12.4.1 + cuDNN 基础镜像，并额外装 torch 用于 CUDA 检测），compose 已声明 `deploy...devices: nvidia` 自动透传 GPU。
-- **数据不丢**：两套 compose 都把 `./backend` 整目录绑挂进容器，数据库 / 配置 / 已下载模型都保留。
-- 首次构建较大较慢（CUDA 基础镜像数 GB + torch），耐心等。
+- GPU 栈用 `backend/Dockerfile.gpu`：基础镜像与 CPU 栈**完全相同**（`python:3.11-slim`），因此 Python 版本（3.11）与 CPU 镜像、CI 保持一致，不会出现「只在 GPU 路径上踩版本差异」的问题。
+- CUDA 运行时（cuBLAS / cuDNN / cuFFT / cuRAND / cuda_runtime）由 `requirements-gpu.txt` / `requirements-ocr-gpu.txt` 里的 pip wheel 提供，**不需要 `nvidia/cuda` 基础镜像**；运行时真正需要的驱动 `libcuda.so` 由 NVIDIA Container Toolkit 注入。
+- 这些 wheel 把 `.so` 装在 `site-packages/nvidia/*/lib`，该路径不在动态链接器搜索范围内。镜像构建时会自动把这些目录写进 `/etc/ld.so.conf.d/` 并执行 `ldconfig`——**少了这一步，设置页会显示「CUDA 不可用」**，尽管显卡完全正常。
+- **数据不丢**：两套 compose 都绑挂 `./backend`，数据库 / 配置 / 已下载模型都保留。
+- 首次构建较大较慢（要下载 `onnxruntime-gpu` 及若干 nvidia CUDA wheel，约 2–3 GB），最终镜像约 8 GB，耐心等。
 
 **3. 启用并确认**
 
 - 「设置 → 音频转写配置」转写引擎选 **Faster Whisper（本地）**，GPU 下可放心选大模型（如 `large-v3`）。
-- 确认真的走了 GPU：`docker logs bilinote-backend | grep -i cuda` 看到 `CUDA 可用，使用 GPU`；或转写时宿主机 `nvidia-smi` 能看到 python 进程占显存。
+- 硬字幕 OCR 默认 `OCR_DEVICE=cuda`（GPU compose 已设）；设为 `cuda` 但缺少 GPU 依赖时会**直接报错，不会静默回退 CPU**。
+- 确认真的走了 GPU，三种方式任选：
+  ```bash
+  # a) 设置页「系统监控」看 CUDA 状态
+  # b) 后端日志
+  docker logs bilinote-backend | grep -i cuda
+  # c) 直接问引擎（最可靠）
+  docker compose exec backend python -c "import ctranslate2; print(ctranslate2.get_cuda_device_count())"
+  docker compose exec backend python -c "import onnxruntime as o; print(o.get_available_providers())"
+  ```
+  预期：第一条输出 `1`，第二条包含 `CUDAExecutionProvider`。转写时宿主机 `nvidia-smi` 也能看到 python 进程占显存。
 
-**国内镜像**：GPU compose 支持 `BASE_REGISTRY` / `APT_MIRROR` / `PIP_INDEX` 这几个 build-arg（注意 `BASE_REGISTRY` 选的源必须支持 `nvidia/cuda` 命名空间，否则拉不到 CUDA 基础镜像）。
+**国内镜像**：GPU compose 支持 `BASE_REGISTRY` / `APT_MIRROR` / `PIP_INDEX` 这几个 build-arg。与 CPU 栈一样，`BASE_REGISTRY` 只需能拉到 `python:3.11-slim`，**不要求镜像源支持 `nvidia/cuda` 命名空间**。
 
-**起来了但没走 GPU？** 依次排查：① 宿主机 `nvidia-smi` 是否正常 → ② NVIDIA Container Toolkit 是否装好（上面 `--gpus all` 测试是否通过）→ ③ `docker logs bilinote-backend` 是否有 CUDA / cuDNN 报错（驱动 CUDA 版本需 ≥ 12.4）。
+**起来了但没走 GPU？** 依次排查：
+
+1. 宿主机 `nvidia-smi` 是否正常；
+2. NVIDIA Container Toolkit 是否装好（上面 `--gpus all` 测试是否通过）；
+3. 容器内 `ldconfig -p | grep cublas` 是否有输出——没有说明 `ldconfig` 步骤没生效；
+4. `docker logs bilinote-backend` 是否有 CUDA / cuDNN 报错（宿主机驱动需支持 CUDA 12.x）。
 
 `fast-whisper` 本身的 GPU 依赖说明可参考：[faster-whisper 项目](https://github.com/SYSTRAN/faster-whisper#requirements)
 
-### 🐳 使用 Docker 一键部署
+## 🧠 路线图
 
-确保你已安装 Docker，然后直接拉取预构建镜像运行：
-
-```bash
-# 拉取最新镜像
-docker pull ghcr.io/jefferyhcool/bilinote:latest
-
-# 运行容器
-docker run -d -p 80:80 \
-  -v bilinote-data:/app/backend/data \
-  -v bilinote-config:/app/backend/config \
-  -v bilinote-static:/app/backend/static \
-  -v bilinote-models:/app/backend/models \
-  --name bilinote \
-  ghcr.io/jefferyhcool/bilinote:latest
-```
-
-上面四个卷分别持久化：`data`（SQLite 数据库 + 生成的笔记）、`config`（LLM 供应商配置 / Cookie / 转写设置）、`static`（笔记引用的视频截图）、`models`（Whisper 模型缓存，可选，避免每次重新下载）。这样 `docker pull` 升级新镜像、删旧容器重建后，配置和历史都不会丢。
-
-> ⚠️ **不要**用 `-v 卷名:/app/backend` 挂整个后端目录——命名卷会用首次启动时的镜像内容固化，之后 `docker pull` 升级也会被旧代码盖住，导致「升级不生效」。只挂上面这些数据子目录即可。
-
-访问：`http://localhost`
-
-也可以使用 docker-compose 本地构建：
-
-```bash
-# 标准部署
-docker-compose up -d
-
-# GPU 加速部署（需要 NVIDIA GPU + NVIDIA Container Toolkit，详见上方「CUDA / GPU 加速」）
-docker-compose -f docker-compose.gpu.yml up --build -d
-```
-
-## 🧠 TODO
-
-- [x] 支持抖音及快手等视频平台
-- [x] 支持前端设置切换 AI 模型切换、语音转文字模型
+- [x] 支持抖音、TikTok 及快手等视频平台
+- [x] 前端可切换 AI 模型与语音转文字模型
 - [x] AI 摘要风格自定义（学术风、口语风、重点提取等）
-- [x] 加入更多模型支持
-- [x] 加入更多音频转文本模型支持
 - [x] 基于 RAG 的笔记内容 AI 问答
-- [ ] 笔记导出为 PDF / Word / Notion
+- [x] 管理员 / 多用户登录与数据隔离
+- [x] 硬字幕 OCR 提取（CPU / GPU）
+- [x] 多用户任务调度与资源限额
+- [ ] 笔记导出为 PDF / Word / Notion（当前仅支持 Markdown 与思维导图 SVG）
 
-### Contact and Join-联系和加入社区
+## 🔎 代码参考
 
-扫描下方公众号二维码，关注后回复 **「交流群」** 即可获取最新的微信交流群二维码（群码会自动更新，避免过期失效）：
-
-<table align="center">
-  <tr>
-    <td align="center"><img src="./doc/wechat-gzh.png" alt="BiliNote 公众号" width="200" /><br/>BiliNote 公众号</td>
-  </tr>
-</table>
-
-
-
-## 🔎代码参考
-- 本项目中的 `抖音下载功能` 部分代码参考引用自：[Evil0ctal/Douyin_TikTok_Download_API](https://github.com/Evil0ctal/Douyin_TikTok_Download_API)
+- `抖音下载功能` 部分代码参考引用自 [Evil0ctal/Douyin_TikTok_Download_API](https://github.com/Evil0ctal/Douyin_TikTok_Download_API)
 
 ## 📜 License
 
+本项目基于 [JefferyHcool/BiliNote](https://github.com/JefferyHcool/BiliNote) 二次开发，遵循 MIT License。原始版权声明：
+
+```
 MIT License
 
----
+Copyright (c) 2024 Jeffery Huang
+```
 
-💬 你的支持与反馈是我持续优化的动力！欢迎 PR、提 issue、Star ⭐️
-## Buy Me a Coffee / 捐赠
-如果你觉得项目对你有帮助，考虑支持我一下吧
-<div style='display:inline;'>
-    <img width='30%' src='https://common-1304618721.cos.ap-chengdu.myqcloud.com/8986c9eb29c356a0cfa3d470c23d3b6.jpg'/>
-    <img width='30%' src='https://common-1304618721.cos.ap-chengdu.myqcloud.com/2a049ea298b206bcd0d8b8da3219d6b.jpg'/>
-</div>
+## 📚 相关文档
 
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=JefferyHcool/BiliNote&type=Date)](https://www.star-history.com/#JefferyHcool/BiliNote&Date)
-
-多用户部署的并发、排队、取消和中断恢复规则见 [任务调度说明](backend/TASK_SCHEDULING.md)。默认全站执行 6 个、每用户执行 1 个；GPU 推理 1 个、CPU 密集阶段 2 个、模型总结请求 2 个。
-
-参数选择依据、GPU 并发 1/2/3/4 对比、显存驻留实验和复现命令见 [并发压测记录及参数选择依据](backend/CONCURRENCY_BENCHMARK.md)。
+- [任务调度说明](backend/TASK_SCHEDULING.md)：多用户部署的并发、排队、取消和中断恢复规则。默认全站执行 6 个、每用户执行 1 个；GPU 推理 1 个、CPU 密集阶段 2 个、模型总结请求 2 个。
+- [并发压测记录及参数选择依据](backend/CONCURRENCY_BENCHMARK.md)：参数选择依据、GPU 并发 1/2/3/4 对比、显存驻留实验和复现命令。
+- [管理员登录与凭据保护](understanding/管理员登录与凭据保护.md)
+- [用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)
+- [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md)
+- [OCR 视频到模型输入流程](understanding/OCR_视频到模型输入流程.md)
+- [README 修改清单](understanding/README修改清单.md)

@@ -2,23 +2,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Github, Star, ExternalLink, Download } from 'lucide-react'
+import { Github, Download } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import logo from '@/assets/icon.svg'
 
-// 二维码统一走 GitHub 在线地址：后续在仓库替换图片后，已打包的 App 会自动更新，无需重新发版
-const GITHUB_DOC_RAW = 'https://raw.githubusercontent.com/JefferyHcool/BiliNote/master/doc'
-const wechatQr = `${GITHUB_DOC_RAW}/wechat-gzh.png`
-const remoteInstallQr = `${GITHUB_DOC_RAW}/remote-install-wechat.png`
+const REPO_URL = 'https://github.com/wlj666666/bilinote'
 
 export default function AboutPage() {
   const appVersion = __APP_VERSION__
-  const images = [
-    'https://common-1304618721.cos.ap-chengdu.myqcloud.com/20250504102850.png',
-    'https://common-1304618721.cos.ap-chengdu.myqcloud.com/20250504103028.png',
-    'https://common-1304618721.cos.ap-chengdu.myqcloud.com/20250504103304.png',
-    'https://common-1304618721.cos.ap-chengdu.myqcloud.com/20250504103625.png',
-  ]
   return (
     <ScrollArea className={'h-full overflow-y-auto bg-paper'}>
       <div className="container mx-auto px-4 py-12">
@@ -43,24 +34,17 @@ export default function AboutPage() {
             <Badge variant="secondary">React</Badge>
             <Badge variant="secondary">FastAPI</Badge>
             <Badge variant="secondary">Docker Compose</Badge>
-            <Badge variant="secondary">Active</Badge>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <Button asChild>
-              <a href="https://www.bilinote.app" target="_blank">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                体验 BiliNote
-              </a>
-            </Button>
             <Button variant="outline" asChild>
-              <a href="https://github.com/JefferyHcool/BiliNote" target="_blank">
+              <a href={REPO_URL} target="_blank">
                 <Github className="mr-2 h-4 w-4" />
                 GitHub 仓库
               </a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="https://github.com/JefferyHcool/BiliNote/releases" target="_blank">
+              <a href={`${REPO_URL}/releases`} target="_blank">
                 <Download className="mr-2 h-4 w-4" />
                 下载桌面版
               </a>
@@ -80,8 +64,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="mb-16">
+        {/* Features Section */}        <section className="mb-16">
           <h2 className="mb-8 text-center text-3xl font-bold">🔧 功能特性</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[
@@ -105,24 +88,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Screenshots Section */}
-        <section className="mb-16">
-          <h2 className="mb-8 text-center text-3xl font-bold">📸 截图预览</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {images.map(num => (
-              <div key={num} className="overflow-hidden rounded-lg border shadow-sm">
-                <img
-                  src={num}
-                  alt={`BiliNote Screenshot ${num}`}
-                  width={600}
-                  height={400}
-                  className="w-full object-cover transition-transform hover:scale-105"
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* Quick Start Section */}
         <section className="mb-16">
           <h2 className="mb-8 text-center text-3xl font-bold">🚀 快速开始</h2>
@@ -135,9 +100,9 @@ export default function AboutPage() {
               <div>
                 <h3 className="mb-3 text-xl font-semibold">1. 克隆仓库</h3>
                 <div className="bg-muted rounded-md p-4 font-mono text-sm">
-                  git clone https://github.com/JefferyHcool/BiliNote.git
+                  git clone https://github.com/wlj666666/bilinote.git
                   <br />
-                  cd BiliNote
+                  cd bilinote
                   <br />
                   mv .env.example .env
                 </div>
@@ -163,16 +128,16 @@ export default function AboutPage() {
                 </div>
               </div>
               <p>
-                访问：<code className="bg-muted rounded px-2 py-1">http://localhost:5173</code>
+                访问：<code className="bg-muted rounded px-2 py-1">http://localhost:3015</code>
               </p>
             </TabsContent>
             <TabsContent value="docker" className="mt-6 space-y-6">
               <div>
                 <h3 className="mb-3 text-xl font-semibold">1. 克隆仓库</h3>
                 <div className="bg-muted rounded-md p-4 font-mono text-sm">
-                  git clone https://github.com/JefferyHcool/BiliNote.git
+                  git clone https://github.com/wlj666666/bilinote.git
                   <br />
-                  cd BiliNote
+                  cd bilinote
                   <br />
                   mv .env.example .env
                 </div>
@@ -198,46 +163,27 @@ export default function AboutPage() {
           </Tabs>
         </section>
 
-        {/* Community Section */}
-        <section className="mb-16">
-          <h2 className="mb-8 text-center text-3xl font-bold">联系和加入社区</h2>
-          <div className="mx-auto max-w-3xl">
-            <div className="flex flex-col items-center justify-center gap-10 md:flex-row md:items-start">
-              <div className="text-center">
-                <h3 className="mb-3 text-xl font-semibold">BiliNote 公众号</h3>
-                <div className="bg-muted mx-auto flex h-52 w-52 items-center justify-center rounded-md">
-                  <img src={wechatQr} alt="BiliNote 公众号" className="h-full w-full object-contain" />
-                </div>
-                <p className="text-muted-foreground mt-3 text-sm">扫描公众号，回复「交流群」获取二维码</p>
-              </div>
-              <div className="text-center">
-                <h3 className="mb-3 text-xl font-semibold">BiliNote AI笔记系统一对一搭建服务</h3>
-                <div className="bg-muted mx-auto flex h-52 w-52 items-center justify-center rounded-md">
-                  <img
-                    src={remoteInstallQr}
-                    alt="BiliNote AI笔记系统一对一搭建服务"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <p className="text-muted-foreground mt-3 text-sm">
-                  专人一对一远程协助，从部署到上手全程陪跑
-                  <br />
-                  扫码加微信，备注「搭建服务」即可咨询
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* License Section */}
         <section className="mb-8 text-center">
           <h2 className="mb-4 text-3xl font-bold">📜 License</h2>
           <p>MIT License</p>
+          <p className="text-muted-foreground mt-2 text-sm">
+            本项目基于{' '}
+            <a
+              href="https://github.com/JefferyHcool/BiliNote"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline"
+            >
+              JefferyHcool/BiliNote
+            </a>{' '}
+            二次开发，遵循 MIT 协议。
+          </p>
         </section>
 
         {/* Footer */}
         <footer className="border-t pt-8 text-center">
-          <p className="mb-4">💬 你的支持与反馈是我持续优化的动力！欢迎 PR、提 issue、Star ⭐️</p>
+          <p className="mb-4">💬 欢迎 PR、提 issue、Star ⭐️</p>
         </footer>
       </div>
     </ScrollArea>

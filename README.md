@@ -6,13 +6,16 @@
 <h1 align="center">BiliNote</h1>
 </div>
 
-<p align="center"><i>AI 视频笔记生成工具 —— 让 AI 为你的视频做笔记</i></p>
+<p align="center"><i>从视频到可检索知识的 AI Agent 应用 —— 转写 · OCR · 结构化笔记 · RAG 问答</i></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
-  <img src="https://img.shields.io/badge/frontend-react%2019-blue" />
-  <img src="https://img.shields.io/badge/backend-fastapi-green" />
-  <img src="https://img.shields.io/badge/LLM-openai%20%7C%20deepseek%20%7C%20qwen-ff69b4" />
+  <img src="https://img.shields.io/badge/python-3.11-3776AB" />
+  <img src="https://img.shields.io/badge/frontend-react%2019-61DAFB" />
+  <img src="https://img.shields.io/badge/backend-fastapi-009688" />
+  <img src="https://img.shields.io/badge/RAG-chromadb%20%2B%20onnx-6e7f64" />
+  <img src="https://img.shields.io/badge/Agent-function%20calling-8b5cf6" />
+  <img src="https://img.shields.io/badge/inference-CUDA%20%2F%20CPU-76B900" />
   <img src="https://img.shields.io/badge/docker-ghcr.io-blue" />
 </p>
 
@@ -21,87 +24,215 @@
 
 ## ✨ 项目简介
 
-BiliNote 是一个 AI 视频笔记助手：给定一个视频链接，它会自动下载视频、提取音频、转写文字（或直接从画面里 OCR 出硬字幕），再交给大模型生成结构清晰、重点明确的 Markdown 笔记，并可插入视频截图与原片时间戳跳转。
+BiliNote 是一个**端到端的 AI 视频理解应用**：给定视频链接，系统自动完成下载 → 音视频分离 → 语音转写（或硬字幕 OCR）→ 大模型结构化笔记 → 可检索问答，全链路在多用户、多任务并发下运行。
+
+与"调一个 LLM API 出摘要"的 demo 不同，本项目的工程重心在三件事上：
+
+- **Agent 化问答**：不是一次性把全文塞给模型，而是"向量检索给初始上下文 + 模型自主调用工具补证据"的多轮闭环，回答可回溯到具体时间戳。
+- **推理与资源工程**：模型推理与 API 进程物理隔离，GPU / CPU / 模型 API 三类资源分阶段闸门，硬字幕 OCR 走 CUDA 加速路径，参数全部由压测数据决定。
+- **可上线的多租户**：管理员 / 普通用户两级角色，笔记、上传、会话、向量索引按用户隔离，历史数据可迁移。
 
 支持哔哩哔哩、YouTube、抖音、TikTok、快手与本地视频文件。
 
-### 本分支的主要改动
+## 🗺️ 技术路线总图
 
-本仓库基于上游 [JefferyHcool/BiliNote](https://github.com/JefferyHcool/BiliNote) 二次开发，核心改动集中在**多用户部署**与**本地推理能力**两块：
+```mermaid
+flowchart TB
+    subgraph FE["前端 · React 19 + Vite + TS"]
+        direction LR
+        F1["任务表单 / 进度轮询"]
+        F2["Markdown 笔记 + 思维导图"]
+        F3["RAG 问答面板<br/>半屏 / 全屏 · 来源可展开"]
+    end
 
-- **管理员 / 多用户登录与数据隔离**：模型供应商、转写器配置、系统监控等管理功能收敛到管理员；笔记、上传文件、聊天记录、向量索引按用户隔离。旧数据自动归入原管理员。详见 [管理员登录与凭据保护](understanding/管理员登录与凭据保护.md) 与 [用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)。
-- **硬字幕 OCR 提取**：视频没有可用字幕时，直接对画面做 OCR 提取硬字幕，支持 CPU / GPU 双路径，GPU 下实测约 6 倍加速。详见 [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md)。
-- **多用户任务调度与资源限额**：全站并发、单用户并发、排队长度、GPU / CPU / API 分阶段槽位统一由 `TaskLimits` 管控，任务可取消、可从中断处恢复。详见 [任务调度说明](backend/TASK_SCHEDULING.md)。
+    subgraph API["API 层 · FastAPI（不承载模型计算）"]
+        direction LR
+        A1["auth 鉴权<br/>PBKDF2 + Bearer"]
+        A2["note 任务提交"]
+        A3["chat 问答 / 索引"]
+        A4["provider · model · config"]
+    end
 
-## 🔧 功能特性
+    subgraph SCHED["调度层 · 多租户准入"]
+        direction LR
+        S1["TaskScheduler<br/>全站 / 单用户排队"]
+        S2["TaskLimits<br/>GPU · CPU · API 分阶段槽位"]
+        S3["断点恢复 / 取消"]
+    end
 
-### 内容生成
+    subgraph PIPE["内容流水线"]
+        direction LR
+        P1["下载器适配<br/>bilibili · youtube · douyin ..."]
+        P2["字幕命中判定"]
+        P3["ASR 转写"]
+        P4["硬字幕 OCR<br/>RapidOCR + CUDA EP"]
+    end
 
-- 多平台支持：Bilibili、YouTube、抖音、TikTok、快手、本地视频文件
-- 自动下载 → 提取音频 → 转写 → 大模型总结的完整流水线
-- 笔记格式与风格可选，支持多版本保留与对比
-- 可选插入视频截图（自动按时间戳截取）
-- 可选原片时间戳跳转链接
-- 笔记顶部视频封面 Banner
-- 多模态视频理解（画面采样拼图后交给多模态模型）
+    subgraph INFRA["本地推理服务 · 独立进程"]
+        direction LR
+        I1["ModelOwner<br/>UDS + JSON（无 pickle）"]
+        I2["CUDA / CPU 双路径"]
+        I3["ONNX 本地 embedding<br/>线程预算受控"]
+    end
 
-### 转写与字幕
+    subgraph LLM["LLM 应用层"]
+        direction LR
+        L1["供应商工厂 + 回退清单"]
+        L2["RequestChunker<br/>按字节预算二分切分"]
+        L3["多模态画面输入"]
+        L4["提示词分层构建"]
+    end
 
-- 本地转写：Fast-Whisper、MLX-Whisper（仅 Apple Silicon）
-- 在线转写：Groq、必剪（BCut）、快手
-- YouTube / Bilibili 优先复用平台字幕，命中时跳过音频下载
-- 硬字幕 OCR：RapidOCR，支持 CPU / CUDA 双路径
+    subgraph RAG["Agent / RAG 层"]
+        direction LR
+        R1["三类 chunk 索引<br/>笔记 / 转录 / 元信息"]
+        R2["向量检索 top-k"]
+        R3["Function Calling<br/>3 工具 · 最多 3 轮"]
+        R4["来源回填<br/>段落 + 时间戳"]
+    end
 
-### 模型与配置
+    subgraph DATA["存储与隔离"]
+        direction LR
+        D1["SQLite + SQLAlchemy<br/>DAO 模式"]
+        D2["ChromaDB 向量库"]
+        D3["ContextVar 任务级<br/>存储作用域"]
+    end
 
-- 自行配置任意 OpenAI 兼容供应商（OpenAI、DeepSeek、Qwen 等）
-- 全局代理：一处配置同时作用于模型接口、转写接口与视频下载，支持 `HTTP_PROXY` 兜底
-- 转写模型就绪门禁：本地模型未下载完成时拦截任务并引导下载
-- Whisper 模型损坏自愈：`model.bin` 截断时自动删除重下
+    FE --> API --> SCHED --> PIPE
+    PIPE --> INFRA
+    PIPE --> LLM
+    LLM --> RAG
+    RAG --> FE
+    INFRA --> DATA
+    LLM --> DATA
+    RAG --> DATA
+    A1 -.-> D3
+```
 
-### 问答与检索
+> 实线为数据流，虚线为隔离约束。API 进程不直接持有模型句柄，所有推理经调度层转入独立推理服务。
 
-- 基于 RAG 的笔记内容 AI 问答，支持 Function Calling
-- 向量索引包含视频元信息（标题、作者、简介、标签）
-- 半屏 / 全屏两种问答视图
+## 🏗️ 核心实现
 
-### 多用户与运维
+### 1. Agent 与 RAG 链路
 
-- 管理员 / 普通用户两级角色，密码以 PBKDF2-SHA256 存储
-- 笔记、文件、聊天、向量索引按用户隔离
-- 任务调度：全站并发、单用户并发、排队、分阶段资源槽位
-- 系统监控页：CUDA 状态、FFmpeg、数据库、Whisper 模型就绪情况
+问答不是"检索一次就回答"，而是**检索 + 工具调用双通道**：
 
-## 🏗️ 技术架构
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant C as chat_service
+    participant V as VectorStore
+    participant M as LLM
+    participant T as chat_tools
+
+    U->>C: 提问
+    C->>V: query(task_id, question, n_results=6)
+    V-->>C: 初始上下文 + sources
+    C->>M: system(检索上下文) + history[-20:] + question
+    loop 最多 3 轮
+        M-->>C: tool_calls
+        C->>T: execute_tool(...)
+        T-->>C: 工具结果（JSON）
+        C->>M: 追加工具结果
+    end
+    M-->>C: 最终回答
+    C-->>U: answer + 来源片段
+```
+
+**索引侧的三类 chunk**（`vector_store.py`）：
+
+| chunk 类型 | 切分策略 | 关键元信息 |
+| --- | --- | --- |
+| `markdown` | 按 `##` / `###` 语义切分，短于 30 字符丢弃 | `section_title` |
+| `transcript` | 15 段滑窗、3 段重叠，每段前置 `[N s]` 时间戳 | `start_time` / `end_time` |
+| `meta` | 标题、UP 主、简介、标签合成单块 | 供"作者是谁"类问题命中 |
+
+**工具设计**（`chat_tools.py`）——刻意区分"可精确查询"与"需全文"两类意图：
+
+- `lookup_transcript`：支持 `start_time` / `end_time` 时间窗、`keyword` 关键词、`position=start|end` 快捷定位，避免模型为了找一句话把整份转录拉进上下文
+- `get_video_info`：元信息
+- `get_note_content`：完整笔记 Markdown
+
+检索侧把 embedding 锁在 `CPUExecutionProvider`，`intra_op=2`、`inter_op=1`，使向量化算力落进 CPU 槽位预算，不与 GPU 推理争抢（`local_embeddings.py`）。
+
+### 2. LLM 应用工程
+
+- **上下文预算感知**：`RequestChunker` 按 UTF-8 字节估算消息体积，超限时优先按段落/图片边界切分；单段仍超限则对该段做**二分查找**，找到最大可容纳前缀，保证任意输入都不会撑爆请求。
+- **多模态视频理解**：`VideoReader` 按固定间隔抽帧（`ThreadPoolExecutor` 并行，默认 2 线程）、相邻帧 MD5 去重，再拼成网格图（默认 2×2、单元 480×270、间隔 6 s）以压缩图片数量与 token 消耗，最后以 OpenAI `content` 数组（text + 多张 `image_url`）送入模型；`model_capabilities.py` 维护模型是否支持图片输入，纯文本模型自动退回 `string` content，避免 `invalid_request_error`。
+- **供应商抽象**：工厂模式统一 OpenAI 兼容协议；针对 `/v1/models` 不可靠（部分网关不实现、key 无权限）的情况，内置供应商维护一份回退模型清单，保证下拉永不空白。
+- **提示词分层**：`prompt.py` 模板 / `prompt_builder.py` 组装 / `timestamp_markers.py` 时间标记容错，风格切换不改调用方。
+
+### 3. 推理与性能工程
+
+**硬字幕 OCR（CPU / GPU 双路径）**——同一条视频实测：
+
+| 阶段 | CPU | GPU (CUDA EP) | 加速比 |
+| --- | --- | --- | --- |
+| 字幕定位（含初始化） | 65.630 s | 10.942 s | ≈ 6.0× |
+| 字幕提取 | 46.237 s | 7.427 s | ≈ 6.2× |
+| **合计** | **111.867 s** | **18.369 s** | **≈ 6.1×** |
+
+实现上不只是换 execution provider：字幕布局学习、空缺复查、连续区域判定、未变化字幕带的结果复用，共同把无效推理量降下来。详见 [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md) 与 [GPU 验证记录](backend/OCR_GPU_VALIDATION.md)。
+
+**推理服务隔离**（`inference_runtime.py`）：
+
+- 模型句柄只存在于单个 ModelOwner 进程，API 进程通过 Unix Domain Socket 传 JSON，**不使用 pickle**（避免反序列化面）
+- 带 stall timeout 与一次重连重试；超时时**先停 ModelOwner 再释放 GPU 槽位**，避免下一个任务拿到脏显存
+- 串行 accept 保证 ASR 不会自我并发，因此 `TASK_GPU_SLOTS` 默认硬约束为 1，多槽位需显式开关放行
+
+**资源闸门**（`task_limits.py` / `task_resources.py`）：
+
+| 维度 | 默认值 | 依据 |
+| --- | --- | --- |
+| 全站并发 | 6 | 短素材吞吐收益拐点 |
+| 单用户并发 / 排队 | 1 / 3 | 防止单用户挤占 |
+| 全站排队上限 | 20 | 内存与磁盘缓冲 |
+| GPU 槽位 | 1 | 实测并发 2/3/4 反而更慢（显存驻留与换入换出） |
+| CPU 密集槽位 | 2 | 解码、OCR 预处理 |
+| 模型 API 槽位 | 2 | 供应商限流友好 |
+
+每个参数都有对应的压测记录与复现命令，见 [并发压测记录](backend/CONCURRENCY_BENCHMARK.md)。
+
+### 4. 多租户与数据隔离
+
+- 密码 PBKDF2-SHA256（60 万次迭代）存储，Bearer token 鉴权，登录接口按 IP 限流
+- 笔记、上传文件、会话历史、向量索引按 `user_id` 分区；`storage_scope.py` 用 ContextVar 在任务上下文内隐式携带作用域，避免逐层透传
+- 旧版单用户数据在升级时自动归入管理员账号（`legacy_migration.py`）
+- 管理功能（供应商、转写器、系统监控、用户管理）收敛到管理员角色
+
+### 5. 技术栈
 
 **后端**（Python 3.11 + FastAPI，端口 8483）
 
 | 目录 | 职责 |
 | --- | --- |
-| `app/routers/` | HTTP 路由：`note`（生成）、`auth`（登录）、`provider` / `model`（供应商）、`config`、`chat`（RAG 问答）、`history`、`files` |
-| `app/services/` | 业务逻辑：`note.py` 编排完整流水线；`task_scheduler.py` + `task_limits.py` 任务调度；`auth.py` 鉴权；`storage_scope.py` 任务级存储隔离；`vector_store.py` 向量检索 |
-| `app/downloaders/` | 平台适配器：bilibili / youtube / douyin / kuaishou / local |
-| `app/transcriber/` | 语音转写引擎，工厂在 `transcriber_provider.py` |
-| `app/ocr/` | 硬字幕 OCR：RapidOCR 封装、字幕布局学习、时序合并、CUDA 运行时 |
-| `app/gpt/` | 大模型集成，工厂模式 + 长文本分块 |
+| `app/routers/` | `note` 任务、`auth` 登录、`chat` RAG 问答、`provider` / `model`、`config`、`history`、`files` |
+| `app/services/` | `note.py` 流水线编排；`task_scheduler` / `task_limits` / `task_resources` 调度；`vector_store` 检索；`chat_service` + `chat_tools` Agent 循环；`inference_runtime` 推理服务；`auth` / `storage_scope` 隔离 |
+| `app/ocr/` | 硬字幕 OCR：引擎封装、布局学习、时序合并、字幕质量判定、CUDA 运行时 |
+| `app/gpt/` | 供应商工厂、提示词构建、`RequestChunker` 分块、多模态消息组装 |
+| `app/downloaders/` · `app/transcriber/` | 平台适配器与转写引擎（上游基线） |
 | `app/db/` | SQLite + SQLAlchemy，DAO 模式 |
 
 **前端**（React 19 + Vite + TypeScript，开发端口 3015）
 
-- `pages/HomePage/` —— 主工作区：输入表单、Markdown 预览、思维导图
-- `pages/SettingPage/` —— 设置页：模型、转写器、下载配置、提示词、系统监控、用户管理
+- `pages/HomePage/` —— 主工作区：任务表单、Markdown 预览、思维导图、`ChatPanel`（基于 `@ant-design/x` 的半屏 / 全屏问答，含引用来源展开与时间段展示）
+- `pages/SettingPage/` —— 供应商、转写器、下载、提示词、系统监控、用户管理
 - `pages/Login/`、`pages/Onboarding/` —— 登录与首启引导
-- `store/` —— Zustand（`taskStore` / `authStore` / `modelStore` / `providerStore` / `configStore` / `chatStore`）
+- `store/` —— Zustand：`taskStore` / `authStore` / `modelStore` / `providerStore` / `configStore` / `chatStore`
 - 设计语言：Tailwind v4 + Radix UI + antd / `@ant-design/x`，主色 sage 绿 `#6e7f64`，明暗双主题
 
-**其它**
+**其它**：`BillNote_extension/` 浏览器扩展（Vue 3 + MV3）；`BillNote_frontend/src-tauri/` 桌面端（Tauri 2）。
 
-- `BillNote_extension/` —— 浏览器扩展（Vue 3 + MV3，Chrome / Edge / Firefox）
-- `BillNote_frontend/src-tauri/` —— 桌面端打包（Tauri 2）
+## 🔧 能力清单
 
-## 📸 截图预览
-
-> 待补充：旧版截图（蓝色主题）已清理，需按当前 sage 绿主题重新截图后放回 `doc/` 并在此引用。
+| 分组 | 能力 |
+| --- | --- |
+| **Agent / RAG** | 向量检索 + Function Calling 双通道问答；三类 chunk 索引；来源与时间戳回填 |
+| **LLM 应用** | 字节预算分块；多模态画面输入与能力判定；供应商回退清单；提示词分层 |
+| **推理工程** | OCR CPU/GPU 双路径（≈6.1×）；单 ModelOwner 进程隔离；UDS + JSON 协议 |
+| **调度与资源** | 全站 / 单用户 / GPU / CPU / API 五级准入；任务取消与断点恢复 |
+| **多租户** | PBKDF2 鉴权、任务级存储作用域、向量库分区、旧数据迁移 |
+| **平台能力**（上游基线） | 六平台下载适配、五种转写引擎、字幕复用、截图与思维导图 |
 
 ## 📦 桌面版下载
 
@@ -382,15 +513,37 @@ docker compose -f docker-compose.gpu.yml up --build -d    # 用 GPU 栈重建
 - [x] 支持抖音、TikTok 及快手等视频平台
 - [x] 前端可切换 AI 模型与语音转文字模型
 - [x] AI 摘要风格自定义（学术风、口语风、重点提取等）
-- [x] 基于 RAG 的笔记内容 AI 问答
+- [x] 基于 RAG + Function Calling 的笔记内容 AI 问答
 - [x] 管理员 / 多用户登录与数据隔离
-- [x] 硬字幕 OCR 提取（CPU / GPU）
+- [x] 硬字幕 OCR 提取（CPU / GPU 双路径）
 - [x] 多用户任务调度与资源限额
+- [ ] 检索质量评估：召回率 / 命中率基准集与 A/B 对比
 - [ ] 笔记导出为 PDF / Word / Notion（当前仅支持 Markdown 与思维导图 SVG）
 
 ## 🔎 代码参考
 
 - `抖音下载功能` 部分代码参考引用自 [Evil0ctal/Douyin_TikTok_Download_API](https://github.com/Evil0ctal/Douyin_TikTok_Download_API)
+
+## 🙋 贡献范围说明
+
+本项目 fork 自 [JefferyHcool/BiliNote](https://github.com/JefferyHcool/BiliNote)（MIT），并在其上做了大量重构与新增。为避免歧义，在此明确划分：
+
+**上游基线**（继承，非本人实现）
+
+- 平台下载适配器（bilibili / youtube / douyin / kuaishou / local）与抖音下载的第三方实现
+- 语音转写引擎接入（fast-whisper / mlx-whisper / groq / bcut / kuaishou）
+- 前端视觉设计语言、思维导图渲染、Tauri 桌面打包、浏览器扩展
+
+**本项目新增与重构**
+
+| 模块 | 内容 |
+| --- | --- |
+| Agent / RAG | `chat_service.py`、`chat_tools.py`、`vector_store.py`、`local_embeddings.py` —— 检索 + Function Calling 闭环、三类 chunk 索引、来源回填 |
+| LLM 应用 | `request_chunker.py`（字节预算二分切分）、`model_capabilities.py`（多模态能力判定）、`model_fallback.py`（供应商回退清单）、`universal_gpt.py` 多模态消息组装 |
+| 推理工程 | `app/ocr/` 全套（布局学习、空缺复查、结果复用、CUDA 运行时）、`inference_runtime.py`（单 ModelOwner + UDS）、`profiling.py` 与压测脚本 |
+| 调度与资源 | `task_scheduler.py`、`task_limits.py`、`task_resources.py`、`task_recovery.py` —— 五级准入、取消、断点恢复 |
+| 多租户 | `auth.py`、`storage_scope.py`、`legacy_migration.py`、`user_data.py` —— 鉴权、任务级隔离、旧数据迁移 |
+| 前端问答 | `ChatPanel.tsx` —— 半屏 / 全屏问答视图、引用来源展开、时间段落展示 |
 
 ## 📜 License
 
@@ -406,8 +559,8 @@ Copyright (c) 2024 Jeffery Huang
 
 - [任务调度说明](backend/TASK_SCHEDULING.md)：多用户部署的并发、排队、取消和中断恢复规则。默认全站执行 6 个、每用户执行 1 个；GPU 推理 1 个、CPU 密集阶段 2 个、模型总结请求 2 个。
 - [并发压测记录及参数选择依据](backend/CONCURRENCY_BENCHMARK.md)：参数选择依据、GPU 并发 1/2/3/4 对比、显存驻留实验和复现命令。
+- [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md)：按数据流位置排列的优化方向与验收办法。
+- [OCR GPU 加速验证](backend/OCR_GPU_VALIDATION.md)：CPU / GPU 同视频对照数据。
+- [OCR 视频到模型输入流程](understanding/OCR_视频到模型输入流程.md)
 - [管理员登录与凭据保护](understanding/管理员登录与凭据保护.md)
 - [用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)
-- [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md)
-- [OCR 视频到模型输入流程](understanding/OCR_视频到模型输入流程.md)
-- [README 修改清单](understanding/README修改清单.md)

@@ -27,8 +27,13 @@ class TaskLimits:
             ('active', 'TASK_MAX_WORKERS', 6), ('user_active', 'TASK_USER_ACTIVE', 1),
             ('user_queued', 'TASK_USER_QUEUE_LIMIT', 3), ('queued', 'TASK_QUEUE_LIMIT', 20),
             ('cpu', 'TASK_CPU_SLOTS', 2), ('gpu', 'TASK_GPU_SLOTS', 1), ('api', 'TASK_API_SLOTS', 2))})
-        if limits.gpu != 1:
-            raise ValueError('当前单 GPU 推理服务要求 TASK_GPU_SLOTS=1')
+        if limits.gpu != 1 and os.getenv('TASK_ALLOW_MULTI_GPU_SLOTS', '0') != '1':
+            # The single ModelOwner serves Whisper through a serial accept(), so a
+            # larger GPU slot count cannot parallelise ASR. It only permits OCR to
+            # overlap with Whisper or with another OCR process. Those combinations
+            # need their own measurements before being enabled by default.
+            raise ValueError('当前单 GPU 推理服务要求 TASK_GPU_SLOTS=1；'
+                             '完成 OCR/ASR 混合负载验证后，可用 TASK_ALLOW_MULTI_GPU_SLOTS=1 显式放行')
         return limits
 
 

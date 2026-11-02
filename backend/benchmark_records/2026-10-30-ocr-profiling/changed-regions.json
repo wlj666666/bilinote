@@ -3,121 +3,56 @@
     "case": 1,
     "time": 60.0,
     "operation": "insert",
-    "baseline": [],
-    "no_cls_tf32": [
-      {
-        "start": 59.4,
-        "end": 60.6,
-        "text": "前期过渡比较顺滑"
-      }
-    ]
+    "baseline_count": 0,
+    "no_cls_tf32_count": 1
   },
   {
     "case": 2,
     "time": 113.6,
     "operation": "insert",
-    "baseline": [],
-    "no_cls_tf32": [
-      {
-        "start": 112.8,
-        "end": 114.4,
-        "text": "可以挂寒冰或者翠神"
-      }
-    ]
+    "baseline_count": 0,
+    "no_cls_tf32_count": 1
   },
   {
     "case": 3,
     "time": 269.7,
     "operation": "insert",
-    "baseline": [],
-    "no_cls_tf32": [
-      {
-        "start": 269.4,
-        "end": 270.0,
-        "text": "狐狸的话我们"
-      }
-    ]
+    "baseline_count": 0,
+    "no_cls_tf32_count": 1
   },
   {
     "case": 4,
     "time": 364.9,
     "operation": "replace",
-    "baseline": [
-      {
-        "start": 364.2,
-        "end": 365.59999999999997,
-        "text": "访"
-      }
-    ],
-    "no_cls_tf32": [
-      {
-        "start": 364.2,
-        "end": 365.59999999999997,
-        "text": "过渡推荐物理这边"
-      },
-      {
-        "start": 365.6,
-        "end": 367.2,
-        "text": "物理这边的话有两种流派"
-      }
-    ]
+    "baseline_count": 1,
+    "no_cls_tf32_count": 2
   },
   {
     "case": 5,
     "time": 440.2,
     "operation": "replace",
-    "baseline": [
-      {
-        "start": 439.4,
-        "end": 441.0,
-        "text": "厂"
-      }
-    ],
-    "no_cls_tf32": [
-      {
-        "start": 439.4,
-        "end": 441.0,
-        "text": "我就不过多赘述了"
-      }
-    ]
+    "baseline_count": 1,
+    "no_cls_tf32_count": 1
   },
   {
     "case": 6,
     "time": 655.0,
     "operation": "insert",
-    "baseline": [],
-    "no_cls_tf32": [
-      {
-        "start": 654.2,
-        "end": 655.8,
-        "text": "连败没血就容易烂魔杖"
-      }
-    ]
+    "baseline_count": 0,
+    "no_cls_tf32_count": 1
   },
   {
     "case": 7,
     "time": 675.9,
     "operation": "insert",
-    "baseline": [],
-    "no_cls_tf32": [
-      {
-        "start": 675.0,
-        "end": 676.8,
-        "text": "3连胜3连败等于6连胜6连败"
-      }
-    ]
+    "baseline_count": 0,
+    "no_cls_tf32_count": 1
   },
   {
     "case": 8,
     "time": 685.0,
     "operation": "insert",
-    "baseline": [],
-    "no_cls_tf32": [
-      {
-        "start": 684.4,
-        "end": 685.6,
-        "text": "3连支持下up主"
-      }
-    ]
+    "baseline_count": 0,
+    "no_cls_tf32_count": 1
   }
 ]

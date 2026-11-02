@@ -1,6 +1,5 @@
 [
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "baseline",
     "concurrency": 1,
     "profile": false,
@@ -13,8 +12,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -27,18 +24,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/baseline/baseline-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/baseline/baseline-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c1-r1/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c1-r2/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "baseline",
     "concurrency": 1,
     "profile": true,
@@ -51,8 +41,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 24,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -66,17 +54,11 @@
       "use_cls": true,
       "limit": 12,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/profiles-shapes/baseline-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/profiles-shapes/baseline-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/profiles-full/baseline-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "baseline",
     "concurrency": 2,
     "profile": false,
@@ -89,8 +71,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 2,
       "repeat": 0,
@@ -103,18 +83,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/baseline/baseline-c2-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/baseline/baseline-c2-r0/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c2-r1/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c2-r2/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "baseline",
     "concurrency": 2,
     "profile": true,
@@ -127,8 +100,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 12,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 2,
       "repeat": 0,
@@ -141,16 +112,11 @@
       "use_cls": true,
       "limit": 12,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/profiles-full/baseline-c2-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/profiles-full/baseline-c2-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "baseline",
     "concurrency": 3,
     "profile": false,
@@ -163,8 +129,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 3,
       "repeat": 1,
@@ -177,18 +141,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/baseline/baseline-c3-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/baseline/baseline-c3-r1/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c3-r2/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c3-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "baseline",
     "concurrency": 4,
     "profile": false,
@@ -201,8 +158,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 4,
       "repeat": 0,
@@ -215,18 +170,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/baseline/baseline-c4-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/baseline/baseline-c4-r0/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c4-r2/result.json",
-      "data/ocr_profile/2026-10-30/baseline/baseline-c4-r1/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "batch16",
     "concurrency": 1,
     "profile": false,
@@ -239,8 +187,6 @@
     "nonempty_caption_exact_vs_baseline": 0.9347826086956522,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -253,17 +199,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/batch16-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 0.9969223345957205,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/batch16-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/tuning/batch16-c1-r1/result.json"
-    ]
+    "caption_similarity_mean": 0.9969223345957205
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "batch16",
     "concurrency": 1,
     "profile": true,
@@ -276,8 +216,6 @@
     "nonempty_caption_exact_vs_baseline": 0.9166666666666666,
     "nonempty_comparisons": 12,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -291,16 +229,11 @@
       "use_cls": true,
       "limit": 12,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/profiles-shapes/batch16-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 0.9861111111111112,
-    "runs": [
-      "data/ocr_profile/2026-10-30/profiles-shapes/batch16-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 0.9861111111111112
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "cpu-smoke",
     "concurrency": 1,
     "profile": true,
@@ -313,8 +246,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 1,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cpu",
       "concurrency": 1,
       "repeat": 0,
@@ -327,16 +258,11 @@
       "use_cls": true,
       "limit": 1,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/cpu-smoke/cpu-smoke-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/cpu-smoke/cpu-smoke-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "det1280-effective",
     "concurrency": 1,
     "profile": false,
@@ -349,8 +275,6 @@
     "nonempty_caption_exact_vs_baseline": 0.75,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -364,17 +288,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/det1280-effective-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 0.9544243177114833,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/det1280-effective-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/tuning/det1280-effective-c1-r1/result.json"
-    ]
+    "caption_similarity_mean": 0.9544243177114833
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "det960",
     "concurrency": 1,
     "profile": false,
@@ -387,8 +305,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -401,17 +317,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/det960-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/det960-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/tuning/det960-c1-r1/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "det960-effective",
     "concurrency": 1,
     "profile": false,
@@ -424,8 +334,6 @@
     "nonempty_caption_exact_vs_baseline": 0.782608695652174,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 1,
@@ -439,17 +347,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/det960-effective-c1-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 0.9559947839015142,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/det960-effective-c1-r1/result.json",
-      "data/ocr_profile/2026-10-30/tuning/det960-effective-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 0.9559947839015142
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "no-cls",
     "concurrency": 1,
     "profile": false,
@@ -462,8 +364,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 1,
@@ -476,17 +376,11 @@
       "use_cls": false,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/no-cls-c1-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/no-cls-c1-r1/result.json",
-      "data/ocr_profile/2026-10-30/tuning/no-cls-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "no-cls-tf32",
     "concurrency": 1,
     "profile": false,
@@ -499,8 +393,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -514,17 +406,11 @@
       "use_cls": false,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/no-cls-tf32-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/no-cls-tf32-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/tuning/no-cls-tf32-c1-r1/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 1,
     "profile": false,
@@ -537,8 +423,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -551,18 +435,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/roi/roi-baseline-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c1-r0/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c1-r2/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c1-r1/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 1,
     "profile": true,
@@ -575,8 +452,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 45,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 0,
@@ -590,16 +465,11 @@
       "use_cls": true,
       "limit": 48,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/profiles-roi-correct/roi-baseline-c1-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/profiles-roi-correct/roi-baseline-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 2,
     "profile": false,
@@ -612,8 +482,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 2,
       "repeat": 1,
@@ -626,18 +494,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/roi/roi-baseline-c2-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c2-r1/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c2-r0/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c2-r2/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 3,
     "profile": false,
@@ -650,8 +511,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 3,
       "repeat": 1,
@@ -664,18 +523,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/roi/roi-baseline-c3-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c3-r1/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c3-r2/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c3-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 4,
     "profile": false,
@@ -688,8 +540,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 4,
       "repeat": 2,
@@ -702,18 +552,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/roi/roi-baseline-c4-r2"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c4-r2/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c4-r0/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c4-r1/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 4,
     "profile": true,
@@ -726,8 +569,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 45,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 4,
       "repeat": 0,
@@ -741,16 +582,11 @@
       "use_cls": true,
       "limit": 48,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/profiles-roi-correct/roi-baseline-c4-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/profiles-roi-correct/roi-baseline-c4-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 6,
     "profile": false,
@@ -763,8 +599,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 6,
       "repeat": 2,
@@ -777,18 +611,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/roi/roi-baseline-c6-r2"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c6-r2/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c6-r1/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c6-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 8,
     "profile": false,
@@ -801,8 +628,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 276,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 8,
       "repeat": 0,
@@ -815,18 +640,11 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/roi/roi-baseline-c8-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c8-r0/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c8-r1/result.json",
-      "data/ocr_profile/2026-10-30/roi/roi-baseline-c8-r2/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-baseline",
     "concurrency": 8,
     "profile": true,
@@ -839,8 +657,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 45,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 8,
       "repeat": 0,
@@ -854,16 +670,11 @@
       "use_cls": true,
       "limit": 48,
       "profile": true,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/profiles-roi-correct/roi-baseline-c8-r0"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/profiles-roi-correct/roi-baseline-c8-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "roi-no-cls",
     "concurrency": 1,
     "profile": false,
@@ -876,8 +687,6 @@
     "nonempty_caption_exact_vs_baseline": 0.9782608695652174,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 1,
@@ -890,17 +699,11 @@
       "use_cls": false,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/roi-no-cls-c1-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 0.9990596227262519,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/roi-no-cls-c1-r1/result.json",
-      "data/ocr_profile/2026-10-30/tuning/roi-no-cls-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 0.9990596227262519
   },
   {
-    "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
     "label": "tf32",
     "concurrency": 1,
     "profile": false,
@@ -913,8 +716,6 @@
     "nonempty_caption_exact_vs_baseline": 1.0,
     "nonempty_comparisons": 184,
     "config": {
-      "dataset": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/frames",
-      "dataset_id": "0bf0c909e291b966d69f12c76ec0cc4cc9f87715f8322cc45e066fc841910a1d",
       "device": "cuda",
       "concurrency": 1,
       "repeat": 1,
@@ -927,13 +728,8 @@
       "use_cls": true,
       "limit": 0,
       "profile": false,
-      "timeout": 600,
-      "trial_dir": "/home/unbekannter/bilinote/BiliNote/backend/data/ocr_profile/2026-10-30/tuning/tf32-c1-r1"
+      "timeout": 600
     },
-    "caption_similarity_mean": 1.0,
-    "runs": [
-      "data/ocr_profile/2026-10-30/tuning/tf32-c1-r1/result.json",
-      "data/ocr_profile/2026-10-30/tuning/tf32-c1-r0/result.json"
-    ]
+    "caption_similarity_mean": 1.0
   }
 ]

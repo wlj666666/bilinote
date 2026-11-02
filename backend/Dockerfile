@@ -13,7 +13,7 @@ RUN rm -f /etc/apt/sources.list && \
     echo "deb https://${APT_MIRROR}/debian bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
     echo "deb https://${APT_MIRROR}/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg curl && \
+    apt-get install -y --no-install-recommends ffmpeg curl libgl1 libglib2.0-0 && \
     rm -rf /var/lib/apt/lists/*
 
 ENV PATH="/usr/bin:${PATH}"
@@ -23,7 +23,8 @@ WORKDIR /app
 
 # 先复制 requirements.txt 利用层缓存
 COPY ./backend/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -i ${PIP_INDEX} -r requirements.txt
+COPY ./backend/requirements-ocr.txt /app/requirements-ocr.txt
+RUN pip install --no-cache-dir -i ${PIP_INDEX} -r requirements.txt -r requirements-ocr.txt
 
 # 再复制应用代码（频繁变动不影响 pip 缓存层）
 COPY ./backend /app

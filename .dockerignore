@@ -16,17 +16,43 @@ backend/models
 backend/logs
 backend/uploads
 backend/*.db
+backend/*.db-*
+backend/config/
+backend/vector_db/
 backend/note_results
+backend/backups/
+backend/benchmark_records/
+backend/tests/
 backend/bin/
 
 # 依赖和构建缓存
-node_modules/
-__pycache__/
-*.py[cod]
-dist/
-build/
+# 注意：Docker 的 .dockerignore 按 filepath.Match 语义匹配，不带前导 ** 的
+# `node_modules/` 只匹配上下文【根目录】那一层，嵌套的
+# BillNote_frontend/node_modules(~891M) / BillNote_extension/node_modules(~667M)
+# 会全部塞进构建上下文。必须用 ** 前缀。
+**/node_modules
+**/__pycache__
+**/*.py[cod]
+**/dist
+**/build
+**/*.egg-info
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
 *.tar
-*.egg-info/
+*.tar.gz
+*.zip
+
+# 文档与本地素材（不参与镜像构建）
+doc/
+test/
+libo/
+ocr/
+logs/
+note_results/
+basic_knowledge/
+understanding/
+*.pdf
 
 # 环境文件
 .env

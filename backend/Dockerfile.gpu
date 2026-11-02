@@ -1,29 +1,71 @@
-# BASE_REGISTRY 默认走 docker.io；国内可换 daocloud / 阿里云镜像（注意所选镜像需支持 nvidia/cuda 命名空间）
+# GPU 镜像：Python 版本与 CPU 镜像（backend/Dockerfile）、Dockerfile.complete、
+# CI 完全一致（3.11），避免 GPU 路径成为唯一没被测过的解释器版本。
+#
+# 为什么不用 nvidia/cuda:*-ubuntu22.04 基础镜像：
+#   1) jammy 官方源只有 Python 3.10，想装 3.11 只能靠 deadsnakes PPA（国内不可达）
+#      或源码编译，两者都让构建变脆；
+#   2) 本项目并不需要系统级 CUDA toolkit —— cuBLAS / cuDNN / cuFFT / cuRAND
+#      全部由 requirements-gpu.txt / requirements-ocr-gpu.txt 里的 pip wheel 提供
+#      （与宿主机 start-gpu.sh 已验证可用的配置一致）；运行时真正需要的
+#      libcuda.so 由 NVIDIA Container Toolkit 在容器启动时注入，与基础镜像无关。
+#   因此用 python:3.11-slim 反而更贴近已验证环境，且 BASE_REGISTRY 不再要求
+#   镜像源支持 nvidia/cuda 命名空间，国内换源更省事。
 ARG BASE_REGISTRY=docker.io
-FROM ${BASE_REGISTRY}/nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM ${BASE_REGISTRY}/library/python:3.11-slim
 
 ARG APT_MIRROR=mirrors.tuna.tsinghua.edu.cn
 ARG PIP_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple
 
+# 让 nvidia-container-toolkit 在 --gpus all / compose deploy.devices 时注入驱动
+ENV NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
 RUN rm -f /etc/apt/sources.list && \
     rm -rf /etc/apt/sources.list.d/* && \
-    echo "deb https://${APT_MIRROR}/ubuntu jammy main restricted universe multiverse" > /etc/apt/sources.list && \
-    echo "deb https://${APT_MIRROR}/ubuntu jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb https://${APT_MIRROR}/ubuntu jammy-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb https://${APT_MIRROR}/debian bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
+    echo "deb https://${APT_MIRROR}/debian bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb https://${APT_MIRROR}/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg python3-pip curl && \
+    apt-get install -y --no-install-recommends ffmpeg curl libgl1 libglib2.0-0 && \
     rm -rf /var/lib/apt/lists/*
 
 ENV HF_ENDPOINT=https://hf-mirror.com
 
 WORKDIR /app
 
-# 先复制 requirements.txt 利用层缓存
-COPY ./backend/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -i ${PIP_INDEX} -r requirements.txt && \
-    pip install --no-cache-dir -i ${PIP_INDEX} 'transformers[torch]>=4.23'
+# Install the CUDA speech dependencies, then replace CPU ONNX Runtime with the
+# matching GPU distribution required by OCR. The two distributions cannot coexist.
+COPY ./backend/requirements.txt ./backend/requirements-gpu.txt ./backend/requirements-ocr.txt ./backend/requirements-ocr-gpu.txt /app/
+RUN pip install --no-cache-dir -i ${PIP_INDEX} -r requirements.txt -r requirements-gpu.txt && \
+    pip uninstall -y onnxruntime && \
+    pip install --no-cache-dir -i ${PIP_INDEX} -r requirements-ocr-gpu.txt
+
+# nvidia-cublas-cu12 / nvidia-cudnn-cu12 把 .so 装在 site-packages/nvidia/*/lib，
+# 这个目录不在动态链接器的搜索路径里。start-gpu.sh 在宿主机上是手动导
+# LD_LIBRARY_PATH，容器里没有等价步骤，后果是：
+#   - env_checker.get_cuda_status() 的 ctypes.CDLL("libcublas.so.12") 抛异常
+#     → 设置页显示「CUDA 不可用」
+#   - ctranslate2 加载 faster-whisper 时 dlopen 失败 → 转写跑不起来
+#
+# 用 ldconfig 注册比写死绝对路径更稳（换 Python 版本不用改）。注意不能拿
+# sysconfig.get_paths()['purelib'] 推导：Debian/Ubuntu 上它指向
+# /usr/lib/python3.X/site-packages，而 pip 实际装到
+# /usr/local/lib/python3.X/site-packages（slim）或 dist-packages（Ubuntu）。
+# 直接问 nvidia 命名空间包的 __path__ 才不会落空。
+RUN set -eux; \
+    dirs="$(python -c "import nvidia, pathlib; \
+print('\n'.join(str(x) for root in list(nvidia.__path__) \
+for x in sorted(pathlib.Path(root).glob('*/lib')) if x.is_dir()))")"; \
+    test -n "$dirs"; \
+    echo "$dirs" > /etc/ld.so.conf.d/nvidia-python.conf; \
+    ldconfig; \
+    cat /etc/ld.so.conf.d/nvidia-python.conf
 
 # 再复制应用代码
 COPY ./backend /app
 
-CMD ["python3", "main.py"]
+# OCR 默认走 CUDA；prepare_runtime() 在缺少 GPU 依赖时会直接报错，
+# 不会静默回退 CPU（见 app/ocr/runtime.py）。
+ENV OCR_DEVICE=cuda
+
+CMD ["python", "main.py"]

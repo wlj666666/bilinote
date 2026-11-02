@@ -8,7 +8,9 @@
  # @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 ### 
 # 等待后端健康检查通过
-until curl -s "http://backend:${BACKEND_PORT}/health" > /dev/null; do
+# 注意：后端没有 /health 路由；存活探测请用公开的 /api/sys_check
+# （/api/sys_health 需要管理员 Bearer token，匿名 curl 恒 401）。
+until curl -s "http://backend:${BACKEND_PORT}/api/sys_check" > /dev/null; do
     echo "等待后端服务就绪..."
     sleep 2
 done

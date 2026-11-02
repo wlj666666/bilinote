@@ -81,6 +81,8 @@ jobs:
           echo "    -v bilinote-config:/app/backend/config \\"
           echo "    -v bilinote-static:/app/backend/static \\"
           echo "    -v bilinote-models:/app/backend/models \\"
+          echo "    -v bilinote-uploads:/app/backend/uploads \\"
+          echo "    -v bilinote-vector-db:/app/backend/vector_db \\"
           echo "    --name bilinote \\"
           echo "    ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
           echo ""

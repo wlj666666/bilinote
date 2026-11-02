@@ -146,6 +146,18 @@ register_exception_handlers(app)
 
 if __name__ == "__main__":
     logger.info(f"Starting server on {host}:{port}")
+    # 容器部署时请求来自 nginx（另一个容器 IP），uvicorn 默认只信任 127.0.0.1
+    # 的代理头，导致 request.client.host 恒为 nginx IP —— 登录限流会把全站
+    # 用户算成同一个来源，第 11 次登录直接 429。
+    # 只在显式配置 FORWARDED_ALLOW_IPS 时才信任反代头（compose 里会设成
+    # 容器网段）：无代理直连时保持 uvicorn 默认，避免外部伪造 X-Forwarded-For
+    # 绕过限流。
+    proxy_kwargs = {}
+    forwarded_allow_ips = os.getenv("FORWARDED_ALLOW_IPS", "").strip()
+    if forwarded_allow_ips:
+        proxy_kwargs = {"proxy_headers": True, "forwarded_allow_ips": forwarded_allow_ips}
     with listener:
-        server = uvicorn.Server(uvicorn.Config(app, host=host, port=port, reload=False))
+        server = uvicorn.Server(uvicorn.Config(
+            app, host=host, port=port, reload=False, **proxy_kwargs,
+        ))
         server.run(sockets=[listener])

@@ -6,6 +6,7 @@ import hashlib
 import json
 import time
 import logging
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -13,7 +14,8 @@ from app.gpt.prompt import BASE_PROMPT, AI_SUM, SCREENSHOT, LINK, MERGE_PROMPT
 from app.gpt.utils import fix_markdown
 from app.gpt.request_chunker import RequestChunker
 from app.gpt.timestamp_markers import (
-    SOURCE_TIME_PROMPT, marker_seconds, resolve_timestamp_markers, source_seconds,
+    SOURCE_TIME_PROMPT, TIMESTAMP_WARNING, marker_seconds, normalize_timestamp_markers,
+    resolve_timestamp_markers, source_seconds, timestamp_marker_count,
 )
 from app.models.transcriber_model import TranscriptSegment
 from app.utils.timestamps import format_timestamp
@@ -110,7 +112,7 @@ class UniversalGPT(GPT):
     def _build_source_signature(self, source: GPTSource) -> str:
         from app.services.task_context import summary_revision
         payload = {
-            "timestamp_format": "source-seconds-v2",
+            "timestamp_format": "source-intervals-v3",
             "model": self.model,
             "provider_endpoint": str(getattr(self.client, "base_url", "")),
             "generation_revision": summary_revision.get(),
@@ -155,6 +157,7 @@ class UniversalGPT(GPT):
             "source_signature": source_signature,
             "phase": phase,
             "partials": partials,
+            "timestamp_warning": getattr(self, '_timestamp_warning', False),
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         tmp_path = path.with_suffix(".tmp")
@@ -288,21 +291,66 @@ class UniversalGPT(GPT):
             raise last_exc
         raise RuntimeError("chat completion failed without exception")
 
-    def _request_markdown(self, messages: list, allowed_seconds: set[int], require_content: bool = False) -> str:
-        # A malformed timestamp must never become a successful cached note.
-        # Retry generation once; network/API retries remain independently bounded.
+    def _timestamp_repair_messages(self, messages: list, markdown: str, error: ValueError,
+                                   allowed_seconds: set[int]) -> list:
+        invalid = re.search(r't=(\d{1,20})(?!\d)', str(error))
+        target = int(invalid.group(1)) if invalid else 0
+        nearby = sorted(sorted(allowed_seconds, key=lambda value: abs(value - target))[:6])
+        feedback = (
+            f'时间标记校验失败：{error}。\n'
+            f'附近可核对的字幕编号：{", ".join(f"[t={value}]" for value in nearby) or "无"}。\n'
+            '请只修正上一份笔记的原片跳转或截图时间标记，保留正文和标题。'
+            '必须从原材料逐字复制与内容对应的编号，附近编号仅供核对，不得随意替换。'
+            '无法确认的标记请删除，不得编造时间。仅输出修正后的完整 Markdown。'
+        )
+        return [*messages, {'role': 'assistant', 'content': markdown}, {'role': 'user', 'content': feedback}]
+
+    def _request_markdown(self, messages: list, allowed_seconds: set[int], require_content: bool = False,
+                          segments=()) -> str:
+        # Keep source IDs in checkpoints/merges; format them only at the end.
+        # An optional link must not discard a successfully generated note.
+        fallback_markdown = None
+        request_messages = messages
         for attempt in range(2):
-            response = self._chat_completion_create(messages)
-            markdown = response.choices[0].message.content.strip()
             try:
-                resolve_timestamp_markers(markdown, allowed_seconds)
-                if require_content and 'Content-[t=' not in markdown:
-                    raise ValueError('模型未返回原片跳转时间编号')
-                return markdown
-            except ValueError:
-                if attempt:
+                response = self._chat_completion_create(request_messages)
+            except Exception:
+                if fallback_markdown is None:
                     raise
-                logger.warning('模型未保留原片时间编号，重新生成一次')
+                logger.warning('时间标记修复请求失败，保留原笔记并移除无效标记', exc_info=True)
+                break
+            content = response.choices[0].message.content
+            if not isinstance(content, str) or not content.strip():
+                if fallback_markdown is None:
+                    raise ValueError('模型未返回有效笔记正文')
+                break
+            markdown = content.strip()
+            if fallback_markdown is None:
+                fallback_markdown = markdown
+            try:
+                normalized = normalize_timestamp_markers(markdown, allowed_seconds, segments)
+                if require_content and 'Content-[t=' not in normalized:
+                    raise ValueError('模型未返回原片跳转时间编号')
+                if normalized != markdown:
+                    logger.info('已根据字幕区间纠正时间编号')
+                if attempt and timestamp_marker_count(normalized) < timestamp_marker_count(fallback_markdown):
+                    self._timestamp_warning = True
+                return normalized
+            except ValueError as exc:
+                if attempt:
+                    break
+                request_messages = self._timestamp_repair_messages(messages, markdown, exc, allowed_seconds)
+                if self._estimate_messages_bytes(request_messages) > self.max_request_bytes:
+                    logger.warning('时间标记修复请求超过大小预算，保留原笔记并移除无效标记')
+                    break
+                logger.warning('模型时间标记无效，反馈具体错误后修复一次：%s', exc)
+
+        markdown = normalize_timestamp_markers(fallback_markdown, allowed_seconds, segments, drop_invalid=True).strip()
+        if not markdown:
+            raise ValueError('移除无效时间标记后没有有效笔记正文')
+        self._timestamp_warning = True
+        logger.warning('部分原片跳转或截图未能生成，已保留笔记正文')
+        return markdown
 
     def _merge_partials(self, partials: list, checkpoint_key: str | None, source_signature: str | None) -> str:
         def build_messages(texts, *_args, **_kwargs):
@@ -344,6 +392,7 @@ class UniversalGPT(GPT):
         return current_partials[0]
 
     def summarize(self, source: GPTSource) -> str:
+        self._timestamp_warning = False
         self.screenshot = source.screenshot
         self.link = source.link
         source.segment = self.ensure_segments_type(source.segment)
@@ -377,15 +426,22 @@ class UniversalGPT(GPT):
             )
 
         partials = []
+        checkpoint_phase = None
         if checkpoint_key and source_signature:
             checkpoint = self._load_checkpoint(checkpoint_key, source_signature)
             if checkpoint and isinstance(checkpoint.get("partials"), list):
                 partials = checkpoint["partials"]
+                checkpoint_phase = checkpoint.get('phase')
+                self._timestamp_warning = bool(checkpoint.get('timestamp_warning'))
 
-        if len(partials) > len(chunks):
+        if checkpoint_phase != 'merge' and len(partials) > len(chunks):
             partials = []
+            self._timestamp_warning = False
 
-        for chunk in chunks[len(partials):]:
+        # Merge checkpoints already cover every source chunk. Their partial
+        # count shrinks during merging and is not a count of summarized chunks.
+        remaining_chunks = [] if checkpoint_phase == 'merge' else chunks[len(partials):]
+        for chunk in remaining_chunks:
             messages = self.create_messages(
                 chunk.segments,
                 title=source.title,
@@ -399,6 +455,7 @@ class UniversalGPT(GPT):
                 markdown = self._request_markdown(
                     messages, source_seconds(chunk.segments),
                     require_content=bool(chunk.segments) and (source.link or 'link' in (source._format or [])),
+                    segments=chunk.segments,
                 )
             except Exception as exc:
                 if checkpoint_key and source_signature:
@@ -413,9 +470,9 @@ class UniversalGPT(GPT):
             markdown = resolve_timestamp_markers(partials[0], source_seconds(source.segment))
             if checkpoint_key:
                 self._clear_checkpoint(checkpoint_key)
-            return markdown
+            return f'{TIMESTAMP_WARNING}\n\n{markdown}' if self._timestamp_warning else markdown
         merged = self._merge_partials(partials, checkpoint_key, source_signature)
         markdown = resolve_timestamp_markers(merged, source_seconds(source.segment))
         if checkpoint_key:
             self._clear_checkpoint(checkpoint_key)
-        return markdown
+        return f'{TIMESTAMP_WARNING}\n\n{markdown}' if self._timestamp_warning else markdown

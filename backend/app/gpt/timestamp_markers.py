@@ -1,4 +1,4 @@
-"""Resolve model references to source times without model-generated arithmetic."""
+"""Validate source references and correct small errors inside subtitle intervals."""
 import re
 
 from app.utils.timestamps import format_timestamp
@@ -13,12 +13,55 @@ SOURCE_TIME_PROMPT = '''
 '''
 
 # Restrict this to time markers; ordinary text such as HTTP Content-Type is valid.
-_MARKER_START = r'\b(?:Content|Screenshot)-(?=\[|t=|\d|\*|$)'
 _MARKER = re.compile(r'\b(Content|Screenshot)-(?=\[|t=|\d)(?:\[([^\]\n]*)\]|([^\s*]+))')
+# Include emphasis wrappers and incomplete markers so fallback removes the whole
+# placeholder, without deleting the heading or the following line of prose.
+_REFERENCE = re.compile(
+    r'(?P<open>\*{0,2})(?P<marker>\b(?:Content|Screenshot)-(?=\[|t=|\d|\*|$)'
+    r'(?:\[[^\]\n*]*\]|\[[^\]\n*\s]*|[^\s*]+)?)(?P<close>\*{0,2})',
+    re.MULTILINE,
+)
+MAX_INTERVAL_CORRECTION_SECONDS = 2
+TIMESTAMP_WARNING = '> 提示：部分原片跳转或截图未能生成，笔记正文已保留。'
 
 
 def source_seconds(segments) -> set[int]:
     return {max(0, int(segment.start)) for segment in segments}
+
+
+def timestamp_marker_count(markdown: str) -> int:
+    return len(list(_REFERENCE.finditer(markdown)))
+
+
+def normalize_timestamp_markers(
+    markdown: str, allowed_seconds: set[int], segments=(), *, drop_invalid: bool = False,
+) -> str:
+    """Keep source IDs internally, snapping only small, unambiguous interval errors.
+
+    Merge callers omit segments: they may only reuse IDs in their own inputs.
+    Never snap across subtitle gaps, hour boundaries by arithmetic, or chunks.
+    """
+    def replace(reference):
+        marker = reference.group('marker')
+        match = _MARKER.fullmatch(marker)
+        token = match.group(2) if match else None
+        anchor = re.fullmatch(r't=(\d+)', token or '')
+        seconds = int(anchor.group(1)) if anchor and len(anchor.group(1)) <= 20 else None
+        if seconds is not None and seconds not in allowed_seconds:
+            candidates = {
+                max(0, int(segment.start)) for segment in segments
+                if segment.start <= seconds < segment.end
+                and 0 < seconds - max(0, int(segment.start)) <= MAX_INTERVAL_CORRECTION_SECONDS
+                and max(0, int(segment.start)) in allowed_seconds
+            }
+            seconds = candidates.pop() if len(candidates) == 1 else None
+        if seconds is None:
+            if drop_invalid:
+                return ''
+            raise ValueError(f'模型返回了无效的原片时间编号：{marker}')
+        return f"{reference.group('open')}{match.group(1)}-[t={seconds}]{reference.group('close')}"
+
+    return _REFERENCE.sub(replace, markdown)
 
 
 def resolve_timestamp_markers(markdown: str, allowed_seconds: set[int]) -> str:
@@ -30,11 +73,7 @@ def resolve_timestamp_markers(markdown: str, allowed_seconds: set[int]) -> str:
             raise ValueError(f'模型返回了无效的原片时间编号：{match.group(0)}')
         return f'{match.group(1)}-[{format_timestamp(int(anchor.group(1)))}]'
 
-    resolved = _MARKER.sub(replace, markdown)
-    # Catch truncated/unclosed markers too, rather than caching unusable links.
-    if len(re.findall(_MARKER_START, markdown)) != len(list(_MARKER.finditer(markdown))):
-        raise ValueError('模型返回了不完整的原片时间标记')
-    return resolved
+    return _MARKER.sub(replace, normalize_timestamp_markers(markdown, allowed_seconds))
 
 
 def marker_seconds(markdown: str) -> set[int]:

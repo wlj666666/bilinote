@@ -224,7 +224,8 @@ def suite(args):
         command=[sys.executable, str(Path(__file__).resolve()), '--mode', args.suite_kind,
             '--active', str(active), '--jobs', str(args.jobs), '--output', str(output),
             '--summary-seconds',str(args.summary_seconds), '--audio-seconds', str(args.audio_seconds),
-            '--ocr-seconds', str(args.ocr_seconds)]
+            '--ocr-seconds', str(args.ocr_seconds),
+            '--gpu-slots', str(args.gpu_slots), '--cpu-slots', str(args.cpu_slots), '--mix', args.mix]
         if args.keep_whisper: command.append('--keep-whisper')
         if args.diverse_ocr: command.append('--diverse-ocr')
         env={**os.environ,'HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1',
@@ -320,9 +321,14 @@ def pipeline_case(args):
             NOTE_OUTPUT_DIR=str(root/'notes'), UPLOAD_ROOT=str(root/'uploads'), STATIC_ROOT=str(root/'static'),
             VECTOR_DB_DIR=str(root/'vectors'), DATA_DIR=str(root/'data'), BENCH_DATA_ROOT=str(root/'data'),
             TASK_MAX_WORKERS=str(args.active), TASK_USER_ACTIVE='1', TASK_USER_QUEUE_LIMIT='3', TASK_QUEUE_LIMIT='20',
-            TASK_CPU_SLOTS='2', TASK_GPU_SLOTS='1', TASK_API_SLOTS='2', EMBEDDING_CPU_THREADS='2',
+            TASK_CPU_SLOTS=str(args.cpu_slots), TASK_GPU_SLOTS=str(args.gpu_slots), TASK_API_SLOTS='2', EMBEDDING_CPU_THREADS='2',
             WHISPER_CPU_THREADS='2', OCR_THREADS='1', WHISPER_KEEP_DURING_OCR='1' if args.keep_whisper else '0',
             TASK_TIMEOUT_SECONDS='900', TASK_HEARTBEAT_TIMEOUT_SECONDS='90')
+        if args.gpu_slots > 1:
+            # Explicit opt-in: the serving code still defaults to a single GPU slot.
+            os.environ['TASK_ALLOW_MULTI_GPU_SLOTS'] = '1'
+        else:
+            os.environ.pop('TASK_ALLOW_MULTI_GPU_SLOTS', None)
         from app.db.init_db import init_db
         from app.db import engine as db_module
         from app.db.models.users import User, AuthSession
@@ -346,7 +352,7 @@ def pipeline_case(args):
             for index in range(args.jobs):
                 user_id=1001+index
                 token=os.urandom(24).hex()
-                kind=['asr','ocr','subtitle'][index%3]
+                kind=['asr','ocr','subtitle'][index%3] if args.mix == 'full' else 'ocr'
                 directory=root/'uploads'/'users'/str(user_id)
                 directory.mkdir(parents=True)
                 dest=directory/f'{kind}-{index}.mp4'
@@ -450,7 +456,7 @@ def pipeline_case(args):
                         'other_statuses':[status for status,_ in burst_results if status not in {200,429}],
                         'p95_seconds':percentile([duration for _,duration in burst_results],.95),'queued_after_burst':queue_count},
                     'jobs_per_minute':round(succeeded*60/elapsed,3),
-                    'summary_stub_seconds':args.summary_seconds,'keep_whisper_during_ocr':args.keep_whisper,'gpu_slots':1,'cpu_slots':2,'api_slots':2,
+                    'summary_stub_seconds':args.summary_seconds,'keep_whisper_during_ocr':args.keep_whisper,'gpu_slots':args.gpu_slots,'cpu_slots':args.cpu_slots,'api_slots':2,'mix':args.mix,
                     'local_indexing':'real CPU ONNX embeddings', 'media':{'asr_seconds':args.audio_seconds,'ocr_seconds':args.ocr_seconds,'ocr_profiles':names,'subtitle':'simulated platform subtitle'},
                     'submit_p95_seconds':percentile(latencies,.95),'poll_p95_seconds':percentile(poll_latencies,.95),
                     'queue_p95_seconds':percentile([j['queue_seconds'] for j in job_results],.95),
@@ -478,6 +484,9 @@ def main():
     parser.add_argument('--ocr-seconds',type=int,default=15)
     parser.add_argument('--diverse-ocr',action='store_true')
     parser.add_argument('--keep-whisper',action='store_true')
+    parser.add_argument('--gpu-slots',type=int,default=1)
+    parser.add_argument('--cpu-slots',type=int,default=2)
+    parser.add_argument('--mix',choices=['full','ocr-only'],default='full')
     parser.add_argument('--label',default='')
     parser.add_argument('--output',default=str(OUTPUT/'case.json'))
     args=parser.parse_args()

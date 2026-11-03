@@ -15,7 +15,7 @@ LABELS = {'cpu': 'CPU', 'gpu': 'GPU', 'api': '模型接口'}
 
 
 @contextmanager
-def resources(*names):
+def resources(*names, timeout=None):
     held = held_resources.get()
     needed = sorted(set(names) - held)
     if not needed:
@@ -39,6 +39,8 @@ def resources(*names):
     announced = False
     try:
         while True:
+            if timeout is not None and time.monotonic() - started >= timeout:
+                raise TimeoutError('等待计算资源超时，请稍后重试')
             complete = True
             for name in needed:
                 found = False

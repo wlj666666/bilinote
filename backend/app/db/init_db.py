@@ -6,6 +6,7 @@ from app.db.models.user_data import UserFile, ChatEntry, DataMigration, DeletedT
 from app.db.engine import get_engine, Base
 from sqlalchemy import inspect, text
 from app.db.models.task_jobs import TaskJob, TaskSubmission, TaskSchedulerState
+from app.db.models.chat_jobs import ChatJob
 
 def init_db():
     engine = get_engine()

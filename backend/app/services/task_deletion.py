@@ -109,6 +109,8 @@ def purge_task(task_id: str, user_id: int, notes_root: str | Path,
 
         with db_module.SessionLocal() as db:
             db.query(ChatEntry).filter_by(task_id=task_id, user_id=user_id).delete()
+            from app.db.models.chat_jobs import ChatJob
+            db.query(ChatJob).filter_by(task_id=task_id, user_id=user_id).delete()
             db.query(UserFile).filter_by(task_id=task_id, user_id=user_id).delete()
             from app.db.models.task_jobs import TaskJob
             db.query(TaskJob).filter_by(task_id=task_id, user_id=user_id).delete()

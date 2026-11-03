@@ -1,6 +1,9 @@
 import json
 import os
 import re
+import threading
+import hashlib
+import time
 from typing import Optional
 
 import chromadb
@@ -10,13 +13,40 @@ from app.utils.logger import get_logger
 from pathlib import Path
 from app.services.storage_scope import current_scope
 from app.services.task_resources import cpu_stage
-from app.services.local_embeddings import CPUEmbeddingFunction
+from app.services.local_embeddings import get_embedding_function
 from app.services.user_data import require_task, task_notes_dir, read_json
+from app.services.task_limits import runtime_dir, positive_env
+from app.services.task_process import FileLock
+from app.services.task_data_lock import task_data_lock
 
 logger = get_logger(__name__)
 
 NOTE_OUTPUT_DIR = os.getenv("NOTE_OUTPUT_DIR", "note_results")
 VECTOR_DB_DIR = os.getenv("VECTOR_DB_DIR", "vector_db")
+
+# Chroma 的 PersistentClient 不是线程安全的：同一进程里并发 new 多个指向同一
+# 路径的 client 会互相踩坏内部状态，实测报错为
+#   'RustBindingsAPI' object has no attribute 'bindings'
+#   '...' / "Could not connect to tenant default_tenant"
+# 后果是并发自动索引时其中一个任务建 collection 失败，前端永远停在 indexing
+# （日志里的 "Collection [...] does not exist" 就是这么来的）。
+# 这里按路径缓存 client，并用锁把首次创建串行化。
+_clients: dict[str, chromadb.api.ClientAPI] = {}
+_clients_guard = threading.Lock()
+
+
+def _persistent_client(path: Path) -> chromadb.api.ClientAPI:
+    key = str(Path(path).resolve())
+    with _clients_guard:
+        client = _clients.get(key)
+        if client is None:
+            Path(path).mkdir(parents=True, exist_ok=True)
+            client = chromadb.PersistentClient(
+                path=key,
+                settings=Settings(anonymized_telemetry=False),
+            )
+            _clients[key] = client
+        return client
 
 
 def _chunk_markdown(markdown: str) -> list[dict]:
@@ -111,14 +141,11 @@ class VectorStoreManager:
 
     def __init__(self, user_id: int | None = None):
         scope = current_scope.get()
-        self.embedding_function = CPUEmbeddingFunction()
+        self.embedding_function = get_embedding_function()
         self.user_id = user_id if user_id is not None else (scope.user_id if scope else None)
         path = Path(VECTOR_DB_DIR) / 'users' / str(self.user_id) if self.user_id is not None else Path(VECTOR_DB_DIR)
         path.mkdir(parents=True, exist_ok=True)
-        self._client = chromadb.PersistentClient(
-            path=str(path),
-            settings=Settings(anonymized_telemetry=False),
-        )
+        self._client = _persistent_client(path)
 
     def _client_for(self, task_id: str, allow_deleted: bool = False):
         if self.user_id is None:
@@ -135,7 +162,7 @@ class VectorStoreManager:
         else:
             task = require_task(task_id, self.user_id)
         if task.storage_relpath == '':
-            return chromadb.PersistentClient(path=str(Path(VECTOR_DB_DIR)), settings=Settings(anonymized_telemetry=False))
+            return _persistent_client(Path(VECTOR_DB_DIR))
         return self._client
 
     def _collection_name(self, task_id: str) -> str:
@@ -144,11 +171,21 @@ class VectorStoreManager:
 
     @cpu_stage
     def index_task(self, task_id: str) -> None:
-        if self.user_id is None:
-            return self._index_task(task_id)
-        from app.services.task_data_lock import task_data_lock
+        # Note workers are separate processes. Serialize replacement of the same
+        # collection across both automatic indexing and manual indexing requests.
         with task_data_lock(self.user_id, task_id):
-            return self._index_task(task_id)
+            identity = f'{VECTOR_DB_DIR}:{self.user_id}:{task_id}'.encode()
+            key = hashlib.sha256(identity).hexdigest()
+            lock = FileLock(runtime_dir() / f'index-{key}.lock')
+            deadline = time.monotonic() + positive_env('CHAT_TIMEOUT_SECONDS', 180)
+            try:
+                while not lock.acquire():
+                    if time.monotonic() >= deadline:
+                        raise TimeoutError('等待笔记索引超时，请稍后重试')
+                    time.sleep(.1)
+                return self._index_task(task_id)
+            finally:
+                lock.close()
 
     def _index_task(self, task_id: str) -> None:
         """读取笔记结果并建立向量索引。"""
@@ -226,7 +263,7 @@ class VectorStoreManager:
         client = self._client_for(task_id)
         try:
             collection = client.get_collection(col_name, embedding_function=self.embedding_function)
-        except Exception:
+        except chromadb.errors.NotFoundError:
             logger.warning(f"Collection 不存在: {col_name}")
             return []
 
@@ -235,16 +272,20 @@ class VectorStoreManager:
         # 每种来源的配额
         quotas = {"meta": 1, "markdown": 2, "transcript": 3}
 
+        # Encode the question once, then reuse the same vector for all source quotas.
+        query_embeddings = self.embedding_function.embed_query(input=[query_text])
+
         for source_type, quota in quotas.items():
             try:
                 results = collection.query(
-                    query_texts=[query_text],
+                    query_embeddings=query_embeddings,
                     n_results=quota,
                     where={"source_type": source_type},
                 )
                 all_chunks.extend(self._parse_results(results))
             except Exception:
-                pass
+                logger.exception('向量检索失败: task_id=%s source=%s', task_id, source_type)
+                raise
 
         return all_chunks
 

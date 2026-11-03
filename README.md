@@ -306,14 +306,35 @@ docker exec -it bilinote python scripts/manage_users.py reset-password admin # �
 
 ```bash
 cp .env.example .env            # 第一次部署务必先创建 .env
-docker compose up --build -d
+bash deploy.sh cpu
 docker compose exec backend python scripts/manage_users.py init-admin admin
 
 # GPU 加速部署（需要 NVIDIA GPU + NVIDIA Container Toolkit，详见下方「CUDA / GPU 加速」）
-docker compose -f docker-compose.gpu.yml up --build -d
+bash deploy.sh gpu
 ```
 
-> 老版本 Docker 只有独立的 `docker-compose`（v1）命令，把上面的 `docker compose` 换成 `docker-compose` 即可，参数完全一致。
+Compose 部署建议使用 `bash deploy.sh gpu`（CPU 用 `bash deploy.sh cpu`）：先构建镜像、
+准备并验证本地 Embedding 模型，成功后才重建服务。首次准备模型需要联网，后续复用
+`backend/models/chroma/onnx_models/all-MiniLM-L6-v2/onnx/` 的六个模型文件。
+Docker 后端默认禁止请求内下载，模型缺失或损坏会在启动时明确报错。
+已有预置模型时，部署与容器重建均不需要下载模型。
+
+Compose 的后端代码以宿主机 `backend/`（容器 `/legacy`）为准；修改 Python 代码后
+重启 backend，修改依赖后运行部署脚本。网页修改需要重新构建 frontend。
+启动日志会打印实际加载的 Embedding 模块及模型路径，可据此核对部署版本。
+
+网页 AI 问答通过 `/api/chat/jobs` 提交任务并查询结果，每条 HTTP 请求都很短，
+慢模型不会使同一条公网隧道请求持续等待。答案与聊天历史一起持久化，刷新或重新打开
+问答可继续查看；服务重启时未完成的问题会标记失败，并提示重新提问。
+默认每用户同时处理一个问题，全站最多 20 个待处理问题、2 个问答 worker，
+每个问题处理预算为 180 秒，可通过 `.env.example` 中的 `CHAT_*` 配置调整。
+当前 worker 调度适用于单个后端进程；不要对同一数据库启动多个 API 副本。
+
+公网访问时，让隧道指向 Docker 的 Nginx 入口（默认 `http://127.0.0.1:3015`），
+前端 API 保持同源 `/api`。`trycloudflare.com` 是临时地址，重启隧道可能变化；
+长期服务应配置自己的域名和固定隧道。
+
+> 部署脚本要求 Docker Compose v2；旧版 `docker-compose` v1 请先升级。
 
 #### Docker 部署常见问题（FAQ）
 
@@ -362,7 +383,9 @@ docker logs -f bilinote-backend
 
 **3. 数据存在哪？删容器会丢吗？**
 
-`docker compose` 把宿主机的 `./backend` 绑挂到容器的 `/legacy`（不是 `/app`，`/app` 保持镜像内代码，避免升级被旧代码盖住）。以下内容都在宿主机 `./backend/` 下、删容器不会丢：
+`docker compose` 把宿主机的 `./backend` 绑挂到容器的 `/legacy`，后端入口和 `PYTHONPATH` 都指向该目录。
+升级 Compose 部署时需要同时更新宿主机代码；单镜像 `docker run` 部署仍使用镜像内代码。
+以下内容都在宿主机 `./backend/` 下、删容器不会丢：
 
 - `./backend/bili_note.db` —— SQLite 库（含账号、LLM 供应商配置、笔记历史）
 - `./backend/config/` —— Cookie、转写器设置、任务超时覆盖
@@ -370,7 +393,7 @@ docker logs -f bilinote-backend
 - `./backend/uploads/` —— 上传的本地视频
 - `./backend/vector_db/` —— RAG 向量索引
 - `./backend/data/` —— 任务运行时缓存、源文件缓存、笔记输出
-- `./backend/models/` —— Whisper 模型缓存
+- `./backend/models/` —— Whisper 与 AI 问答 Embedding 模型缓存
 
 要彻底重置就 `docker compose down && rm -rf backend/bili_note.db backend/config backend/vector_db`。
 

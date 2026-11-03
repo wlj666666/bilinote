@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Bubble, Sender } from '@ant-design/x'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -8,7 +8,7 @@ import { Loader2, Trash2, ChevronDown, ChevronUp, BookOpen, UserRound, Bot, Maxi
 import { toast } from 'react-hot-toast'
 import { useChatStore } from '@/store/chatStore'
 import { useTaskStore } from '@/store/taskStore'
-import { askQuestion, getChatStatus, indexTask, type ChatSource, type IndexStatus } from '@/services/chat'
+import { askQuestion, getActiveChat, waitForAnswer, getChatStatus, indexTask, type ChatSource, type IndexStatus } from '@/services/chat'
 
 type ChatMode = 'half' | 'full'
 
@@ -37,7 +37,7 @@ function SourceBadges({ sources }: { sources: ChatSource[] }) {
         <div className="mt-1 flex flex-wrap gap-1">
           {sources.map((s, i) => (
             <Badge key={i} variant="outline" className="text-xs font-normal">
-              {s.source_type === 'markdown'
+              {s.source_type === 'meta' ? '视频信息' : s.source_type === 'markdown'
                 ? s.section_title || '笔记'
                 : `${(s.start_time ?? 0).toFixed(0)}s ~ ${(s.end_time ?? 0).toFixed(0)}s`}
             </Badge>
@@ -51,6 +51,9 @@ function SourceBadges({ sources }: { sources: ChatSource[] }) {
 export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [progress, setProgress] = useState('正在生成回答…')
+  const [indexAttempt, setIndexAttempt] = useState(0)
+  const chatController = useRef<AbortController | null>(null)
   const [indexStatus, setIndexStatus] = useState<IndexStatus | null>(null)
 
   const messages = useChatStore(state => state.chatHistory[taskId]) ?? []
@@ -58,19 +61,44 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
   const clearChat = useChatStore(state => state.clearChat)
   const loadHistory = useChatStore(state => state.loadHistory)
 
-  const currentTaskId = useTaskStore(state => state.currentTaskId)
   const tasks = useTaskStore(state => state.tasks)
   const currentTask = useMemo(
-    () => tasks.find(t => t.id === currentTaskId) ?? null,
-    [tasks, currentTaskId],
+    () => tasks.find(t => t.id === taskId) ?? null,
+    [tasks, taskId],
   )
+
+  // Resume a server-owned answer after navigation/reload. Abort only local polling.
+  useEffect(() => {
+    const controller = new AbortController()
+    chatController.current = controller
+    setLoading(true)
+    setInput('')
+    const resume = async () => {
+      try {
+        const job = await getActiveChat(taskId, controller.signal)
+        if (controller.signal.aborted) return
+        await loadHistory(taskId)
+        if (controller.signal.aborted) return
+        if (job) {
+          await waitForAnswer(job, controller.signal, setProgress)
+          if (!controller.signal.aborted) await loadHistory(taskId)
+        }
+      } catch (error: any) {
+        if (!controller.signal.aborted) toast.error(error?.msg || error?.message || '无法读取问答状态，请稍后重试')
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
+      }
+    }
+    void resume()
+    return () => controller.abort()
+  }, [taskId, loadHistory])
 
   // 检查索引状态，未索引时自动触发，indexing 时轮询
   useEffect(() => {
     if (!taskId) return
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | null = null
-    void loadHistory(taskId).catch(() => {})
+    setIndexStatus(null)
 
     const poll = async () => {
       try {
@@ -85,7 +113,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
         }
 
         // indexing 状态持续轮询
-        if (res.status === 'indexing' || res.status === 'idle') {
+        if (!cancelled && (res.status === 'indexing' || res.status === 'idle')) {
           timer = setTimeout(poll, 2000)
         }
       } catch {
@@ -98,12 +126,14 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
       cancelled = true
       if (timer) clearTimeout(timer)
     }
-  }, [taskId])
+  }, [taskId, indexAttempt])
 
   const handleSend = useCallback(
     async (value: string) => {
       const question = value.trim()
       if (!question || loading) return
+      const controller = chatController.current
+      if (!controller || controller.signal.aborted) return
 
       const providerId = currentTask?.formData?.provider_id
       const modelName = currentTask?.formData?.model_name
@@ -118,25 +148,23 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
 
       try {
         const history = messages.map(m => ({ role: m.role, content: m.content }))
-        const res = await askQuestion({
+        await askQuestion({
           task_id: taskId,
           question,
           history,
           provider_id: providerId,
           model_name: modelName,
-        })
-        addMessage(taskId, {
-          role: 'assistant',
-          content: res.answer,
-          sources: res.sources,
-        })
-      } catch {
-        toast.error('问答请求失败')
+        }, controller.signal, setProgress)
+        if (!controller.signal.aborted) await loadHistory(taskId)
+      } catch (error: any) {
+        if (controller.signal.aborted || error?.name === 'AbortError') return
+        toast.error(error?.msg || error?.message || '问答请求失败，请稍后重试')
+        void loadHistory(taskId).catch(() => {})
       } finally {
-        setLoading(false)
+        if (!controller.signal.aborted) setLoading(false)
       }
     },
-    [loading, taskId, currentTask, messages, addMessage],
+    [loading, taskId, currentTask, messages, addMessage, loadHistory],
   )
 
   // 转换为 Bubble.List 的数据格式
@@ -155,13 +183,13 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
       items.push({
         key: 'loading',
         role: 'ai' as const,
-        content: '思考中...',
+        content: progress,
         loading: true,
       } as any)
     }
 
     return items
-  }, [messages, loading])
+  }, [messages, loading, progress])
 
   // Bubble 角色配置
   const roles = useMemo(
@@ -202,7 +230,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
         <Loader2 className="h-6 w-6 animate-spin" />
         <div className="text-center">
           <p className="text-sm font-medium">正在索引笔记内容...</p>
-          <p className="mt-1 text-xs">首次使用需下载 Embedding 模型（约 80MB），请耐心等待</p>
+          <p className="mt-1 text-xs">首次使用会建立搜索索引，完成后即可提问</p>
         </div>
       </div>
     )
@@ -219,6 +247,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
             setIndexStatus('indexing')
             try {
               await indexTask(taskId)
+              setIndexAttempt(attempt => attempt + 1)
             } catch {
               toast.error('索引请求失败')
               setIndexStatus('failed')

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from app.db.models.users import User
 from app.services.auth import get_current_user
 from app.services.available_models import require_available_model
@@ -7,7 +7,9 @@ from app.services.user_data import require_task, chat_history, append_chat
 from app.db import engine as db_module
 from app.db.models.user_data import ChatEntry
 from app.utils.secrets import customer_result
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from app.services.chat_jobs import chat_jobs
+from app.services.task_data_lock import task_data_lock
 
 from app.services.chat_service import chat as chat_service
 from app.services.vector_store import VectorStoreManager
@@ -33,10 +35,41 @@ class ChatMessage(BaseModel):
 
 class AskRequest(BaseModel):
     task_id: str
-    question: str
+    question: str = Field(min_length=1, max_length=10000)
     history: list[ChatMessage] = []
     provider_id: str
     model_name: str
+
+
+class ChatJobRequest(AskRequest):
+    request_id: str = Field(min_length=1, max_length=80)
+
+
+@router.post('/chat/jobs')
+def submit_chat(data: ChatJobRequest, user: User = Depends(get_current_user)):
+    validate_task_id(data.task_id)
+    if not data.question.strip():
+        raise HTTPException(422, '请输入问题')
+    if user.role != 'admin':
+        require_available_model(data.provider_id, data.model_name)
+    job = chat_jobs.submit(user.id, data.task_id, data.request_id, {
+        'question': data.question, 'provider_id': data.provider_id, 'model_name': data.model_name,
+    })
+    return R.success(job)
+
+
+@router.get('/chat/jobs')
+def active_chat(task_id: str, user: User = Depends(get_current_user)):
+    job = chat_jobs.active(task_id, user.id)
+    return R.success(job)
+
+
+@router.get('/chat/jobs/{job_id}')
+def get_chat_job(job_id: str, user: User = Depends(get_current_user)):
+    job = chat_jobs.get(job_id, user.id)
+    if job['result'] and user.role != 'admin':
+        job['result'] = customer_result(job['result'])
+    return R.success(job)
 
 
 def _do_index(task_id: str, user_id: int):
@@ -131,8 +164,13 @@ def get_history(task_id: str, user: User = Depends(get_current_user)):
 
 @router.delete('/chat/history')
 def clear_history(task_id: str, user: User = Depends(get_current_user)):
-    require_task(task_id, user.id)
-    with db_module.SessionLocal() as db:
-        db.query(ChatEntry).filter_by(user_id=user.id, task_id=task_id).delete()
-        db.commit()
+    with task_data_lock(user.id, task_id):
+        require_task(task_id, user.id)
+        if chat_jobs.active(task_id, user.id):
+            raise HTTPException(409, '请等待当前回答完成后再清空记录')
+        with db_module.SessionLocal() as db:
+            db.query(ChatEntry).filter_by(user_id=user.id, task_id=task_id).delete()
+            from app.db.models.chat_jobs import ChatJob
+            db.query(ChatJob).filter_by(user_id=user.id, task_id=task_id).delete()
+            db.commit()
     return R.success()

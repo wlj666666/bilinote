@@ -28,11 +28,14 @@ services:
       OCR_DEVICE: ${OCR_DEVICE:-cuda}
       # 信任来自 Docker 网段的 X-Forwarded-For，让登录限流按真实客户端 IP 计数
       FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-*}
-      PYTHONPATH: /app
+      # Compose runs checked-out source; Python dependencies come from the image.
+      PYTHONPATH: /legacy
+      EMBEDDING_MODEL_DIR: /app/models/chroma/onnx_models/all-MiniLM-L6-v2
+      EMBEDDING_ALLOW_DOWNLOAD: "0"
     working_dir: /legacy
-    command: ["python3", "/app/main.py"]
+    command: ["python3", "/legacy/main.py"]
     volumes:
-      # Keep the legacy backend data layout writable without masking image code in /app.
+      # Source and runtime data use one authoritative checkout.
       - ./backend:/legacy
       - ./backend/data:/app/data
       - ./backend/models:/app/models

@@ -1,4 +1,5 @@
 import json
+import time
 from typing import Optional
 
 from app.gpt.gpt_factory import GPTFactory
@@ -7,6 +8,8 @@ from app.services.provider import ProviderService
 from app.services.vector_store import VectorStoreManager
 from app.services.chat_tools import TOOLS, execute_tool
 from app.utils.logger import get_logger
+from app.services.task_limits import positive_env
+from app.services.task_resources import resources
 
 logger = get_logger(__name__)
 
@@ -73,6 +76,7 @@ def chat(
     provider_id: str,
     model_name: str,
     user_id: int | None = None,
+    timeout_seconds: float | None = None,
 ) -> dict:
     """
     RAG + Tool Calling 问答。
@@ -81,10 +85,15 @@ def chat(
     3. 如果 LLM 调用了工具，执行工具并将结果返回给 LLM
     4. 循环直到 LLM 给出最终回答
     """
+    started = time.monotonic()
+    deadline = started + (timeout_seconds if timeout_seconds is not None else positive_env('CHAT_TIMEOUT_SECONDS', 180))
     vector_store = VectorStoreManager(user_id=user_id)
 
     # 1. 检索初始上下文
-    chunks = vector_store.query(task_id, question, n_results=6)
+    with resources('cpu', timeout=max(.01, deadline - time.monotonic())):
+        chunks = vector_store.query(task_id, question, n_results=6)
+    logger.info('问答检索完成: task_id=%s elapsed=%.2fs chunks=%s',
+                task_id, time.monotonic() - started, len(chunks))
     context = _build_context(chunks) if chunks else "（未检索到相关内容，请使用工具查询）"
     sources = _build_sources(chunks) if chunks else []
 
@@ -113,10 +122,23 @@ def chat(
 
     logger.info(f"Chat: task_id={task_id}, model={model_name}")
 
+    def complete(**kwargs):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('问答处理超时')
+        with resources('api', timeout=remaining):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError('问答处理超时')
+            call_started = time.monotonic()
+            response = gpt.client.chat.completions.create(timeout=remaining, **kwargs)
+            logger.info('问答模型返回: task_id=%s elapsed=%.2fs', task_id, time.monotonic() - call_started)
+            return response
+
     # 4. Tool calling 循环（最多 3 轮）
     max_rounds = 3
     for round_i in range(max_rounds):
-        response = gpt.client.chat.completions.create(
+        response = complete(
             model=gpt.model,
             messages=messages,
             tools=TOOLS,
@@ -150,7 +172,7 @@ def chat(
             })
 
     # 超过最大轮次，做最后一次不带 tools 的调用
-    response = gpt.client.chat.completions.create(
+    response = complete(
         model=gpt.model,
         messages=messages,
         temperature=0.7,

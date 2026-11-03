@@ -81,6 +81,12 @@ async def lifespan(app: FastAPI):
         ProviderService.get_all_providers()
         CookieConfigManager().list_all()
 
+        # Make missing/corrupt embeddings a startup error, never a user's long download.
+        from app.services.local_embeddings import get_embedding_function
+        get_embedding_function()
+        from app.services.chat_jobs import chat_jobs
+        chat_jobs.start()
+
         # 把已配置的代理 export 到环境变量，让 huggingface_hub（whisper 模型下载）
         # 也能走代理——含转写时的按需下载（issue #417）。
         from app.services.proxy_config_manager import ProxyConfigManager
@@ -97,6 +103,8 @@ async def lifespan(app: FastAPI):
 
         logger.info("[startup 5/5] 启动完成，等待请求")
     except Exception:
+        from app.services.chat_jobs import chat_jobs
+        chat_jobs.stop()
         from app.services.task_scheduler import task_scheduler
         task_scheduler.stop()
         logger.exception("[startup FAILED] 后端启动期异常，详见堆栈；容器会退出并由 restart 策略决定是否重试")
@@ -105,6 +113,7 @@ async def lifespan(app: FastAPI):
     try:
         yield
     finally:
+        chat_jobs.stop()
         task_scheduler.stop()
 
 app = create_app(lifespan=lifespan)

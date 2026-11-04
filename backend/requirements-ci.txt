@@ -3,6 +3,7 @@
 -c requirements.txt
 -c requirements-ocr.txt
 fastapi
+httpx
 SQLAlchemy
 python-dotenv
 numpy

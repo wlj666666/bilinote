@@ -28,7 +28,7 @@ function clearSensitiveState() {
   useProviderStore.setState({ provider: [] })
   useModelStore.setState({ models: [], modelList: [], selectedModel: '', loading: false })
   useTaskStore.getState().setOwner(null)
-  useChatStore.setState({ chatHistory: {} })
+  useChatStore.setState({ chatHistory: {}, modelSelections: {} })
 }
 
 let bootstrapPromise: Promise<void> | null = null

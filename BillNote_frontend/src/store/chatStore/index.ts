@@ -11,6 +11,8 @@ export interface ChatMessage {
 
 interface ChatState {
   chatHistory: Record<string, ChatMessage[]>
+  modelSelections: Record<string, number>
+  selectModel: (taskId: string, modelId: number) => void
   addMessage: (taskId: string, message: ChatMessage) => void
   clearChat: (taskId: string) => Promise<void>
   loadHistory: (taskId: string) => Promise<void>
@@ -20,6 +22,10 @@ interface ChatState {
 // The server owns chat history. Private content is never hydrated from shared storage.
 export const useChatStore = create<ChatState>((set, get) => ({
   chatHistory: {},
+  modelSelections: {},
+  selectModel: (taskId, modelId) => set(state => ({
+    modelSelections: { ...state.modelSelections, [taskId]: modelId },
+  })),
   addMessage: (taskId, message) => set(state => ({ chatHistory: {
     ...state.chatHistory, [taskId]: [...(state.chatHistory[taskId] || []), message],
   } })),

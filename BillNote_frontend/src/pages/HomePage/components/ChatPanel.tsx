@@ -1,13 +1,15 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, useId } from 'react'
 import { Bubble, Sender } from '@ant-design/x'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Trash2, ChevronDown, ChevronUp, BookOpen, UserRound, Bot, Maximize2, Minimize2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useChatStore } from '@/store/chatStore'
 import { useTaskStore } from '@/store/taskStore'
+import { useModelStore } from '@/store/modelStore'
 import { askQuestion, getActiveChat, waitForAnswer, getChatStatus, indexTask, type ChatSource, type IndexStatus } from '@/services/chat'
 
 type ChatMode = 'half' | 'full'
@@ -55,17 +57,31 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
   const [indexAttempt, setIndexAttempt] = useState(0)
   const chatController = useRef<AbortController | null>(null)
   const [indexStatus, setIndexStatus] = useState<IndexStatus | null>(null)
+  const modelSelectId = useId()
 
   const messages = useChatStore(state => state.chatHistory[taskId]) ?? []
   const addMessage = useChatStore(state => state.addMessage)
   const clearChat = useChatStore(state => state.clearChat)
   const loadHistory = useChatStore(state => state.loadHistory)
+  const selectedModelId = useChatStore(state => state.modelSelections[taskId])
+  const selectModel = useChatStore(state => state.selectModel)
+  const modelList = useModelStore(state => state.modelList)
+  const modelsLoading = useModelStore(state => state.loading)
+  const loadEnabledModels = useModelStore(state => state.loadEnabledModels)
 
   const tasks = useTaskStore(state => state.tasks)
   const currentTask = useMemo(
     () => tasks.find(t => t.id === taskId) ?? null,
     [tasks, taskId],
   )
+  const selectedModel = modelList.find(model => model.id === selectedModelId)
+    ?? modelList.find(model => model.provider_id === currentTask?.formData?.provider_id
+      && model.model_name === currentTask?.formData?.model_name)
+    ?? modelList[0]
+
+  useEffect(() => {
+    void loadEnabledModels()
+  }, [loadEnabledModels])
 
   // Resume a server-owned answer after navigation/reload. Abort only local polling.
   useEffect(() => {
@@ -135,10 +151,8 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
       const controller = chatController.current
       if (!controller || controller.signal.aborted) return
 
-      const providerId = currentTask?.formData?.provider_id
-      const modelName = currentTask?.formData?.model_name
-      if (!providerId || !modelName) {
-        toast.error('无法获取模型配置，请确认任务已完成')
+      if (!selectedModel) {
+        toast.error('请先选择可用的问答模型')
         return
       }
 
@@ -152,8 +166,8 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
           task_id: taskId,
           question,
           history,
-          provider_id: providerId,
-          model_name: modelName,
+          provider_id: selectedModel.provider_id,
+          model_name: selectedModel.model_name,
         }, controller.signal, setProgress)
         if (!controller.signal.aborted) await loadHistory(taskId)
       } catch (error: any) {
@@ -164,7 +178,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
         if (!controller.signal.aborted) setLoading(false)
       }
     },
-    [loading, taskId, currentTask, messages, addMessage, loadHistory],
+    [loading, taskId, selectedModel, messages, addMessage, loadHistory],
   )
 
   // 转换为 Bubble.List 的数据格式
@@ -292,6 +306,29 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
         </div>
       </div>
 
+      <div className="flex items-center gap-2 border-b px-3 py-2">
+        <label htmlFor={modelSelectId} className="shrink-0 text-xs text-neutral-500">问答模型</label>
+        <Select
+          value={selectedModel ? String(selectedModel.id) : ''}
+          onValueChange={value => selectModel(taskId, Number(value))}
+          onOpenChange={open => { if (open) void loadEnabledModels() }}
+          disabled={loading || modelList.length === 0}
+        >
+          <SelectTrigger id={modelSelectId} size="sm" className="min-w-0 flex-1 truncate">
+            <SelectValue placeholder={modelsLoading ? '正在加载模型…' : '暂无可用模型'} />
+          </SelectTrigger>
+          <SelectContent>
+            {modelList.map(model => (
+              <SelectItem key={model.id} value={String(model.id)}>
+                {model.model_name}
+                {modelList.some(other => other.id !== model.id && other.model_name === model.model_name)
+                  ? ` · ${model.provider_id}` : ''}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* 消息列表 */}
       <div className="flex-1 overflow-hidden">
         {messages.length === 0 && !loading ? (
@@ -317,6 +354,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
           onChange={setInput}
           onSubmit={handleSend}
           loading={loading}
+          disabled={!selectedModel}
           placeholder="输入你的问题..."
         />
       </div>

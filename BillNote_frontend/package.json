@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "typecheck": "tsc -b --pretty false",
+    "check:ci": "node scripts/ci-diagnostics.mjs",
+    "test:ci": "node --test scripts/ci-diagnostics.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

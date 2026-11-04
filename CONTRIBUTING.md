@@ -22,6 +22,44 @@
 
 详细结构与开发命令见 [CLAUDE.md](./CLAUDE.md)。提交时**单 PR 不要跨多个工作区做无关改动**，便于评审与回滚。
 
+### 基础 CI
+
+[CI 工作流](.github/workflows/ci.yml) 在所有 PR、推送到 `main` / `master` / `develop`
+以及手动触发时执行。Docker、桌面端和扩展的发布工作流也会先运行同一套检查，
+通过后才构建发布产物。CI 不会部署或重启服务器。
+
+本地复现（Python 3.11、Node 20、pnpm 9.15.0；Python 依赖建议安装在独立虚拟环境）：
+
+```bash
+cd backend
+python -m pip install -r requirements-ci.txt
+DATABASE_URL=sqlite:///:memory: python -m unittest discover -s tests -v
+
+cd ../BillNote_frontend
+pnpm install --frozen-lockfile
+pnpm test:ci
+pnpm check:ci
+DOCKER_BUILD=1 pnpm build
+```
+
+- 后端运行 `backend/tests/` 的全部现有单元测试，任何失败或导入错误都会阻塞 CI。
+  测试依赖由生产 requirements 约束版本；不启动 API、不下载模型、不需要 GPU 或 API key。
+  此检查不代表完整生产依赖、真实推理或端到端视频链路已经验证。
+- 前端构建必须成功。`DOCKER_BUILD=1` 使用前端目录的环境配置，避免读取仓库根目录的本机 `.env`。
+- 类型检查覆盖 `tsconfig.app.json` 和 `tsconfig.node.json`；lint 使用现有 ESLint 配置。
+  首次接入时已有错误保存在 `BillNote_frontend/ci-diagnostics-baseline.json`，
+  按文件、规则/错误码、错误消息、相关源码及出现次数匹配，新增错误阻塞 CI。
+  删除旧错误不会失败；ESLint warning 会报告，但不阻塞。
+  `pnpm typecheck` 和 `pnpm lint` 仍保留完整严格输出，当前存量错误会让这两个命令失败。
+- `pnpm test:ci` 验证基线比较器会拦截新增错误、重复错误及替换后的不同错误。
+
+不应为使普通 PR 通过而重新生成基线。集中清理历史问题或升级检查工具时，
+可手动运行 `node scripts/ci-diagnostics.mjs --write-baseline`，逐项审查基线差异；
+基线不会在 CI 中自动更新。
+
+若需禁止检查失败的 PR 合并，需要仓库管理员在 GitHub 分支保护 / Rulesets 中，
+把本工作流的 `CI result` 检查设为必需。仅添加工作流文件不会自动修改分支保护。
+
 ---
 
 ## 2. 分支模型

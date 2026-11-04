@@ -1,0 +1,11 @@
+# Only the dependencies imported by the current offline unit tests.
+# Use the same direct versions as production, without installing ASR/export tools.
+-c requirements.txt
+-c requirements-ocr.txt
+fastapi
+httpx
+SQLAlchemy
+python-dotenv
+numpy
+rapidocr
+onnxruntime

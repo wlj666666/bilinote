@@ -533,6 +533,22 @@ pnpm dev
 
 访问：`http://localhost:3015`
 
+## ✅ 自动检查与发布
+
+仓库通过 [GitHub Actions CI](.github/workflows/ci.yml)，在所有 PR、推送到
+`main` / `master` / `develop` 以及手动触发时执行基础检查：
+
+- **后端测试**：运行现有单元测试，不需要 GPU、模型下载或 API key。
+- **前端检查**：验证锁文件依赖安装，运行类型检查、ESLint 和检查器自身测试，并完成生产构建。
+- **历史问题基线**：已有类型与 lint 错误记录在基线中，新增错误会使 CI 失败；ESLint warning 不阻塞。
+
+推送 `v*` 标签后，Docker 镜像、桌面安装包和浏览器扩展的发布工作流会先通过同一套 CI，
+再构建并发布到 GHCR / GitHub Release。服务器仍通过 `bash deploy.sh cpu` 或
+`bash deploy.sh gpu` 手动部署，CI 不会自动更新运行中的服务。
+
+本地检查命令、基线维护和分支保护设置见 [贡献指南：基础 CI](CONTRIBUTING.md#基础-ci)。
+基础检查不覆盖真实 GPU / LLM 推理及完整视频处理链路。
+
 ## ⚙️ 依赖说明
 
 ### 🎬 FFmpeg
@@ -657,6 +673,7 @@ Copyright (c) 2024 Jeffery Huang
 
 ## 📚 相关文档
 
+- [贡献指南](CONTRIBUTING.md)：基础 CI、本地检查命令、分支管理与提交规范。
 - [任务调度说明](backend/TASK_SCHEDULING.md)：多用户部署的并发、排队、取消和中断恢复规则。默认全站执行 6 个、每用户执行 1 个；GPU 推理 1 个、CPU 密集阶段 2 个、模型总结请求 2 个。
 - [并发压测记录及参数选择依据](backend/CONCURRENCY_BENCHMARK.md)：参数选择依据、GPU 并发 1/2/3/4 对比、显存驻留实验和复现命令。
 - [管理员后台核心需求](docs/管理员后台需求文档.md)：总览、任务监控、资源与用户管理的范围及口径。

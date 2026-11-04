@@ -1,0 +1,967 @@
+{
+  "version": 1,
+  "typecheck": [
+    {
+      "file": "node_modules/.pnpm/react-markdown@8.0.7_@types+react@19.2.14_react@19.2.4/node_modules/react-markdown/lib/complex-types.ts",
+      "code": "TS2503",
+      "message": "Cannot find namespace 'JSX'.",
+      "source": "JSX"
+    },
+    {
+      "file": "node_modules/.pnpm/react-markdown@8.0.7_@types+react@19.2.14_react@19.2.4/node_modules/react-markdown/lib/complex-types.ts",
+      "code": "TS2503",
+      "message": "Cannot find namespace 'JSX'.",
+      "source": "JSX"
+    },
+    {
+      "file": "node_modules/.pnpm/react-markdown@8.0.7_@types+react@19.2.14_react@19.2.4/node_modules/react-markdown/lib/complex-types.ts",
+      "code": "TS2344",
+      "message": "Type 'TagName' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.\n  Type 'string | number | symbol' is not assignable to type 'ElementType<any, keyof IntrinsicElements>'.\n    Type 'string' is not assignable to type 'ElementType<any, keyof IntrinsicElements>'.\n      Type 'TagName' is not assignable to type 'FunctionComponent<any>'.\n        Type 'string | number | symbol' is not assignable to type 'FunctionComponent<any>'.\n          Type 'string' is not assignable to type 'FunctionComponent<any>'.",
+      "source": "TagName"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Form.tsx",
+      "code": "TS2339",
+      "message": "Property 'cookie' does not exist on type 'AxiosResponse<any, any, {}>'.",
+      "source": "cookie"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Form.tsx",
+      "code": "TS7006",
+      "message": "Parameter 'values' implicitly has an 'any' type.",
+      "source": "values"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "TS6133",
+      "message": "'Button' is declared but its value is never read.",
+      "source": "import { Button } from '@/components/ui/button.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "TS6133",
+      "message": "'useProviderStore' is declared but its value is never read.",
+      "source": "import { useProviderStore } from '@/store/providerStore'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "TS6192",
+      "message": "All imports in import declaration are unused.",
+      "source": "import { DouyinLogo, KuaishouLogo } from '@/components/Icons/platform.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "TS6133",
+      "message": "'handleClick' is declared but its value is never read.",
+      "source": "handleClick"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "TS6133",
+      "message": "'Switch' is declared but its value is never read.",
+      "source": "import { Switch } from '@/components/ui/switch.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "TS6133",
+      "message": "'AILogo' is declared but its value is never read.",
+      "source": "import AILogo from '@/components/Form/modelForm/Icons'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "TS6133",
+      "message": "'updateProvider' is declared but its value is never read.",
+      "source": "updateProvider"
+    },
+    {
+      "file": "src/components/Form/modelForm/Icons/index.tsx",
+      "code": "TS2604",
+      "message": "JSX element type 'Icon' does not have any construct or call signatures.",
+      "source": "Icon"
+    },
+    {
+      "file": "src/components/Form/modelForm/Icons/index.tsx",
+      "code": "TS2786",
+      "message": "'Icon' cannot be used as a JSX component.\n  Its type 'IconToc[] | CompoundedIcon | ((namespace: string) => { fill: string; id: string; }) | ((namespace: string, length: number) => { fill: string; id: string; }[]) | ((id: string, config?: LobeIconCdnConfig | undefined) => string) | ... 8 more ... | CompoundedIcon' is not a valid JSX element type.\n    Type 'IconToc[]' is not assignable to type 'ElementType'.",
+      "source": "Icon"
+    },
+    {
+      "file": "src/components/Form/modelForm/Icons/index.tsx",
+      "code": "TS2604",
+      "message": "JSX element type 'Variant' does not have any construct or call signatures.",
+      "source": "Variant"
+    },
+    {
+      "file": "src/components/Icons/index.tsx",
+      "code": "TS2604",
+      "message": "JSX element type 'Icon' does not have any construct or call signatures.",
+      "source": "Icon"
+    },
+    {
+      "file": "src/components/Icons/index.tsx",
+      "code": "TS2786",
+      "message": "'Icon' cannot be used as a JSX component.\n  Its type 'IconToc[] | CompoundedIcon | ((namespace: string) => { fill: string; id: string; }) | ((namespace: string, length: number) => { fill: string; id: string; }[]) | ((id: string, config?: LobeIconCdnConfig | undefined) => string) | ... 8 more ... | CompoundedIcon' is not a valid JSX element type.\n    Type 'IconToc[]' is not assignable to type 'ElementType'.",
+      "source": "Icon"
+    },
+    {
+      "file": "src/components/Icons/index.tsx",
+      "code": "TS2604",
+      "message": "JSX element type 'Variant' does not have any construct or call signatures.",
+      "source": "Variant"
+    },
+    {
+      "file": "src/components/Icons/platform.tsx",
+      "code": "TS2322",
+      "message": "Type '{ children: Element[]; t: string; className: string; viewBox: string; version: string; xmlns: string; \"p-id\": string; width: string; height: string; }' is not assignable to type 'SVGProps<SVGSVGElement>'.\n  Property 't' does not exist on type 'SVGProps<SVGSVGElement>'.",
+      "source": "t"
+    },
+    {
+      "file": "src/components/Icons/platform.tsx",
+      "code": "TS2322",
+      "message": "Type '{ children: Element[]; t: string; className: string; viewBox: string; version: string; xmlns: string; \"p-id\": string; width: string; height: string; }' is not assignable to type 'SVGProps<SVGSVGElement>'.\n  Property 't' does not exist on type 'SVGProps<SVGSVGElement>'.",
+      "source": "t"
+    },
+    {
+      "file": "src/components/Icons/platform.tsx",
+      "code": "TS2322",
+      "message": "Type '{ children: Element[]; t: string; className: string; viewBox: string; version: string; xmlns: string; \"p-id\": string; width: string; height: string; }' is not assignable to type 'SVGProps<SVGSVGElement>'.\n  Property 't' does not exist on type 'SVGProps<SVGSVGElement>'.",
+      "source": "t"
+    },
+    {
+      "file": "src/components/Icons/platform.tsx",
+      "code": "TS2322",
+      "message": "Type '{ children: Element; t: string; className: string; viewBox: string; version: string; xmlns: string; \"p-id\": string; width: string; height: string; }' is not assignable to type 'SVGProps<SVGSVGElement>'.\n  Property 't' does not exist on type 'SVGProps<SVGSVGElement>'.",
+      "source": "t"
+    },
+    {
+      "file": "src/components/Icons/platform.tsx",
+      "code": "TS2322",
+      "message": "Type '{ children: Element[]; t: string; className: string; viewBox: string; version: string; xmlns: string; \"p-id\": string; width: string; height: string; }' is not assignable to type 'SVGProps<SVGSVGElement>'.\n  Property 't' does not exist on type 'SVGProps<SVGSVGElement>'.",
+      "source": "t"
+    },
+    {
+      "file": "src/components/ui/checkbox.tsx",
+      "code": "TS2345",
+      "message": "Argument of type 'FormEvent<HTMLButtonElement>' is not assignable to parameter of type 'ChangeEvent<HTMLButtonElement, Element>'.\n  Types of property 'target' are incompatible.\n    Type 'EventTarget' is not assignable to type 'EventTarget & HTMLButtonElement'.\n      Type 'EventTarget' is missing the following properties from type 'HTMLButtonElement': disabled, form, formAction, formEnctype, and 318 more.",
+      "source": "{} as React.FormEvent<HTMLButtonElement>"
+    },
+    {
+      "file": "src/lib/markmap.ts",
+      "code": "TS2345",
+      "message": "Argument of type 'CSSItem[] | undefined' is not assignable to parameter of type 'CSSItem[]'.\n  Type 'undefined' is not assignable to type 'CSSItem[]'.",
+      "source": "styles"
+    },
+    {
+      "file": "src/lib/markmap.ts",
+      "code": "TS2345",
+      "message": "Argument of type 'JSItem[] | undefined' is not assignable to parameter of type 'JSItem[]'.\n  Type 'undefined' is not assignable to type 'JSItem[]'.",
+      "source": "scripts"
+    },
+    {
+      "file": "src/pages/HomePage/Home.tsx",
+      "code": "TS6133",
+      "message": "'content' is declared but its value is never read.",
+      "source": "content"
+    },
+    {
+      "file": "src/pages/HomePage/Home.tsx",
+      "code": "TS2741",
+      "message": "Property 'content' is missing in type '{ status: ViewStatus; }' but required in type 'MarkdownViewerProps'.",
+      "source": "MarkdownViewer"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS2339",
+      "message": "Property 'showTranscribe' does not exist on type 'NoteHeaderProps'.",
+      "source": "showTranscribe"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS2339",
+      "message": "Property 'viewMode' does not exist on type 'NoteHeaderProps'.",
+      "source": "viewMode"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS2339",
+      "message": "Property 'setViewMode' does not exist on type 'NoteHeaderProps'.",
+      "source": "setViewMode"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS6133",
+      "message": "'reversedMarkdown' is declared but its value is never read.",
+      "source": "reversedMarkdown"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS2339",
+      "message": "Property 'findIndex' does not exist on type 'string | VersionNote[]'.\n  Property 'findIndex' does not exist on type 'string'.",
+      "source": "findIndex"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS7006",
+      "message": "Parameter 'v' implicitly has an 'any' type.",
+      "source": "v"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS2339",
+      "message": "Property 'map' does not exist on type 'string | VersionNote[]'.\n  Property 'map' does not exist on type 'string'.",
+      "source": "map"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS7006",
+      "message": "Parameter 'v' implicitly has an 'any' type.",
+      "source": "v"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS6133",
+      "message": "'idx' is declared but its value is never read.",
+      "source": "idx"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "TS7006",
+      "message": "Parameter 'idx' implicitly has an 'any' type.",
+      "source": "idx"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS6133",
+      "message": "'Download' is declared but its value is never read.",
+      "source": "Download"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS7016",
+      "message": "Could not find a declaration file for module 'react-syntax-highlighter'. '<frontend>/node_modules/.pnpm/react-syntax-highlighter@15.6.6_react@19.2.4/node_modules/react-syntax-highlighter/dist/cjs/index.js' implicitly has an 'any' type.\n  Try `npm i --save-dev @types/react-syntax-highlighter` if it exists or add a new declaration (.d.ts) file containing `declare module 'react-syntax-highlighter';`",
+      "source": "'react-syntax-highlighter'"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS7016",
+      "message": "Could not find a declaration file for module 'react-syntax-highlighter/dist/esm/styles/prism'. '<frontend>/node_modules/.pnpm/react-syntax-highlighter@15.6.6_react@19.2.4/node_modules/react-syntax-highlighter/dist/esm/styles/prism/index.js' implicitly has an 'any' type.\n  Try `npm i --save-dev @types/react-syntax-highlighter` if it exists or add a new declaration (.d.ts) file containing `declare module 'react-syntax-highlighter/dist/esm/styles/prism';`",
+      "source": "'react-syntax-highlighter/dist/esm/styles/prism'"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2740",
+      "message": "Type 'Element' is missing the following properties from type 'HTMLElement': accessKey, accessKeyLabel, autocapitalize, dir, and 126 more.",
+      "source": "target"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS6133",
+      "message": "'copied' is declared but its value is never read.",
+      "source": "copied"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2345",
+      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string>'.\n  Type 'undefined' is not assignable to type 'SetStateAction<string>'.",
+      "source": "currentTask.formData.style"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2345",
+      "message": "Argument of type 'string | Markdown[]' is not assignable to parameter of type 'SetStateAction<string>'.\n  Type 'Markdown[]' is not assignable to type 'SetStateAction<string>'.",
+      "source": "currentTask?.markdown"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2339",
+      "message": "Property 'created_at' does not exist on type 'string | Markdown'.\n  Property 'created_at' does not exist on type 'string'.",
+      "source": "created_at"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2339",
+      "message": "Property 'created_at' does not exist on type 'string | Markdown'.\n  Property 'created_at' does not exist on type 'string'.",
+      "source": "created_at"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2339",
+      "message": "Property 'ver_id' does not exist on type 'string | Markdown'.\n  Property 'ver_id' does not exist on type 'string'.",
+      "source": "ver_id"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2339",
+      "message": "Property 'find' does not exist on type 'string | Markdown[]'.\n  Property 'find' does not exist on type 'string'.",
+      "source": "find"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS7006",
+      "message": "Parameter 'v' implicitly has an 'any' type.",
+      "source": "v"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS6133",
+      "message": "'alertButton' is declared but its value is never read.",
+      "source": "alertButton"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS6133",
+      "message": "'exportButton' is declared but its value is never read.",
+      "source": "exportButton"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2322",
+      "message": "Type '{ className: string; }' is not assignable to type 'IntrinsicAttributes'.\n  Property 'className' does not exist on type 'IntrinsicAttributes'.",
+      "source": "className"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS18047",
+      "message": "'currentTask' is possibly 'null'.",
+      "source": "currentTask"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS2322",
+      "message": "Type 'Task | null' is not assignable to type '{ markdown: string | VersionNote[]; } | undefined'.\n  Type 'null' is not assignable to type '{ markdown: string | VersionNote[]; } | undefined'.",
+      "source": "currentTask"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "TS4104",
+      "message": "The type 'readonly [{ readonly label: \"精简\"; readonly value: \"minimal\"; }, { readonly label: \"详细\"; readonly value: \"detailed\"; }, { readonly label: \"教程\"; readonly value: \"tutorial\"; }, { readonly label: \"学术\"; readonly value: \"academic\"; }, ... 4 more ..., { ...; }]' is 'readonly' and cannot be assigned to the mutable type '{ value: string; label: string; }[]'.",
+      "source": "noteStyles"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "TS6133",
+      "message": "'onChange' is declared but its value is never read.",
+      "source": "onChange"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "TS2554",
+      "message": "Expected 1 arguments, but got 0.",
+      "source": "useRef"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "TS6133",
+      "message": "'ScrollArea' is declared but its value is never read.",
+      "source": "import { ScrollArea } from '@/components/ui/scroll-area.tsx'"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "TS6133",
+      "message": "'Badge' is declared but its value is never read.",
+      "source": "import { Badge } from '@/components/ui/badge.tsx'"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "TS6133",
+      "message": "'PinyinMatch' is declared but its value is never read.",
+      "source": "import PinyinMatch from 'pinyin-match'"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "TS6133",
+      "message": "'setRawSearch' is declared but its value is never read.",
+      "source": "setRawSearch"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "TS2322",
+      "message": "Type '\"small\"' is not assignable to type '\"default\" | \"sm\" | \"lg\" | \"icon\" | null | undefined'.",
+      "source": "size"
+    },
+    {
+      "file": "src/pages/HomePage/components/StepBar.tsx",
+      "code": "TS6133",
+      "message": "'isLast' is declared but its value is never read.",
+      "source": "isLast"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "TS6133",
+      "message": "'getTranscriberConfig' is declared but its value is never read.",
+      "source": "getTranscriberConfig"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "TS6133",
+      "message": "'providerId' is declared but its value is never read.",
+      "source": "providerId"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "TS2740",
+      "message": "Type 'AxiosResponse<any, any, {}>' is missing the following properties from type 'any[]': length, pop, push, concat, and 29 more.",
+      "source": "list"
+    },
+    {
+      "file": "src/pages/SettingPage/components/menuBar.tsx",
+      "code": "TS6133",
+      "message": "'FC' is declared but its value is never read.",
+      "source": "FC"
+    },
+    {
+      "file": "src/pages/SettingPage/components/menuBar.tsx",
+      "code": "TS6196",
+      "message": "'IMenuItem' is declared but never used.",
+      "source": "IMenuItem"
+    },
+    {
+      "file": "src/pages/SettingPage/transcriber.tsx",
+      "code": "TS6133",
+      "message": "'mlxAvailable' is declared but its value is never read.",
+      "source": "mlxAvailable"
+    },
+    {
+      "file": "src/services/downloader.ts",
+      "code": "TS7006",
+      "message": "Parameter 'id' implicitly has an 'any' type.",
+      "source": "id"
+    }
+  ],
+  "lint": [
+    {
+      "file": "src/components/Form/DownloaderForm/Form.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'e' is defined but never used.",
+      "source": "} catch (e) {"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'Button' is defined but never used.",
+      "source": "import { Button } from '@/components/ui/button.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'useProviderStore' is defined but never used.",
+      "source": "import { useProviderStore } from '@/store/providerStore'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'DouyinLogo' is defined but never used.",
+      "source": "import { DouyinLogo, KuaishouLogo } from '@/components/Icons/platform.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'KuaishouLogo' is defined but never used.",
+      "source": "import { DouyinLogo, KuaishouLogo } from '@/components/Icons/platform.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/Options.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'handleClick' is assigned a value but never used.",
+      "source": "const handleClick = () => {"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'Switch' is defined but never used.",
+      "source": "import { Switch } from '@/components/ui/switch.tsx'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'AILogo' is defined but never used.",
+      "source": "import AILogo from '@/components/Form/modelForm/Icons'"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "Icon: any"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'updateProvider' is assigned a value but never used.",
+      "source": "const updateProvider = useProviderStore(state => state.updateProvider)"
+    },
+    {
+      "file": "src/components/Form/DownloaderForm/providerCard.tsx",
+      "code": "@typescript-eslint/ban-ts-comment",
+      "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+      "source": "// @ts-ignore"
+    },
+    {
+      "file": "src/components/Form/modelForm/ModelSelector.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'error' is defined but never used.",
+      "source": "} catch (error) {"
+    },
+    {
+      "file": "src/components/Form/modelForm/components/providerCard.tsx",
+      "code": "@typescript-eslint/ban-ts-comment",
+      "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+      "source": "// @ts-ignore"
+    },
+    {
+      "file": "src/hooks/useCheckBackend.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const fromEnv = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined"
+    },
+    {
+      "file": "src/pages/HomePage/Home.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'content' is assigned a value but never used.",
+      "source": "const content = currentTask?.markdown || ''"
+    },
+    {
+      "file": "src/pages/HomePage/components/ChatPanel.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} catch (error: any) {"
+    },
+    {
+      "file": "src/pages/HomePage/components/ChatPanel.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} catch (error: any) {"
+    },
+    {
+      "file": "src/pages/HomePage/components/ChatPanel.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} as any)"
+    },
+    {
+      "file": "src/pages/HomePage/components/ChatPanel.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "contentRender: (content: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'reversedMarkdown' is assigned a value but never used.",
+      "source": "const reversedMarkdown: VersionNote[] = Array.isArray(currentTask?.markdown)"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownHeader.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'idx' is defined but never used.",
+      "source": "{(currentTask?.markdown || []).map((v, idx) => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'Download' is defined but never used.",
+      "source": "import { Copy, Download, ArrowRight, Play, ExternalLink } from 'lucide-react'"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "h1: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "h2: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "h3: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "h4: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "p: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "a: ({ href, children, ...props }: any) => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "no-useless-escape",
+      "message": "Unnecessary escape character: \\[.",
+      "source": "s.replace(/[-：:\\s*\\[\\]]/g, '').toLowerCase()"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'node' is defined but never used.",
+      "source": "img: ({ node, ...props }: any) => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "img: ({ node, ...props }: any) => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "strong: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "li: ({ children, ...props }: any) => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "ul: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "ol: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "blockquote: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "code: ({ inline, className, children, ...props }: any) => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "table: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "th: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "td: ({ children, ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "hr: ({ ...props }: any) => ("
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'copied' is assigned a value but never used.",
+      "source": "const [copied, setCopied] = useState(false)"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'e' is defined but never used.",
+      "source": "} catch (e) {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'alertButton' is assigned a value but never used.",
+      "source": "const alertButton = {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkdownViewer.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'exportButton' is assigned a value but never used.",
+      "source": "const exportButton = {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "customButtons?: any[]"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'onChange' is defined but never used.",
+      "source": "onChange,"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "prefer-const",
+      "message": "'text' is never reassigned. Use 'const' instead.",
+      "source": "let text = decodeHtmlEntities(html);"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const convertToXMindNode = (node: any, isRoot = false): any => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const convertToXMindNode = (node: any, isRoot = false): any => {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const xmindNode: any = {"
+    },
+    {
+      "file": "src/pages/HomePage/components/MarkmapComponent.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "attached: node.children.map((child: any) => convertToXMindNode(child, false))"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteForm.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} catch (e: any) {"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'ScrollArea' is defined but never used.",
+      "source": "import { ScrollArea } from '@/components/ui/scroll-area.tsx'"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'Badge' is defined but never used.",
+      "source": "import { Badge } from '@/components/ui/badge.tsx'"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'PinyinMatch' is defined but never used.",
+      "source": "import PinyinMatch from 'pinyin-match'"
+    },
+    {
+      "file": "src/pages/HomePage/components/NoteHistory.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'setRawSearch' is assigned a value but never used.",
+      "source": "const [rawSearch, setRawSearch] = useState('')"
+    },
+    {
+      "file": "src/pages/HomePage/components/StepBar.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'isLast' is assigned a value but never used.",
+      "source": "const isLast = index === steps.length - 1"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'getTranscriberConfig' is defined but never used.",
+      "source": "import { getTranscriberConfig, updateTranscriberConfig } from '@/services/transcriber'"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "function errText(e: any): string {"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const fromEnv = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'providerId' is assigned a value but never used.",
+      "source": "const [providerId, setProviderId] = useState<string | null>(null)"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const res: any = await addProvider({"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "catch (addErr: any) {"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const list: any[] = (await getProviderList({ silent: true })) || []"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "catch (modelErr: any) {"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "catch (e: any) {"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "catch (e: any) {"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} as any)"
+    },
+    {
+      "file": "src/pages/Onboarding/index.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "catch (e: any) {"
+    },
+    {
+      "file": "src/pages/SettingPage/Monitor.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'err' is defined but never used.",
+      "source": "} catch (err) {"
+    },
+    {
+      "file": "src/pages/SettingPage/components/menuBar.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'FC' is defined but never used.",
+      "source": "import { FC, JSX } from 'react'"
+    },
+    {
+      "file": "src/pages/SettingPage/components/menuBar.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'IMenuItem' is defined but never used.",
+      "source": "interface IMenuItem {"
+    },
+    {
+      "file": "src/pages/SettingPage/components/menuBar.tsx",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const MenuBar: ({ menuItem }: { menuItem: any }) => JSX.Element = ({ menuItem }) => {"
+    },
+    {
+      "file": "src/pages/SettingPage/transcriber.tsx",
+      "code": "@typescript-eslint/no-unused-vars",
+      "message": "'mlxAvailable' is assigned a value but never used.",
+      "source": "const [mlxAvailable, setMlxAvailable] = useState(false)"
+    },
+    {
+      "file": "src/services/chat.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} catch (error: any) {"
+    },
+    {
+      "file": "src/services/downloader.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "export const updateDownloaderCookie = async (data: { cookie: string; platform: any }) => {"
+    },
+    {
+      "file": "src/services/model.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "export const updateProviderById = async (data: any, opts?: CallOpts) => {"
+    },
+    {
+      "file": "src/services/model.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "export const addProvider = async (data: any, opts?: CallOpts) => {"
+    },
+    {
+      "file": "src/services/model.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "export const testConnection = async (data: any, opts?: CallOpts) => {"
+    },
+    {
+      "file": "src/services/note.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} catch (e: any) {"
+    },
+    {
+      "file": "src/store/providerStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const fromApi = (item: any): IProvider => ({"
+    },
+    {
+      "file": "src/store/providerStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "const items = await getProviderList() as unknown as any[]"
+    },
+    {
+      "file": "src/store/taskStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "raw_info: any"
+    },
+    {
+      "file": "src/store/taskStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "raw: any"
+    },
+    {
+      "file": "src/store/taskStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "addPendingTask: (taskId: string, platform: string, formData: any) =>"
+    },
+    {
+      "file": "src/store/taskStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "retryTask: async (id: string, payload?: any) => {"
+    },
+    {
+      "file": "src/store/taskStore/index.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "} catch (e: any) {"
+    },
+    {
+      "file": "src/utils/request.ts",
+      "code": "@typescript-eslint/no-explicit-any",
+      "message": "Unexpected any. Specify a different type.",
+      "source": "export interface IResponse<T = any> {"
+    }
+  ]
+}

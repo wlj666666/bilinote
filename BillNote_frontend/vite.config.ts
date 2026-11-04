@@ -31,7 +31,9 @@ export default defineConfig(({ mode }) => {
   const appVersion = env.VITE_APP_VERSION || process.env.VITE_APP_VERSION || readAppVersion()
 
   return {
-    base: './',
+    // Web deep links (/admin/tasks) need root asset URLs on refresh.
+    // Desktop builds retain relative assets for the packaged WebView.
+    base: mode === 'tauri' ? './' : '/',
     define: {
       __APP_VERSION__: JSON.stringify(appVersion),
     },

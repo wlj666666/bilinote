@@ -22,6 +22,9 @@ class TaskScheduler:
         self.inference = None
         self.thread = None
         self.lock = None
+        self.last_heartbeat_at = None
+        self.last_error_at = None
+        self.last_cycle_ok_at = None
 
     def start(self):
         if self.thread and self.thread.is_alive():
@@ -37,6 +40,13 @@ class TaskScheduler:
             time.sleep(.1)
         try:
             recover_jobs()
+            # Reconcile legacy state and metadata while holding the singleton
+            # lock, before new workers can update the same task rows.
+            from app.services.task_recovery import recover_interrupted_tasks
+            recovered = recover_interrupted_tasks(os.getenv('NOTE_OUTPUT_DIR', 'note_results'))
+            logger.info('已处理 %s 个服务中断遗留任务', recovered)
+            from app.services.admin import backfill_metadata
+            backfill_metadata()
             os.environ['TASK_INFERENCE_KEY'] = os.urandom(32).hex()
             self.start_inference()
             self.thread = threading.Thread(target=self.run, name='task-scheduler', daemon=True)
@@ -92,6 +102,7 @@ class TaskScheduler:
 
     def run(self):
         while not self.stopping.is_set():
+            self.last_heartbeat_at = time.time()
             try:
                 if self.inference.poll() is not None:
                     # Callers retain their resource gates while the local IPC
@@ -113,7 +124,9 @@ class TaskScheduler:
                     except Exception:
                         update_attempt(task_id, token, state='FAILED', phase='FAILED', message='任务进程启动失败，请重试', finished_at=time.time())
                         logger.exception('启动任务失败 task_id=%s', task_id)
+                self.last_cycle_ok_at = time.time()
             except Exception:
+                self.last_error_at = time.time()
                 logger.exception('任务调度异常，将继续重试')
             self.stopping.wait(.25)
 

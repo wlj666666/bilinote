@@ -98,6 +98,11 @@ def import_legacy_history(data: LegacyImport, admin: User = Depends(require_admi
                 task.display_data = json.dumps(allowed, ensure_ascii=False)
                 if task.form_data is None and item.get('formData'):
                     task.form_data = json.dumps(item['formData'], ensure_ascii=False)
+                from app.services.admin import PHASES, safe_text
+                audio = item.get('audioMeta') or {}
+                task.title = safe_text(audio.get('title'), 1024) if isinstance(audio, dict) else ''
+                state = item.get('status', 'UNKNOWN')
+                task.legacy_status = state if state in PHASES else 'UNKNOWN'
                 imported += 1
         db.flush()
         for task_id, messages in data.chats.items():

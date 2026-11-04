@@ -5,11 +5,18 @@ import {
   Info,
   Activity,
   Users,
+  LayoutDashboard,
 } from 'lucide-react'
 import MenuBar, { IMenuProps } from '@/pages/SettingPage/components/menuBar.tsx'
 
 const Menu = () => {
   const menuList: IMenuProps[] = [
+    {
+      id: 'admin',
+      name: '管理后台',
+      icon: <LayoutDashboard />,
+      path: '/admin',
+    },
     {
       id: 'users',
       name: '客户账号',

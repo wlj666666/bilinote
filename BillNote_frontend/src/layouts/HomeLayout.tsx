@@ -1,5 +1,5 @@
 import React, { FC, useRef, useState } from 'react'
-import { SlidersHorizontal, PanelLeftClose, PanelLeftOpen, History as HistoryIcon, LogOut } from 'lucide-react'
+import { SlidersHorizontal, PanelLeftClose, PanelLeftOpen, History as HistoryIcon, LogOut, LayoutDashboard } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import {
   Tooltip,
@@ -52,6 +52,7 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
                 <div className="text-2xl font-semibold text-foreground">BiliNote</div>
               </div>
               <div className="flex items-center gap-1">
+                {user?.role === 'admin' && <Link to="/admin" title="管理后台" aria-label="管理后台" className="text-muted-foreground hover:text-primary rounded p-1 hover:bg-sage"><LayoutDashboard className="h-5 w-5" /></Link>}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>

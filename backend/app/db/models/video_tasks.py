@@ -16,4 +16,7 @@ class VideoTask(Base):
     form_data = Column(Text, nullable=True)
     display_data = Column(Text, nullable=True)
     deleted = Column(Boolean, nullable=False, default=False)
+    # Small, queryable metadata for the admin list; never load note bodies there.
+    title = Column(String(1024), nullable=True)
+    legacy_status = Column(String(40), nullable=True)
     created_at = Column(DateTime, server_default=func.now())

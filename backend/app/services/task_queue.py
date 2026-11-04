@@ -30,7 +30,8 @@ def transaction():
             raise
 
 
-def enqueue(user_id, payload, task_id=None, request_id=None, limits=None):
+def enqueue(user_id, payload, task_id=None, request_id=None, limits=None,
+            expected_state=None, expected_updated_at=None):
     limits = limits or TaskLimits.from_env()
     encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     fingerprint = hashlib.sha256(json.dumps(payload['form'], ensure_ascii=False, sort_keys=True).encode()).hexdigest()
@@ -54,6 +55,10 @@ def enqueue(user_id, payload, task_id=None, request_id=None, limits=None):
                          VideoTask.user_id == user_id, VideoTask.deleted.is_(False))) if task_id else None
         if task_id and task is None:
             raise HTTPException(404, '任务不存在')
+        if expected_state is not None and (
+                job is None or job.state != expected_state or
+                (expected_updated_at is not None and job.updated_at != expected_updated_at)):
+            raise HTTPException(409, '任务状态已变化，请刷新后重试')
         if job and job.state not in TERMINAL:
             if json.loads(job.payload)['form'] != payload['form']:
                 raise HTTPException(409, '任务正在排队或执行，不能修改参数；请结束后再重试')

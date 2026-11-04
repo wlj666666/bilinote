@@ -97,10 +97,6 @@ async def lifespan(app: FastAPI):
         from app.services.task_scheduler import task_scheduler
         task_scheduler.start()
 
-        from app.services.task_recovery import recover_interrupted_tasks
-        recovered = recover_interrupted_tasks(os.getenv("NOTE_OUTPUT_DIR", "note_results"))
-        logger.info("已处理 %s 个服务中断遗留任务", recovered)
-
         logger.info("[startup 5/5] 启动完成，等待请求")
     except Exception:
         from app.services.chat_jobs import chat_jobs

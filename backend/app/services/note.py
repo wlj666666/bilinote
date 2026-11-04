@@ -198,6 +198,10 @@ class NoteGenerator:
                 platform, output_path, screenshot, video_understanding, video_interval, grid_size,
                 identity, input_key, policy, signature, legacy_policy)
 
+            if scope:
+                from app.services.admin import record_title
+                record_title(task_id, scope.user_id, audio_meta.title)
+
             # 3. GPT 总结
             markdown = self._summarize_text(
                 audio_meta=audio_meta,

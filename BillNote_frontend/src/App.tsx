@@ -19,6 +19,10 @@ import { Button } from '@/components/ui/button'
 // 非首屏页面使用 React.lazy 按需加载
 const Onboarding = lazy(() => import('@/pages/Onboarding'))
 const SettingPage = lazy(() => import('./pages/SettingPage/index.tsx'))
+const AdminLayout = lazy(() => import('@/pages/Admin/Layout'))
+const AdminOverview = lazy(() => import('@/pages/Admin/Overview'))
+const AdminTasks = lazy(() => import('@/pages/Admin/Tasks'))
+const AdminUsers = lazy(() => import('@/pages/Admin/Users'))
 
 // 桌面端首启引导守卫：未完成 onboarding 时强制跳到 /onboarding
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
@@ -44,9 +48,8 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   return isAdmin ? <>{children}</> : <Navigate to="/" replace />
 }
 
-function AuthenticatedApp() {
+function WorkspaceHome() {
   useTaskPolling(3000) // 每 3 秒轮询一次
-  const isAdmin = useAuthStore(state => state.user?.role === 'admin')
   const user = useAuthStore(state => state.user)
   const loadTasks = useTaskStore(state => state.loadTasks)
   const [dataReady, setDataReady] = useState(false)
@@ -66,18 +69,20 @@ function AuthenticatedApp() {
     return () => { cancelled = true }
   }, [user, loadTasks, retryData])
 
-  // 在后端初始化完成后执行系统检查
-  useEffect(() => {
-    if (isAdmin) {
-      systemCheck().catch(() => {})
-    }
-  }, [isAdmin])
-
   if (!dataReady) return <div className="flex h-screen flex-col items-center justify-center gap-4">
     <p>{dataError || '正在加载你的笔记…'}</p>
     {dataError && <Button onClick={() => setRetryData(value => value + 1)}>重试</Button>}
     <Button variant="ghost" onClick={() => { void useAuthStore.getState().logout().catch(() => {}) }}>退出登录</Button>
   </div>
+
+  return <HomePage />
+}
+
+function AuthenticatedApp() {
+  const isAdmin = useAuthStore(state => state.user?.role === 'admin')
+  useEffect(() => {
+    if (isAdmin) systemCheck().catch(() => {})
+  }, [isAdmin])
 
   // 桌面端使用 HashRouter 避免刷新 404；Web 端继续使用 BrowserRouter
   const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
@@ -90,9 +95,15 @@ function AuthenticatedApp() {
       <Router>
         <Suspense fallback={<div className="flex h-screen items-center justify-center">加载中…</div>}>
           <Routes>
+            <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
+              <Route index element={<AdminOverview />} />
+              <Route path="tasks" element={<AdminTasks />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Route>
             <Route path="/onboarding" element={<AdminGuard><Onboarding /></AdminGuard>} />
             <Route path="/" element={<OnboardingGuard><Index /></OnboardingGuard>}>
-              <Route index element={<HomePage />} />
+              <Route index element={<WorkspaceHome />} />
               <Route path="settings" element={<AdminGuard><SettingPage /></AdminGuard>}>
                 <Route index element={<Navigate to="model" replace />} />
                 <Route path="model" element={<Model />}>

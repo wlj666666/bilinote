@@ -30,7 +30,8 @@ def init_db():
                 connection.execute(text(f'ALTER TABLE users ADD COLUMN {name} INTEGER'))
     task_columns = {column['name'] for column in inspect(engine).get_columns('video_tasks')}
     additions = {'user_id': 'INTEGER', 'storage_relpath': "VARCHAR NOT NULL DEFAULT ''",
-                 'form_data': 'TEXT', 'display_data': 'TEXT', 'deleted': 'BOOLEAN NOT NULL DEFAULT 0'}
+                 'form_data': 'TEXT', 'display_data': 'TEXT', 'deleted': 'BOOLEAN NOT NULL DEFAULT 0',
+                 'title': 'VARCHAR(1024)', 'legacy_status': 'VARCHAR(40)'}
     with engine.begin() as connection:
         for name, sql_type in additions.items():
             if name not in task_columns:

@@ -5,9 +5,10 @@ from app.services.auth import get_current_user, require_admin
 
 
 def create_app(lifespan) -> FastAPI:
-    from .routers import auth, note, provider, model, config, chat, files, history
+    from .routers import admin, auth, note, provider, model, config, chat, files, history
     app = FastAPI(title="BiliNote",lifespan=lifespan)
     app.include_router(auth.router, prefix="/api")
+    app.include_router(admin.router, prefix="/api")
     app.include_router(config.public_router, prefix="/api")
     app.include_router(note.router, prefix="/api", dependencies=[Depends(get_current_user)])
     app.include_router(provider.router, prefix="/api", dependencies=[Depends(require_admin)])

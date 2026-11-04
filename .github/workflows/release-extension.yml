@@ -13,7 +13,14 @@ permissions:
   contents: write
 
 jobs:
+  checks:
+    name: Pre-release CI
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
   build:
+    needs: checks
     name: Build & attach to release
     runs-on: ubuntu-latest
     defaults:

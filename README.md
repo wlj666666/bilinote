@@ -1,12 +1,10 @@
-<div style="display: flex; justify-content: center; align-items: center; gap: 10px;
-">
-    <p align="center">
-  <img src="./BillNote_frontend/src/assets/icon.svg" alt="BiliNote Banner" width="50" height="50" />
+<p align="center">
+  <img src="./BillNote_frontend/src/assets/icon.svg" alt="BiliNote 标志" width="64" height="64" />
 </p>
 <h1 align="center">BiliNote</h1>
-</div>
 
-<p align="center"><i>从视频到可检索知识的 AI Agent 应用 —— 转写 · OCR · 结构化笔记 · RAG 问答</i></p>
+<p align="center"><strong>从视频到可检索知识</strong></p>
+<p align="center">结构化笔记 · 视频问答 · 思维导图 · 语音转写与字幕 OCR</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
@@ -19,22 +17,84 @@
   <img src="https://img.shields.io/badge/docker-ghcr.io-blue" />
 </p>
 
-
-
+<p align="center">
+  <a href="#feature-preview">功能预览</a> ·
+  <a href="#admin-console">管理后台</a> ·
+  <a href="#architecture">技术架构</a> ·
+  <a href="#quick-start">快速开始</a>
+</p>
 
 ## ✨ 项目简介
 
-BiliNote 是一个**端到端的 AI 视频理解应用**：给定视频链接，系统自动完成下载 → 音视频分离 → 语音转写（或硬字幕 OCR）→ 大模型结构化笔记 → 可检索问答，全链路在多用户、多任务并发下运行。
+BiliNote 是一款 **AI 视频笔记与问答工具**。粘贴视频链接或上传本地音视频，即可提取字幕或转写语音，生成带目录、要点和原片时间跳转的笔记；随后切换思维导图梳理结构，或围绕视频内容继续提问。
 
-与"调一个 LLM API 出摘要"的 demo 不同，本项目的工程重心在三件事上：
+支持哔哩哔哩、YouTube、抖音、TikTok、快手与本地视频文件，提供 Web 工作区、浏览器扩展和桌面端。面向多人部署时，支持账号登录、用户数据隔离、任务排队和管理员后台。
 
-- **Agent 化问答**：不是一次性把全文塞给模型，而是"向量检索给初始上下文 + 模型自主调用工具补证据"的多轮闭环，回答可回溯到具体时间戳。
-- **推理与资源工程**：模型推理与 API 进程物理隔离，GPU / CPU / 模型 API 三类资源分阶段闸门，硬字幕 OCR 走 CUDA 加速路径，参数全部由压测数据决定。
-- **可上线的多租户**：管理员 / 普通用户两级角色，笔记、上传、会话、向量索引按用户隔离，历史数据可迁移。
+<a id="feature-preview"></a>
 
-支持哔哩哔哩、YouTube、抖音、TikTok、快手与本地视频文件。
+## 📸 功能预览
+
+下面用同一条课程视频，展示从生成笔记到回看原文、整理知识和继续提问的过程。所有截图均可点击查看原图。
+
+### 1. 视频生成笔记，关键位置一键回看
+
+在一个工作区中选择视频、模型与笔记风格，管理生成历史，阅读带章节目录和时间标记的笔记。点击「原片」链接，可以回到对应的视频位置。
+
+[![视频笔记工作区：左侧生成配置、中间历史记录、右侧视频信息与带时间跳转的章节目录](docs/images/1.png)](docs/images/1.png)
+
+<details>
+<summary><strong>展开查看：笔记正文与 AI 总结</strong></summary>
+
+目录下方按章节展开论点、例子和总结，便于阅读与复习；生成结果支持复制、导出 Markdown 和切换历史版本。
+
+[![笔记正文示例：章节要点、重点加粗、原片时间跳转与 AI 总结](docs/images/2.png)](docs/images/2.png)
+
+</details>
+
+### 2. 围绕视频内容继续提问
+
+看完笔记后，可以直接提出自己的问题。下图根据课程内容，追问 AI 时代程序员应具备的能力。问答结合笔记与转录检索，并可通过工具查询视频细节；问答模型可以独立选择。
+
+[![视频 AI 问答：用户围绕课程提问，助手结合视频内容给出分点回答与时间线索](docs/images/3.png)](docs/images/3.png)
+
+### 3. 用思维导图梳理知识结构
+
+同一份笔记可切换为思维导图，按章节与要点展开层级关系，适合快速回顾、整理课程脉络。导图支持缩放和 SVG 导出，节点中的原片链接保留时间定位。
+
+[![思维导图视图：课程章节、知识要点与原片时间链接按层级展开](docs/images/4.png)](docs/images/4.png)
+
+### 4. 对照带时间轴的提取原文
+
+优先复用平台字幕；字幕不可用时，按所选方式进行语音转写或画面字幕 OCR。「原文参照」显示文字来源、时间与文本片段，可与生成笔记对照阅读。
+
+[![OCR 原文参照：右侧按时间展示画面字幕提取结果，并标明文字来源、片段数与总时长](docs/images/5.png)](docs/images/5.png)
+
+<a id="admin-console"></a>
+
+## 🛠️ 管理后台
+
+管理员登录后可进入 `/admin`，集中查看全站任务概况、服务运行状态，并管理用户账号。资源卡片提供当前可采集的 CPU、内存、GPU、显存与磁盘指标；任务与资源数据由后端读取并定期刷新。
+
+[![管理员系统总览：任务数量、用户数量、执行与排队概况，以及后端、调度器和推理服务状态](docs/images/6.png)](docs/images/6.png)
+
+<details>
+<summary><strong>展开查看：跨用户任务列表</strong></summary>
+
+任务监控支持查看视频笔记与问答任务，按用户、状态筛选，进入详情定位当前阶段和失败原因；管理员还可取消尚未执行的视频排队任务、重试失败的视频任务。
+
+下面展示视频任务列表局部：不同用户的任务、使用模型、最新状态与已记录的耗时集中呈现，便于核对处理情况。旧任务缺少耗时记录时显示「未知」。
+
+[![全站任务列表局部：不同用户的视频任务、模型、完成状态、提交时间与处理耗时](docs/images/7.png)](docs/images/7.png)
+
+</details>
+
+用户管理支持创建、启用、停用普通账号及重置密码。笔记、上传文件、聊天记录和向量索引按用户隔离；监控页展示运行信息，不新增跨用户正文读取权限。
+
+<a id="architecture"></a>
 
 ## 🗺️ 技术路线总图
+
+上述功能由视频处理流水线、检索与工具调用、独立推理进程以及多用户调度共同支撑。
 
 ```mermaid
 flowchart TB
@@ -51,6 +111,7 @@ flowchart TB
         A2["note 任务提交"]
         A3["chat 问答 / 索引"]
         A4["provider · model · config"]
+        A5["admin 全站查询与管理"]
     end
 
     subgraph SCHED["调度层 · 多租户准入"]
@@ -157,9 +218,9 @@ sequenceDiagram
 
 ### 2. LLM 应用工程
 
-- **上下文预算感知**：`RequestChunker` 按 UTF-8 字节估算消息体积，超限时优先按段落/图片边界切分；单段仍超限则对该段做**二分查找**，找到最大可容纳前缀，保证任意输入都不会撑爆请求。
+- **上下文预算感知**：`RequestChunker` 按 UTF-8 字节估算消息体积，超限时优先按段落/图片边界切分；单段仍超限则对该段做**二分查找**，找到配置字节预算内可容纳的最大前缀。
 - **多模态视频理解**：`VideoReader` 按固定间隔抽帧（`ThreadPoolExecutor` 并行，默认 2 线程）、相邻帧 MD5 去重，再拼成网格图（默认 2×2、单元 480×270、间隔 6 s）以压缩图片数量与 token 消耗，最后以 OpenAI `content` 数组（text + 多张 `image_url`）送入模型；`model_capabilities.py` 维护模型是否支持图片输入，纯文本模型自动退回 `string` content，避免 `invalid_request_error`。
-- **供应商抽象**：工厂模式统一 OpenAI 兼容协议；针对 `/v1/models` 不可靠（部分网关不实现、key 无权限）的情况，内置供应商维护一份回退模型清单，保证下拉永不空白。
+- **供应商抽象**：工厂模式统一 OpenAI 兼容协议；针对 `/v1/models` 不可靠（部分网关不实现、key 无权限）的情况，内置供应商维护回退模型清单，改善模型选择与配置体验。
 - **提示词分层**：`prompt.py` 模板 / `prompt_builder.py` 组装 / `timestamp_markers.py` 时间标记容错，风格切换不改调用方。
 
 ### 3. 推理与性能工程
@@ -172,7 +233,9 @@ sequenceDiagram
 | 字幕提取 | 46.237 s | 7.427 s | ≈ 6.2× |
 | **合计** | **111.867 s** | **18.369 s** | **≈ 6.1×** |
 
-实现上不只是换 execution provider：字幕布局学习、空缺复查、连续区域判定、未变化字幕带的结果复用，共同把无效推理量降下来。详见 [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md) 与 [GPU 验证记录](backend/OCR_GPU_VALIDATION.md)。
+以上为记录中的单视频、同硬件对照结果；实际耗时随素材、模型与硬件而变化。
+
+字幕布局学习、空缺复查、连续区域判定、未变化字幕带的结果复用，共同减少无效推理量。详见 [OCR 实现与配置说明](backend/OCR.md) 与 [GPU 验证记录](backend/OCR_GPU_VALIDATION.md)。
 
 **推理服务隔离**（`inference_runtime.py`）：
 
@@ -198,7 +261,7 @@ sequenceDiagram
 - 密码 PBKDF2-SHA256（60 万次迭代）存储，Bearer token 鉴权，登录接口按 IP 限流
 - 笔记、上传文件、会话历史、向量索引按 `user_id` 分区；`storage_scope.py` 用 ContextVar 在任务上下文内隐式携带作用域，避免逐层透传
 - 旧版单用户数据在升级时自动归入管理员账号（`legacy_migration.py`）
-- 管理功能（供应商、转写器、系统监控、用户管理）收敛到管理员角色
+- `/admin` 后台的全站统计、任务操作、资源监控，以及供应商、转写器与用户配置均要求管理员权限；普通用户的业务接口继续校验数据归属
 
 ### 5. 技术栈
 
@@ -206,7 +269,7 @@ sequenceDiagram
 
 | 目录 | 职责 |
 | --- | --- |
-| `app/routers/` | `note` 任务、`auth` 登录、`chat` RAG 问答、`provider` / `model`、`config`、`history`、`files` |
+| `app/routers/` | `note` 任务、`auth` 登录、`chat` RAG 问答、`admin` 管理后台、`provider` / `model`、`config`、`history`、`files` |
 | `app/services/` | `note.py` 流水线编排；`task_scheduler` / `task_limits` / `task_resources` 调度；`vector_store` 检索；`chat_service` + `chat_tools` Agent 循环；`inference_runtime` 推理服务；`auth` / `storage_scope` 隔离 |
 | `app/ocr/` | 硬字幕 OCR：引擎封装、布局学习、时序合并、字幕质量判定、CUDA 运行时 |
 | `app/gpt/` | 供应商工厂、提示词构建、`RequestChunker` 分块、多模态消息组装 |
@@ -216,6 +279,7 @@ sequenceDiagram
 **前端**（React 19 + Vite + TypeScript，开发端口 3015）
 
 - `pages/HomePage/` —— 主工作区：任务表单、Markdown 预览、思维导图、`ChatPanel`（基于 `@ant-design/x` 的半屏 / 全屏问答，含引用来源展开与时间段展示）
+- `pages/Admin/` —— 管理后台：系统总览、资源卡片、全站任务监控与用户管理
 - `pages/SettingPage/` —— 供应商、转写器、下载、提示词、系统监控、用户管理
 - `pages/Login/`、`pages/Onboarding/` —— 登录与首启引导
 - `store/` —— Zustand：`taskStore` / `authStore` / `modelStore` / `providerStore` / `configStore` / `chatStore`
@@ -232,6 +296,7 @@ sequenceDiagram
 | **推理工程** | OCR CPU/GPU 双路径（≈6.1×）；单 ModelOwner 进程隔离；UDS + JSON 协议 |
 | **调度与资源** | 全站 / 单用户 / GPU / CPU / API 五级准入；任务取消与断点恢复 |
 | **多租户** | PBKDF2 鉴权、任务级存储作用域、向量库分区、旧数据迁移 |
+| **管理后台** | 全站任务与服务状态、资源指标、用户管理、视频排队取消与失败重试 |
 | **平台能力**（上游基线） | 六平台下载适配、五种转写引擎、字幕复用、截图与思维导图 |
 
 ## 📦 桌面版下载
@@ -239,6 +304,8 @@ sequenceDiagram
 桌面客户端（Windows / macOS）可在 [Releases](https://github.com/wlj666666/bilinote/releases) 页面下载。
 
 > Windows 用户请注意：请勿在含中文的路径下运行。
+
+<a id="quick-start"></a>
 
 ## 🚀 快速开始
 
@@ -548,6 +615,7 @@ docker compose -f docker-compose.gpu.yml up --build -d    # 用 GPU 栈重建
 - [x] 管理员 / 多用户登录与数据隔离
 - [x] 硬字幕 OCR 提取（CPU / GPU 双路径）
 - [x] 多用户任务调度与资源限额
+- [x] 管理后台：系统总览、任务与资源监控、用户管理
 - [ ] 检索质量评估：召回率 / 命中率基准集与 A/B 对比
 - [ ] 笔记导出为 PDF / Word / Notion（当前仅支持 Markdown 与思维导图 SVG）
 
@@ -575,6 +643,7 @@ docker compose -f docker-compose.gpu.yml up --build -d    # 用 GPU 栈重建
 | 调度与资源 | `task_scheduler.py`、`task_limits.py`、`task_resources.py`、`task_recovery.py` —— 五级准入、取消、断点恢复 |
 | 多租户 | `auth.py`、`storage_scope.py`、`legacy_migration.py`、`user_data.py` —— 鉴权、任务级隔离、旧数据迁移 |
 | 前端问答 | `ChatPanel.tsx` —— 半屏 / 全屏问答视图、引用来源展开、时间段落展示 |
+| 管理后台 | `pages/Admin/`、`routers/admin.py`、`services/admin.py`、`admin_resources.py` —— 全站查询、资源采样、任务处置与用户管理 |
 
 ## 📜 License
 
@@ -590,8 +659,10 @@ Copyright (c) 2024 Jeffery Huang
 
 - [任务调度说明](backend/TASK_SCHEDULING.md)：多用户部署的并发、排队、取消和中断恢复规则。默认全站执行 6 个、每用户执行 1 个；GPU 推理 1 个、CPU 密集阶段 2 个、模型总结请求 2 个。
 - [并发压测记录及参数选择依据](backend/CONCURRENCY_BENCHMARK.md)：参数选择依据、GPU 并发 1/2/3/4 对比、显存驻留实验和复现命令。
-- [OCR 推理加速路线图](understanding/OCR_推理加速路线图.md)：按数据流位置排列的优化方向与验收办法。
+- [管理员后台核心需求](docs/管理员后台需求文档.md)：总览、任务监控、资源与用户管理的范围及口径。
+- [管理员后台验证记录](docs/管理员后台验证记录.md)：真实数据来源、权限与任务操作回归、浏览器联调及验证边界。
+- [OCR 实现与配置说明](backend/OCR.md)：字幕提取流程、设备选择与运行参数。
 - [OCR GPU 加速验证](backend/OCR_GPU_VALIDATION.md)：CPU / GPU 同视频对照数据。
-- [OCR 视频到模型输入流程](understanding/OCR_视频到模型输入流程.md)
-- [管理员登录与凭据保护](understanding/管理员登录与凭据保护.md)
-- [用户数据隔离与旧历史迁移](understanding/用户数据隔离与旧历史迁移.md)
+- [OCR 验证记录](backend/OCR_VALIDATION.md)：合成素材、真实视频测试及验证边界。
+- [登录会话与权限校验实现](backend/app/services/auth.py)：密码校验、登录会话与管理员鉴权。
+- [旧历史迁移实现](backend/app/services/legacy_migration.py)：数据归属迁移与数据库备份。

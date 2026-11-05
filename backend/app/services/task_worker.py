@@ -56,7 +56,8 @@ def execute():
                     extras=form.get('extras'), video_understanding=form.get('video_understanding', False),
                     video_interval=form.get('video_interval', 0), grid_size=form.get('grid_size') or [],
                     text_extraction_method=form.get('text_extraction_method', 'asr'), user_id=user_id)
-                update_attempt(task_id, token, state='SUCCESS', phase='SUCCESS', message='笔记生成完成', finished_at=time.time(), next_retry_at=None)
+                update_attempt(task_id, token, state='SUCCESS', phase='SUCCESS', message='笔记生成完成',
+                    finished_at=time.time(), next_retry_at=None, error_type=None, error_detail=None)
                 return
             except Exception as exc:
                 error = redact_secrets(str(exc))[:4000]

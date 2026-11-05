@@ -38,7 +38,7 @@ def build_openai_client(
     request_timeout = timeout if timeout is not None else httpx.Timeout(
         connect=float(os.getenv("OPENAI_CONNECT_TIMEOUT", "10")),
         write=float(os.getenv("OPENAI_WRITE_TIMEOUT", "30")),
-        read=float(os.getenv("OPENAI_READ_TIMEOUT", "180")),
+        read=float(os.getenv("OPENAI_READ_TIMEOUT", "240")),
         pool=10.0,
     )
     # UniversalGPT owns retries. SDK retries here used to multiply 3 attempts into 9.

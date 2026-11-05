@@ -2,6 +2,10 @@
 
 本文档面向**发版执行者**，覆盖从 `develop` 切发版到产物上架商店的完整步骤。日常分支与提交规范见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
+当前账号与仓库为 `Brief4code/bilinote`，GHCR 镜像路径使用全小写的
+`ghcr.io/brief4code/bilinote`；Docker workflow 会自动将仓库路径转换为小写。
+发布后需确认镜像访问权限和 Release 附件可下载。更新链接本身不会生成镜像或桌面安装包。
+
 ---
 
 ## 流程总览
@@ -71,7 +75,7 @@ push tag **会自动触发 [`.github/workflows/release-extension.yml`](.github/w
 
 CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 release notes：
 
-1. 打开 https://github.com/wlj666666/bilinote/releases/new
+1. 打开 https://github.com/Brief4code/bilinote/releases/new
 2. Tag: 选 `vX.Y.Z`
 3. Title: `vX.Y.Z`
 4. Body: 直接贴 [`CHANGELOG.md`](./CHANGELOG.md) 的对应段
@@ -121,7 +125,7 @@ git branch -d release/X.Y.Z
 
 `.github/workflows/release-extension.yml` 末尾有三段商店自动发布的 job 注释。要启用：
 
-1. 在 https://github.com/wlj666666/bilinote/settings/secrets/actions 加 secrets：
+1. 在 https://github.com/Brief4code/bilinote/settings/secrets/actions 加 secrets：
 
 | 商店 | 需要的 secret |
 |---|---|

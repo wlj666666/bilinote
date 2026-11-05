@@ -104,6 +104,7 @@ function AuthenticatedApp() {
             <Route path="/onboarding" element={<AdminGuard><Onboarding /></AdminGuard>} />
             <Route path="/" element={<OnboardingGuard><Index /></OnboardingGuard>}>
               <Route index element={<WorkspaceHome />} />
+              <Route path="app" element={<WorkspaceHome />} />
               <Route path="settings" element={<AdminGuard><SettingPage /></AdminGuard>}>
                 <Route index element={<Navigate to="model" replace />} />
                 <Route path="model" element={<Model />}>

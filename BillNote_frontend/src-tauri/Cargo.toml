@@ -2,9 +2,9 @@
 name = "app"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
+authors = ["Brief4code"]
 license = ""
-repository = ""
+repository = "https://github.com/Brief4code/bilinote"
 edition = "2021"
 rust-version = "1.77.2"
 

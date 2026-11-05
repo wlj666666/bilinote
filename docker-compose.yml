@@ -63,6 +63,9 @@ services:
       dockerfile: BillNote_frontend/Dockerfile
       args:
         BASE_REGISTRY: ${BASE_REGISTRY:-docker.io}
+        VITE_SITE_URL: ${VITE_SITE_URL:-}
+        VITE_GOOGLE_SITE_VERIFICATION: ${VITE_GOOGLE_SITE_VERIFICATION:-}
+        VITE_BING_SITE_VERIFICATION: ${VITE_BING_SITE_VERIFICATION:-}
     env_file:
       - .env
     expose:

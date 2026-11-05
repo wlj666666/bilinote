@@ -63,6 +63,7 @@ export default function LoginPage() {
           {registering ? '已有账号？去登录' : '没有账号？立即注册'}
         </Button>
         {registering && <p className="text-xs text-muted-foreground">暂不支持找回密码，请妥善保存，或使用浏览器保存账号密码。</p>}
+        {!('__TAURI_INTERNALS__' in window) && <a href="/" className="block text-center text-sm text-muted-foreground hover:underline">了解 BiliNote · 返回官网</a>}
       </form>
     </div>
   )

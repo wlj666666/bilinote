@@ -301,7 +301,7 @@ sequenceDiagram
 
 ## 📦 桌面版下载
 
-桌面客户端（Windows / macOS）可在 [Releases](https://github.com/wlj666666/bilinote/releases) 页面下载。
+桌面客户端（Windows / macOS）可在 [Releases](https://github.com/Brief4code/bilinote/releases) 页面下载。
 
 > Windows 用户请注意：请勿在含中文的路径下运行。
 
@@ -313,8 +313,11 @@ sequenceDiagram
 
 确保已安装 Docker（含 Compose v2，即 `docker compose` 子命令），直接拉取预构建镜像运行：
 
+预构建镜像需要已发布且具备访问权限。若拉取返回 `403`、`denied` 或 `manifest unknown`，
+可使用本节下方的 Compose 源码构建方式。
+
 ```bash
-docker pull ghcr.io/wlj666666/bilinote:latest
+docker pull ghcr.io/brief4code/bilinote:latest
 
 docker run -d -p 80:80 \
   -v bilinote-data:/app/backend/data \
@@ -324,7 +327,7 @@ docker run -d -p 80:80 \
   -v bilinote-vector-db:/app/backend/vector_db \
   -v bilinote-models:/app/backend/models \
   --name bilinote \
-  ghcr.io/wlj666666/bilinote:latest
+  ghcr.io/brief4code/bilinote:latest
 ```
 
 六个卷分别持久化：
@@ -419,7 +422,7 @@ Compose 的后端代码以宿主机 `backend/`（容器 `/legacy`）为准；修
 
 `docker compose build` 拉 `python:3.11-slim` / `node:20-alpine` / `nginx:1.25-alpine` 时连 `auth.docker.io` 超时。三种解法，按推荐顺序：
 
-- **方法 A：直接用预构建镜像（最省事）**——不要本地 build，跳到上面的 `docker pull ghcr.io/wlj666666/bilinote:latest` 路径，ghcr.io 在国内通常比 docker.io 顺。
+- **方法 A：直接用预构建镜像（最省事）**——不要本地 build，跳到上面的 `docker pull ghcr.io/brief4code/bilinote:latest` 路径，ghcr.io 在国内通常比 docker.io 顺。
 - **方法 B：配置 Docker daemon 镜像加速器**——编辑 `/etc/docker/daemon.json`（Docker Desktop 在设置 → Docker Engine 里改），加：
   ```json
   {
@@ -495,7 +498,7 @@ nginx 默认 `proxy_read_timeout` 是 60 秒，长 LLM 调用会被掐断。本�
 #### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/wlj666666/bilinote.git
+git clone https://github.com/Brief4code/bilinote.git
 cd bilinote
 mv .env.example .env
 ```
@@ -532,6 +535,10 @@ pnpm dev
 ```
 
 访问：`http://localhost:3015`
+
+网站首页提供公开的产品介绍与使用教程，点击「进入工作区」或访问 `/app` 登录使用。
+原有 `/admin`、`/settings/*` 和 `3015` 端口的 Cloudflare Tunnel 访问方式继续可用。
+正式域名、sitemap 与站长平台验证配置见 [SEO 部署说明](docs/SEO部署说明.md)。
 
 ## ✅ 自动检查与发布
 

@@ -43,6 +43,12 @@ FROM ${BASE_REGISTRY}/library/node:20-alpine AS frontend-builder
 # 可由发布 workflow 从 git tag 注入，用于前端 About 页展示版本；未传时由 Vite 回退读取 tauri.conf.json。
 ARG VITE_APP_VERSION=
 ENV VITE_APP_VERSION=${VITE_APP_VERSION}
+ARG VITE_SITE_URL=
+ARG VITE_GOOGLE_SITE_VERIFICATION=
+ARG VITE_BING_SITE_VERIFICATION=
+ENV VITE_SITE_URL=${VITE_SITE_URL} \
+    VITE_GOOGLE_SITE_VERIFICATION=${VITE_GOOGLE_SITE_VERIFICATION} \
+    VITE_BING_SITE_VERIFICATION=${VITE_BING_SITE_VERIFICATION}
 
 # pnpm 版本 pin 到 9 系列：
 # - lockfile (BillNote_frontend/pnpm-lock.yaml) 是 lockfileVersion '9.0'，由 pnpm 9 生成

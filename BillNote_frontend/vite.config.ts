@@ -4,6 +4,8 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import tailwindcss from '@tailwindcss/vite'
+import { publicSite } from './site/plugin.mjs'
+import { siteOptions } from './site/render.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -37,7 +39,8 @@ export default defineConfig(({ mode }) => {
     define: {
       __APP_VERSION__: JSON.stringify(appVersion),
     },
-    plugins: [react(), tailwindcss()],
+    // Desktop keeps its original SPA entry; Web adds crawlable static pages.
+    plugins: [react(), tailwindcss(), ...(mode === 'tauri' ? [] : [publicSite(siteOptions({ ...env, ...process.env }))])],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

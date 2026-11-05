@@ -63,6 +63,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test CI diagnostic gate
         run: pnpm test:ci
+      - name: Test public site and SEO routes
+        run: pnpm test:seo
       - name: Check types and lint against existing diagnostics
         run: pnpm check:ci
       - name: Build frontend

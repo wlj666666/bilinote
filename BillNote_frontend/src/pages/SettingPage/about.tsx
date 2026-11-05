@@ -6,7 +6,7 @@ import { Github, Download } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import logo from '@/assets/icon.svg'
 
-const REPO_URL = 'https://github.com/wlj666666/bilinote'
+const REPO_URL = 'https://github.com/Brief4code/bilinote'
 
 export default function AboutPage() {
   const appVersion = __APP_VERSION__
@@ -100,7 +100,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="mb-3 text-xl font-semibold">1. 克隆仓库</h3>
                 <div className="bg-muted rounded-md p-4 font-mono text-sm">
-                  git clone https://github.com/wlj666666/bilinote.git
+                  git clone https://github.com/Brief4code/bilinote.git
                   <br />
                   cd bilinote
                   <br />
@@ -135,7 +135,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="mb-3 text-xl font-semibold">1. 克隆仓库</h3>
                 <div className="bg-muted rounded-md p-4 font-mono text-sm">
-                  git clone https://github.com/wlj666666/bilinote.git
+                  git clone https://github.com/Brief4code/bilinote.git
                   <br />
                   cd bilinote
                   <br />

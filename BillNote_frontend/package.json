@@ -10,6 +10,8 @@
     "typecheck": "tsc -b --pretty false",
     "check:ci": "node scripts/ci-diagnostics.mjs",
     "test:ci": "node --test scripts/ci-diagnostics.test.mjs",
+    "test:seo": "node --test site/seo.test.mjs",
+    "check:seo:http": "node site/check-http.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

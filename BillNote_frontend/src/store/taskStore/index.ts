@@ -80,7 +80,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         const tasks: Task[] = []
         let offset = 0
         while (true) {
-          const page = await request.get<unknown, { tasks: Task[]; has_more: boolean }>('/tasks', { params: { offset, limit: 100 }, sessionToken: token })
+          const page = await request.get<unknown, { tasks: Task[]; has_more: boolean }>('/tasks', { params: { offset, limit: 100 }, sessionToken: token, timeout: 30000 })
           if (ownerId !== get().ownerId || token !== getAuthToken()) return
           tasks.push(...page.tasks)
           if (!page.has_more) break

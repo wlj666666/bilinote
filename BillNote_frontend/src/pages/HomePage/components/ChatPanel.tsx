@@ -10,6 +10,8 @@ import { toast } from 'react-hot-toast'
 import { useChatStore } from '@/store/chatStore'
 import { useTaskStore } from '@/store/taskStore'
 import { useModelStore } from '@/store/modelStore'
+import { ModelQuotaLabel } from '@/components/ModelQuota'
+import { useModelQuotas } from '@/store/modelQuotaStore'
 import { askQuestion, getActiveChat, waitForAnswer, getChatStatus, indexTask, type ChatSource, type IndexStatus } from '@/services/chat'
 
 type ChatMode = 'half' | 'full'
@@ -51,6 +53,7 @@ function SourceBadges({ sources }: { sources: ChatSource[] }) {
 }
 
 export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps) {
+  const { refresh: refreshQuotas } = useModelQuotas()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState('正在生成回答…')
@@ -311,18 +314,28 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
         <Select
           value={selectedModel ? String(selectedModel.id) : ''}
           onValueChange={value => selectModel(taskId, Number(value))}
-          onOpenChange={open => { if (open) void loadEnabledModels() }}
+          onOpenChange={open => {
+            if (open) {
+              void loadEnabledModels()
+              void refreshQuotas()
+            }
+          }}
           disabled={loading || modelList.length === 0}
         >
           <SelectTrigger id={modelSelectId} size="sm" className="min-w-0 flex-1 truncate">
-            <SelectValue placeholder={modelsLoading ? '正在加载模型…' : '暂无可用模型'} />
+            <SelectValue placeholder={modelsLoading ? '正在加载模型…' : '暂无可用模型'}>{selectedModel?.model_name}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {modelList.map(model => (
               <SelectItem key={model.id} value={String(model.id)}>
-                {model.model_name}
-                {modelList.some(other => other.id !== model.id && other.model_name === model.model_name)
-                  ? ` · ${model.provider_id}` : ''}
+                <span className="flex flex-col items-start gap-0.5">
+                  <span>
+                    {model.model_name}
+                    {modelList.some(other => other.id !== model.id && other.model_name === model.model_name)
+                      ? ` · ${model.provider_id}` : ''}
+                  </span>
+                  <ModelQuotaLabel providerId={model.provider_id} modelName={model.model_name} />
+                </span>
               </SelectItem>
             ))}
           </SelectContent>

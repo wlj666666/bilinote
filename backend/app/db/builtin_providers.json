@@ -23,7 +23,7 @@
     "logo": "Qwen",
     "api_key": "",
     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    "models": ["qwen-plus", "qwen-turbo", "qwen-max", "qwen-long"]
+    "models": ["qwen3.8-2.4t-a95b", "glm-5.3", "qwen3.7-max", "qwen3.8-max", "qwen3.7-max-2026-06-08", "kimi-k3", "qwen3.7-plus", "qwen3.8-flash", "qwen3.7-flash", "qwen3.6-plus", "qwen3.6-flash", "qwen3-vl-plus", "deepseek-v4-pro-0813", "deepseek-v4-flash-0731", "MiniMax-M2.5"]
   },
     {
     "id": "Claude",

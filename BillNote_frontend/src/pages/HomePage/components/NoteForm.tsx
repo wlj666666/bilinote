@@ -39,6 +39,8 @@ import { noteStyles, noteFormats, videoPlatforms } from '@/constant/note.ts'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
+import { ModelQuotaLabel } from '@/components/ModelQuota'
+import { useModelQuotas } from '@/store/modelQuotaStore'
 
 /* -------------------- 校验 Schema -------------------- */
 /** 用户粘贴的链接常缺协议头（如 bilibili.com/...），无任何 scheme 时自动补 https:// */
@@ -132,6 +134,7 @@ const CheckboxGroup = ({
 
 /* -------------------- 主组件 -------------------- */
 const NoteForm = () => {
+  const { refresh: refreshQuotas } = useModelQuotas()
   const isAdmin = useAuthStore(state => state.user?.role === 'admin')
   const userId = useAuthStore(state => state.user?.id)
   const navigate = useNavigate();
@@ -425,7 +428,7 @@ const NoteForm = () => {
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 items-start gap-2">
             {/* 模型选择 */}
             {
 
@@ -433,11 +436,14 @@ const NoteForm = () => {
                control={form.control}
                name="model_name"
                render={({ field }) => (
-                 <FormItem>
+                 <FormItem className="min-w-0">
                    <SectionHeader title="模型选择" tip="不同模型效果不同，建议自行测试" />
                    <Select
-                     onOpenChange={()=>{
-                       loadEnabledModels()
+                     onOpenChange={open => {
+                       if (open) {
+                         void loadEnabledModels()
+                         void refreshQuotas()
+                       }
                      }}
                      value={field.value}
                      onValueChange={modelName => {
@@ -452,13 +458,18 @@ const NoteForm = () => {
                    >
                      <FormControl>
                        <SelectTrigger className="w-full min-w-0 truncate">
-                         <SelectValue />
+                         <SelectValue>{selectedModelInfo?.model_name}</SelectValue>
                        </SelectTrigger>
                      </FormControl>
                      <SelectContent>
                        {modelList.map(m => (
                          <SelectItem key={m.id} value={m.model_name}>
-                           {m.model_name}{m.supports_image_input === true ? ' · 可读图' : m.supports_image_input === false ? ' · 纯文本' : ' · 能力待确认'}
+                           <span className="flex flex-col items-start gap-0.5">
+                             <span>
+                               {m.model_name}{m.supports_image_input === true ? ' · 可读图' : m.supports_image_input === false ? ' · 纯文本' : ' · 能力待确认'}
+                             </span>
+                             <ModelQuotaLabel providerId={m.provider_id} modelName={m.model_name} />
+                           </span>
                          </SelectItem>
                        ))}
                      </SelectContent>
@@ -467,7 +478,7 @@ const NoteForm = () => {
                  </FormItem>
                )}
              />): (
-               <FormItem>
+               <FormItem className="min-w-0">
                  <SectionHeader title="模型选择" tip="不同模型效果不同，建议自行测试" />
                   <Button type={'button'} variant={
                     'outline'
@@ -482,7 +493,7 @@ const NoteForm = () => {
               control={form.control}
               name="style"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="min-w-0">
                   <SectionHeader title="笔记风格" tip="选择生成笔记的呈现风格" />
                   <Select
                     value={field.value}

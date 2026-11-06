@@ -12,6 +12,12 @@ def client_available_models():
     from app.services.available_models import available_models
     return R.success(available_models())
 
+
+@client_router.get("/model_quotas")
+def client_model_quotas():
+    from app.services.model_quota import saved_model_quotas
+    return R.success(saved_model_quotas())
+
 modelService = ModelService()
 class CreateModelRequest(BaseModel):
     provider_id: str

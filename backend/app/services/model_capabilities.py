@@ -4,19 +4,24 @@ import re
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 
-# Curated from the Alibaba catalog and verified with this workspace's API key.
-# The order is the recommended order for BiliNote's video-note workflow.
+# Verified 2026-11-06. These 15 models had usable free quota expiring 2026-12-05
+# in this workspace. Expiry is account-specific; read live balances via model_quota.
 RECOMMENDED_QWEN_MODELS: list[tuple[str, bool]] = [
     ("qwen3.8-2.4t-a95b", False),
-    ("deepseek-v4-pro", False),
     ("glm-5.3", False),
     ("qwen3.7-max", False),
-    ("qwen3.6-max-preview", False),
     ("qwen3.8-max", True),
     ("qwen3.7-max-2026-06-08", True),
     ("kimi-k3", True),
     ("qwen3.7-plus", True),
-    ("qwen3-vl-235b-a22b-thinking", True),
+    ("qwen3.8-flash", True),
+    ("qwen3.7-flash", True),
+    ("qwen3.6-plus", True),
+    ("qwen3.6-flash", True),
+    ("qwen3-vl-plus", True),
+    ("deepseek-v4-pro-0813", False),
+    ("deepseek-v4-flash-0731", False),
+    ("MiniMax-M2.5", False),
 ]
 RECOMMENDED_CAPABILITIES = dict(RECOMMENDED_QWEN_MODELS)
 

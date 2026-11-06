@@ -13,6 +13,8 @@ import { ModelSelector } from '@/components/Form/modelForm/ModelSelector'
 import { deleteModelById, importRecommendedModels, testConnection } from '@/services/model'
 import { useModelStore } from '@/store/modelStore'
 import { useProviderStore } from '@/store/providerStore'
+import { ModelQuotaLabel, ModelQuotaDetails, ModelQuotaStatus } from '@/components/ModelQuota'
+import { useModelQuotas } from '@/store/modelQuotaStore'
 
 const providerSchema = z.object({
   name: z.string().min(2, '名称不能少于 2 个字符'),
@@ -35,6 +37,7 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
   const [importing, setImporting] = useState(false)
   const [isBuiltIn, setIsBuiltIn] = useState(false)
   const [models, setModels] = useState<SavedModel[]>([])
+  const { refresh: refreshQuotas } = useModelQuotas()
   const providerForm = useForm<ProviderFormValues>({
     resolver: zodResolver(providerSchema),
     defaultValues: { name: '', apiKey: '', baseUrl: '', type: 'custom' },
@@ -73,7 +76,10 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
   }, [id, isCreate])
 
   const refreshSavedModels = async () => {
-    if (id) setModels(await loadModelsById(id))
+    if (id) {
+      setModels(await loadModelsById(id))
+      await refreshQuotas()
+    }
   }
 
   const handleRecommendedImport = async () => {
@@ -83,7 +89,7 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
       await importRecommendedModels(id)
       await refreshSavedModels()
       await useModelStore.getState().loadEnabledModels()
-      toast.success('已导入 5 个文本模型和 5 个可读图模型')
+      toast.success('已导入推荐模型')
     } catch {
       toast.error('导入推荐模型失败')
     } finally {
@@ -185,22 +191,27 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
             <h2 className="font-bold">模型列表</h2>
             {id === 'qwen' && (
               <Button type="button" onClick={handleRecommendedImport} disabled={importing}>
-                {importing ? '导入中...' : '一键导入推荐的 10 个模型'}
+                {importing ? '导入中...' : '一键导入推荐的 15 个模型'}
               </Button>
             )}
             <ModelSelector providerId={id} onSaved={refreshSavedModels} />
           </div>
           <div className="flex flex-col gap-2">
-            <h2 className="font-bold">已启用模型</h2>
-            <div className="flex flex-wrap gap-2 rounded p-2.5">
+            <h2 className="font-bold">已启用模型（{models.length}）</h2>
+            {id === 'qwen' && <ModelQuotaStatus />}
+            <div className="flex flex-col gap-2 rounded p-2.5">
               {models.map(model => (
-                <span key={model.id} className="inline-flex items-center gap-1 rounded-md bg-sage px-2 py-0.5 text-sm text-primary">
-                  {model.model_name}
-                  <span className="text-xs">{model.supports_image_input === true ? '· 可读图' : model.supports_image_input === false ? '· 纯文本' : '· 能力待确认'}</span>
-                  <button type="button" onClick={() => handleDelete(model.id)} aria-label={`删除 ${model.model_name}`} className="hover:text-foreground">
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
+                <div key={model.id} className="flex flex-col gap-1 rounded-md bg-sage p-3 text-sm text-primary">
+                  <div className="flex items-center gap-1">
+                    {model.model_name}
+                    <span className="text-xs">{model.supports_image_input === true ? '· 可读图' : model.supports_image_input === false ? '· 纯文本' : '· 能力待确认'}</span>
+                    <button type="button" onClick={() => handleDelete(model.id)} aria-label={`删除 ${model.model_name}`} className="hover:text-foreground">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <ModelQuotaLabel providerId={id} modelName={model.model_name} />
+                  <ModelQuotaDetails providerId={id} modelName={model.model_name} />
+                </div>
               ))}
             </div>
           </div>

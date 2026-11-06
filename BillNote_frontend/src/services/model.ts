@@ -48,3 +48,24 @@ export const deleteModelById = async (modelId: number) => {
 export const importRecommendedModels = async (providerId: string) => {
   return await request.post(`/models/import_recommended/${providerId}`)
 }
+
+export interface ModelQuota {
+  provider_id: string
+  model_name: string
+  remaining_tokens: number | null
+  total_tokens: number | null
+  expires_at: number | null
+  status: 'available' | 'exhausted' | 'expired' | 'unknown' | 'unsupported'
+}
+
+export interface ModelQuotaSnapshot {
+  status: 'ok' | 'needs_login' | 'error' | 'unsupported'
+  message: string
+  updated_at: number | null
+  refresh_interval_seconds: number
+  models: ModelQuota[]
+}
+
+export const fetchModelQuotas = async (): Promise<ModelQuotaSnapshot> => {
+  return await request.get('/model_quotas', { suppressToast: true, timeout: 20000 }) as unknown as ModelQuotaSnapshot
+}

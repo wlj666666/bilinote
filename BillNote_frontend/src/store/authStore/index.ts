@@ -5,6 +5,7 @@ import { useProviderStore } from '@/store/providerStore'
 import { useModelStore } from '@/store/modelStore'
 import { useTaskStore } from '@/store/taskStore'
 import { useChatStore } from '@/store/chatStore'
+import { resetModelQuotas } from '@/store/modelQuotaStore'
 
 export interface AuthUser {
   id: number
@@ -25,6 +26,7 @@ interface AuthState {
 }
 
 function clearSensitiveState() {
+  resetModelQuotas()
   useProviderStore.setState({ provider: [] })
   useModelStore.setState({ models: [], modelList: [], selectedModel: '', loading: false })
   useTaskStore.getState().setOwner(null)

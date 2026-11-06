@@ -149,7 +149,9 @@ def chat(
 
         # 没有工具调用，直接返回
         if not msg.tool_calls:
-            return {"answer": msg.content or "", "sources": sources}
+            if not msg.content or not msg.content.strip():
+                raise ValueError('问答模型未返回有效文本回答')
+            return {"answer": msg.content, "sources": sources}
 
         # 处理工具调用
         messages.append(msg)
@@ -171,11 +173,21 @@ def chat(
                 "content": result,
             })
 
-    # 超过最大轮次，做最后一次不带 tools 的调用
+    # 部分兼容网关会根据历史 tool 消息继续生成 tool_calls，即使省略 tools。
+    # 显式关闭工具选择，并要求根据现有证据收束，避免以空字符串完成问答。
+    messages.append({
+        "role": "system",
+        "content": "工具调用轮数已达上限，禁止继续调用工具。请根据已经获得的内容直接回答；"
+                   "如果现有资料未提供所问信息，请明确说明未提供，不要猜测或补造数据。",
+    })
     response = complete(
         model=gpt.model,
         messages=messages,
+        tools=TOOLS,
+        tool_choice="none",
         temperature=0.7,
     )
-
-    return {"answer": response.choices[0].message.content or "", "sources": sources}
+    msg = response.choices[0].message
+    if msg.tool_calls or not msg.content or not msg.content.strip():
+        raise ValueError('问答模型在工具调用结束后未返回有效文本回答')
+    return {"answer": msg.content, "sources": sources}

@@ -1,0 +1,991 @@
+{
+  "version": "1.1",
+  "created_at": "2026-11-05",
+  "language": "zh-CN",
+  "scoring": "all reference fact regex groups and timestamp checks must pass; fixed before model evaluation; no LLM judge",
+  "videos": [
+    {
+      "id": "resume",
+      "task_id": "e6118091-66ff-4cb8-800f-95db526e65ce",
+      "source_note": "users/1/e6118091-66ff-4cb8-800f-95db526e65ce.json"
+    },
+    {
+      "id": "fastapi",
+      "task_id": "b45c9027-67b9-4a9b-88bc-da605a1a2e0b",
+      "source_note": "b45c9027-67b9-4a9b-88bc-da605a1a2e0b.json"
+    },
+    {
+      "id": "sqlite",
+      "task_id": "7523fd27-bba2-4383-956e-cb3024f7676e",
+      "source_note": "7523fd27-bba2-4383-956e-cb3024f7676e.json"
+    },
+    {
+      "id": "session",
+      "task_id": "a6afbfb1-e8d1-4fb8-932e-ec45c1d8b736",
+      "source_note": "a6afbfb1-e8d1-4fb8-932e-ec45c1d8b736.json"
+    },
+    {
+      "id": "https",
+      "task_id": "89f4bf7d-6730-478d-8b66-aaf8beb9f344",
+      "source_note": "users/1/89f4bf7d-6730-478d-8b66-aaf8beb9f344.json"
+    }
+  ],
+  "cases": [
+    {
+      "id": "resume-01",
+      "video": "resume",
+      "category": "metadata",
+      "question": "这段视频的 UP 主是谁？请依据视频元信息回答。",
+      "reference_answer": "程序员鱼皮。",
+      "answer_groups": [
+        [
+          "程序员鱼皮",
+          "程序员于皮"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "程序员鱼皮",
+          "程序员于皮"
+        ]
+      ]
+    },
+    {
+      "id": "resume-02",
+      "video": "resume",
+      "category": "summary",
+      "question": "视频建议工作经历重点体现哪三个维度？",
+      "reference_answer": "架构设计、技术前瞻性与落地、运维和问题解决。",
+      "answer_groups": [
+        [
+          "架构"
+        ],
+        [
+          "技术前瞻",
+          "技术.{0,10}落地"
+        ],
+        [
+          "运维"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "架构设计"
+        ],
+        [
+          "技术前瞻性和落地能力"
+        ],
+        [
+          "运维"
+        ]
+      ]
+    },
+    {
+      "id": "resume-03",
+      "video": "resume",
+      "category": "fact",
+      "question": "按视频的建议，成绩排名达到前百分之多少就可以写在简历里？",
+      "reference_answer": "前20%。",
+      "answer_groups": [
+        [
+          "20[%％]",
+          "百分之二十"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "如果你排名前20%以上"
+        ]
+      ]
+    },
+    {
+      "id": "resume-04",
+      "video": "resume",
+      "category": "fact",
+      "question": "视频举的支付中心例子，用哪两种设计模式解决多渠道支付适配？",
+      "reference_answer": "策略模式和工厂模式。",
+      "answer_groups": [
+        [
+          "策略"
+        ],
+        [
+          "工厂"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "策略模式加工厂模式"
+        ]
+      ]
+    },
+    {
+      "id": "resume-05",
+      "video": "resume",
+      "category": "quote",
+      "question": "请查阅视频228到239秒的原始转录，教育背景和奖项应该怎么安排？引用原文，不只转述。",
+      "reference_answer": "原文：可以合并成一个板块。",
+      "answer_groups": [
+        [
+          "可以合并成一个板块"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "可以合并成一个板块"
+        ]
+      ]
+    },
+    {
+      "id": "resume-06",
+      "video": "resume",
+      "category": "timestamp",
+      "question": "请定位原文“项目中90%以上的代码”这句话，给出其开始时间，精确到秒。",
+      "reference_answer": "921.92秒，约15:22。",
+      "answer_groups": [
+        [
+          "\\S"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "项目中90%以上的代码"
+        ]
+      ],
+      "time_seconds": [
+        921.92
+      ],
+      "time_tolerance": 2
+    },
+    {
+      "id": "resume-07",
+      "video": "resume",
+      "category": "cross_segment",
+      "question": "结合667到691秒和971到980秒，分别说明支付中心用了什么设计模式，以及热点监控能力封装成了什么？",
+      "reference_answer": "策略模式加工厂模式；封装为标准化Agent Skills技能包。",
+      "answer_groups": [
+        [
+          "策略"
+        ],
+        [
+          "工厂"
+        ],
+        [
+          "agent.?skills",
+          "技能包"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "策略模式加工厂模式"
+        ],
+        [
+          "agent skills技能包"
+        ]
+      ]
+    },
+    {
+      "id": "resume-08",
+      "video": "resume",
+      "category": "unanswerable",
+      "question": "视频展示的AI热点监控工具，截至录制当天的确切日活跃用户数DAU是多少？仅依据视频，没有就明确说明。",
+      "reference_answer": "视频没有提供该工具的确切DAU。",
+      "answer_groups": [
+        [
+          "未(?:提及|提供|给出|说明|透露|公布|涉及|出现|找到)",
+          "没有.{0,12}(?:提|给|说明|提供|公布|透露|涉及|出现|找到)",
+          "无法.{0,12}(?:确定|得知|回答|确认|判断)",
+          "不(?:清楚|知道|能确定|能确认|能得知)",
+          "没有.{0,45}(?:数据|实测|实现)",
+          "并未.{0,20}(?:涉及|实现|说明|给出|提及)"
+        ]
+      ],
+      "evidence_groups": [],
+      "forbidden_patterns": [
+        "(?:dau|日活(?:跃用户数)?).{0,6}(?:是|为|达到|约)\\d"
+      ]
+    },
+    {
+      "id": "fastapi-01",
+      "video": "fastapi",
+      "category": "metadata",
+      "question": "这段FastAPI课程视频的UP主是谁？请依据视频元信息回答。",
+      "reference_answer": "李勃老师。",
+      "answer_groups": [
+        [
+          "李勃老师"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "李勃老师"
+        ]
+      ]
+    },
+    {
+      "id": "fastapi-02",
+      "video": "fastapi",
+      "category": "summary",
+      "question": "视频如何区分FastAPI和uvicorn各自的职责？",
+      "reference_answer": "FastAPI定义接口，uvicorn运行服务、接收并转交请求。",
+      "answer_groups": [
+        [
+          "fastapi"
+        ],
+        [
+          "uvicorn"
+        ],
+        [
+          "定义接口",
+          "接口.{0,8}(?:逻辑|做什么|定义)"
+        ],
+        [
+          "运行服务",
+          "跑起来",
+          "监听",
+          "接收请求"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "FastAPI负责定义接口"
+        ],
+        [
+          "uvicorn负责运行服务"
+        ]
+      ]
+    },
+    {
+      "id": "fastapi-03",
+      "video": "fastapi",
+      "category": "fact",
+      "question": "视频最后用什么命令把当前环境的依赖重新记录下来，记录到哪个文件？",
+      "reference_answer": "pip freeze，写入requirements.txt。",
+      "answer_groups": [
+        [
+          "pipfreeze"
+        ],
+        [
+          "requirements[.]txt"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "pip freeze"
+        ],
+        [
+          "requirements.txt"
+        ]
+      ]
+    },
+    {
+      "id": "fastapi-04",
+      "video": "fastapi",
+      "category": "fact",
+      "question": "请求示例把text字段错写成了哪个字段？FastAPI返回哪个状态码？",
+      "reference_answer": "错写成txt，返回422。",
+      "answer_groups": [
+        [
+          "txt"
+        ],
+        [
+          "422"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "这里呢写了txt"
+        ],
+        [
+          "422"
+        ]
+      ]
+    },
+    {
+      "id": "fastapi-05",
+      "video": "fastapi",
+      "category": "quote",
+      "question": "请查询1196到1210秒的原始转录，老师在交互式文档里先后点击的两个按钮是什么？按顺序列出。",
+      "reference_answer": "先Try it out，再Execute。",
+      "answer_groups": [
+        [
+          "tryitout"
+        ],
+        [
+          "execute"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "try it out"
+        ],
+        [
+          "execute"
+        ]
+      ]
+    },
+    {
+      "id": "fastapi-06",
+      "video": "fastapi",
+      "category": "timestamp",
+      "question": "请定位原文“uvicorn负责运行服务”，给出这句话的开始时间，精确到秒。",
+      "reference_answer": "370.4秒，约06:10。",
+      "answer_groups": [
+        [
+          "\\S"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "uvicorn负责运行服务"
+        ]
+      ],
+      "time_seconds": [
+        370.4
+      ],
+      "time_tolerance": 2
+    },
+    {
+      "id": "fastapi-07",
+      "video": "fastapi",
+      "category": "cross_segment",
+      "question": "结合330到381秒和2010到2042秒，说明uvicorn在项目中的作用，以及安装好的依赖如何被记录下来。",
+      "reference_answer": "uvicorn运行服务；pip freeze生成requirements.txt。",
+      "answer_groups": [
+        [
+          "uvicorn"
+        ],
+        [
+          "运行服务",
+          "跑起来",
+          "接收请求",
+          "监听",
+          "asgi服务器",
+          "运行.{0,30}(?:应用|服务|接口)",
+          "提供http服务"
+        ],
+        [
+          "pipfreeze"
+        ],
+        [
+          "requirements[.]txt"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "uvicorn负责运行服务"
+        ],
+        [
+          "pip freeze"
+        ],
+        [
+          "requirements.txt"
+        ]
+      ]
+    },
+    {
+      "id": "fastapi-08",
+      "video": "fastapi",
+      "category": "unanswerable",
+      "question": "这段课程实测的FastAPI接口在1000并发下P99延迟是多少毫秒？仅依据视频，没有就明确说明。",
+      "reference_answer": "视频没有提供该并发条件下的P99实测数据。",
+      "answer_groups": [
+        [
+          "未(?:提及|提供|给出|说明|透露|公布|涉及|出现|找到)",
+          "没有.{0,12}(?:提|给|说明|提供|公布|透露|涉及|出现|找到)",
+          "无法.{0,12}(?:确定|得知|回答|确认|判断)",
+          "不(?:清楚|知道|能确定|能确认|能得知)",
+          "没有.{0,45}(?:数据|实测|实现)",
+          "并未.{0,20}(?:涉及|实现|说明|给出|提及)"
+        ]
+      ],
+      "evidence_groups": [],
+      "forbidden_patterns": [
+        "p99.{0,8}(?:是|为|约|达到)\\d"
+      ]
+    },
+    {
+      "id": "sqlite-01",
+      "video": "sqlite",
+      "category": "metadata",
+      "question": "这段SQLite重构课程视频的UP主是谁？依据视频元信息回答。",
+      "reference_answer": "李勃老师。",
+      "answer_groups": [
+        [
+          "李勃老师"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "李勃老师"
+        ]
+      ]
+    },
+    {
+      "id": "sqlite-02",
+      "video": "sqlite",
+      "category": "summary",
+      "question": "这节课把后端代码区分成哪三层？",
+      "reference_answer": "接口层、业务层、存储层。",
+      "answer_groups": [
+        [
+          "接口层"
+        ],
+        [
+          "业务层"
+        ],
+        [
+          "存储层"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "接口层"
+        ],
+        [
+          "业务层"
+        ],
+        [
+          "存储层"
+        ]
+      ]
+    },
+    {
+      "id": "sqlite-03",
+      "video": "sqlite",
+      "category": "fact",
+      "question": "本节把存储层拆到哪个文件？接口层和业务层继续放在哪个文件？",
+      "reference_answer": "storage.py；main.py。",
+      "answer_groups": [
+        [
+          "storage[.]py"
+        ],
+        [
+          "main[.]py"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "storage.py"
+        ],
+        [
+          "main.py"
+        ]
+      ]
+    },
+    {
+      "id": "sqlite-04",
+      "video": "sqlite",
+      "category": "fact",
+      "question": "本节替换存储实现时，老师是否打开或修改过前端文件？",
+      "reference_answer": "没有打开或修改前端文件。",
+      "answer_groups": [
+        [
+          "没有",
+          "未(?:打开|修改|改动)",
+          "不需要",
+          "没(?:有)?(?:改|打开)"
+        ],
+        [
+          "前端"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "我们没有打开任何一个前端文件"
+        ],
+        [
+          "更没有改过前端的代码"
+        ]
+      ]
+    },
+    {
+      "id": "sqlite-05",
+      "video": "sqlite",
+      "category": "quote",
+      "question": "请查阅220到240秒的原始转录，引用老师对“重构”行为边界的一句原话。",
+      "reference_answer": "重构只挪位置不改行为。",
+      "answer_groups": [
+        [
+          "重构只挪位置不改行为",
+          "重构的时候功能一点都不能变"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "重构只挪位置不改行为"
+        ]
+      ]
+    },
+    {
+      "id": "sqlite-06",
+      "video": "sqlite",
+      "category": "timestamp",
+      "question": "请定位原文“重构只挪位置不改行为”，给出这句话的开始时间，精确到秒。",
+      "reference_answer": "226.2秒，约03:46。",
+      "answer_groups": [
+        [
+          "\\S"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "重构只挪位置不改行为"
+        ]
+      ],
+      "time_seconds": [
+        226.2
+      ],
+      "time_tolerance": 2
+    },
+    {
+      "id": "sqlite-07",
+      "video": "sqlite",
+      "category": "cross_segment",
+      "question": "结合220到240秒和2072到2085秒，说明本次重构遵循什么行为原则，以及前端文件有没有修改。",
+      "reference_answer": "只挪位置不改行为；没有打开或修改前端文件。",
+      "answer_groups": [
+        [
+          "不改行为",
+          "功能.{0,8}(?:不变|不能变)",
+          "行为.{0,5}不变",
+          "接口约定不变",
+          "不改动接口约定",
+          "接口.{0,5}稳定"
+        ],
+        [
+          "前端"
+        ],
+        [
+          "没有",
+          "未修改",
+          "未改动",
+          "没(?:有)?改"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "重构只挪位置不改行为"
+        ],
+        [
+          "更没有改过前端的代码"
+        ]
+      ]
+    },
+    {
+      "id": "sqlite-08",
+      "video": "sqlite",
+      "category": "unanswerable",
+      "question": "本节项目的SQLite数据库被实测支持多少个同时在线用户？请给确切人数；视频未提供就说明。",
+      "reference_answer": "视频没有给出同时在线用户容量实测。",
+      "answer_groups": [
+        [
+          "未(?:提及|提供|给出|说明|透露|公布|涉及|出现|找到)",
+          "没有.{0,12}(?:提|给|说明|提供|公布|透露|涉及|出现|找到)",
+          "无法.{0,12}(?:确定|得知|回答|确认|判断)",
+          "不(?:清楚|知道|能确定|能确认|能得知)",
+          "没有.{0,45}(?:数据|实测|实现)",
+          "并未.{0,20}(?:涉及|实现|说明|给出|提及)"
+        ]
+      ],
+      "evidence_groups": [],
+      "forbidden_patterns": [
+        "(?:支持|在线用户|并发用户).{0,6}(?:为|是|达到|约)\\d"
+      ]
+    },
+    {
+      "id": "session-01",
+      "video": "session",
+      "category": "metadata",
+      "question": "这段状态与会话课程视频的UP主是谁？依据视频元信息回答。",
+      "reference_answer": "李勃老师。",
+      "answer_groups": [
+        [
+          "李勃老师"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "李勃老师"
+        ]
+      ]
+    },
+    {
+      "id": "session-02",
+      "video": "session",
+      "category": "summary",
+      "question": "按视频的项目改造方案，实现会话需要做哪三件事？",
+      "reference_answer": "生成唯一难猜的session_id、数据库增加字段保存ID、用Cookie传递ID。",
+      "answer_groups": [
+        [
+          "(?:会话|session).{0,8}id",
+          "id.{0,8}(?:会话|session)"
+        ],
+        [
+          "数据库"
+        ],
+        [
+          "cookie"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "生成一个会话ID"
+        ],
+        [
+          "给数据库加一个字段"
+        ],
+        [
+          "让这个ID在浏览器和服务器之间去传递"
+        ]
+      ]
+    },
+    {
+      "id": "session-03",
+      "video": "session",
+      "category": "fact",
+      "question": "视频中的Cookie Max-Age为2592000，这个值的单位是什么，等于多少天？",
+      "reference_answer": "单位秒，等于30天。",
+      "answer_groups": [
+        [
+          "秒"
+        ],
+        [
+          "30天",
+          "三十天"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "单位是秒"
+        ],
+        [
+          "这个2592000就是30天"
+        ]
+      ]
+    },
+    {
+      "id": "session-04",
+      "video": "session",
+      "category": "fact",
+      "question": "根据本节内容，仅用Cookie实现会话是否就完成了用户身份认证？真正认证还需要什么？",
+      "reference_answer": "没有；还需要注册登录、密码安全等认证机制。",
+      "answer_groups": [
+        [
+          "不是",
+          "不等于",
+          "不代表",
+          "不意味着",
+          "没有",
+          "不能",
+          "不够",
+          "还需要",
+          "并未"
+        ],
+        [
+          "注册",
+          "登录"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "真正的用户身份认证"
+        ],
+        [
+          "要搞注册登录"
+        ]
+      ]
+    },
+    {
+      "id": "session-05",
+      "video": "session",
+      "category": "quote",
+      "question": "请查阅1075到1087秒的原始转录，引用一句说明“号码如何用于取包裹”的原话。",
+      "reference_answer": "用这个号就可以来取包裹。",
+      "answer_groups": [
+        [
+          "用这个号就可以来取包裹"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "用这个号就可以来取包裹"
+        ]
+      ]
+    },
+    {
+      "id": "session-06",
+      "video": "session",
+      "category": "timestamp",
+      "question": "请定位原文“这个2592000就是30天”，给出这句话的开始时间，精确到秒。",
+      "reference_answer": "1527秒，25:27。",
+      "answer_groups": [
+        [
+          "\\S"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "这个2592000就是30天"
+        ]
+      ],
+      "time_seconds": [
+        1527
+      ],
+      "time_tolerance": 2
+    },
+    {
+      "id": "session-07",
+      "video": "session",
+      "category": "cross_segment",
+      "question": "结合1343到1374秒和2600到2634秒，概括会话ID如何生成、保存、传递，以及为什么这还不等于用户身份认证。",
+      "reference_answer": "服务端生成ID，数据库保存，Cookie传递；换浏览器或清Cookie会丢会话，认证还需注册登录。",
+      "answer_groups": [
+        [
+          "id"
+        ],
+        [
+          "数据库"
+        ],
+        [
+          "cookie"
+        ],
+        [
+          "注册",
+          "登录"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "生成一个会话ID"
+        ],
+        [
+          "给数据库加一个字段"
+        ],
+        [
+          "要搞注册登录"
+        ]
+      ]
+    },
+    {
+      "id": "session-08",
+      "video": "session",
+      "category": "unanswerable",
+      "question": "本节最终实现的登录接口使用bcrypt的cost参数是多少？仅依据视频，没有实现或未说明就明确回答。",
+      "reference_answer": "本节没有实现该bcrypt登录接口，也未给出cost参数。",
+      "answer_groups": [
+        [
+          "未(?:提及|提供|给出|说明|透露|公布|涉及|出现|找到)",
+          "没有.{0,12}(?:提|给|说明|提供|公布|透露|涉及|出现|找到)",
+          "无法.{0,12}(?:确定|得知|回答|确认|判断)",
+          "不(?:清楚|知道|能确定|能确认|能得知)",
+          "没有.{0,45}(?:数据|实测|实现)",
+          "并未.{0,20}(?:涉及|实现|说明|给出|提及)"
+        ]
+      ],
+      "evidence_groups": [],
+      "forbidden_patterns": [
+        "cost.{0,8}(?:为|是|设置为)\\d"
+      ]
+    },
+    {
+      "id": "https-01",
+      "video": "https",
+      "category": "metadata",
+      "question": "这段域名与HTTPS课程视频的UP主是谁？依据视频元信息回答。",
+      "reference_answer": "李勃老师。",
+      "answer_groups": [
+        [
+          "李勃老师"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "李勃老师"
+        ]
+      ]
+    },
+    {
+      "id": "https-02",
+      "video": "https",
+      "category": "summary",
+      "question": "按本节的上线链路，DNS的A记录负责什么，HTTPS证书解决什么问题？",
+      "reference_answer": "A记录将域名指向服务器IPv4；证书验证身份并支撑HTTPS安全通信。",
+      "answer_groups": [
+        [
+          "ip",
+          "服务器地址"
+        ],
+        [
+          "身份",
+          "认证",
+          "可信",
+          "验证",
+          "加密",
+          "安全"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "A记录"
+        ],
+        [
+          "证书"
+        ]
+      ]
+    },
+    {
+      "id": "https-03",
+      "video": "https",
+      "category": "fact",
+      "question": "视频讲到的DNS A记录和AAAA记录分别对应哪种IP地址？",
+      "reference_answer": "A对应IPv4，AAAA对应IPv6。",
+      "answer_groups": [
+        [
+          "ipv4"
+        ],
+        [
+          "ipv6"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "IPv4"
+        ],
+        [
+          "IPv6"
+        ]
+      ]
+    },
+    {
+      "id": "https-04",
+      "video": "https",
+      "category": "fact",
+      "question": "视频明确说server_name里的下划线是不是通配符？它实际表示什么样的名字？",
+      "reference_answer": "不是通配符，是故意设置的不会匹配真实域名的名字。",
+      "answer_groups": [
+        [
+          "不是",
+          "并非",
+          "不是什么"
+        ],
+        [
+          "不会.{0,12}(?:匹配|对上)",
+          "不匹配",
+          "故意",
+          "无效",
+          "占位"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "它不是什么通配符"
+        ],
+        [
+          "真实域名对上的名字"
+        ]
+      ]
+    },
+    {
+      "id": "https-05",
+      "video": "https",
+      "category": "quote",
+      "question": "请查阅1995到2008秒的原始转录，老师如何纠正“下划线是通配符”的误解？引用原话。",
+      "reference_answer": "它不是什么通配符。",
+      "answer_groups": [
+        [
+          "它不是什么通配符"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "它不是什么通配符"
+        ]
+      ]
+    },
+    {
+      "id": "https-06",
+      "video": "https",
+      "category": "timestamp",
+      "question": "请定位原文“它不是什么通配符”，给出这句话的开始时间，精确到秒。",
+      "reference_answer": "1999.8秒，约33:20。",
+      "answer_groups": [
+        [
+          "\\S"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "它不是什么通配符"
+        ]
+      ],
+      "time_seconds": [
+        1999.8
+      ],
+      "time_tolerance": 2
+    },
+    {
+      "id": "https-07",
+      "video": "https",
+      "category": "cross_segment",
+      "question": "结合5210到5235秒和5777到5790秒，说明以前为什么没有给Cookie加Secure，以及现在请求通过哪个端口、使用什么证书？",
+      "reference_answer": "以前没有HTTPS；现在走443端口，使用自己申请的证书。",
+      "answer_groups": [
+        [
+          "没有https",
+          "没(?:有)?(?:用|上|启用)?https",
+          "未(?:启用|使用)https",
+          "还是http",
+          "只有http"
+        ],
+        [
+          "443"
+        ],
+        [
+          "自己.{0,8}(?:申请|证书)",
+          "申请.{0,8}证书",
+          "let.?s.?encrypt",
+          "certbot.{0,10}(?:申请|证书)"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "以前我们就没有HTTPS嘛"
+        ],
+        [
+          "然后走443端口"
+        ],
+        [
+          "用的是我们自己申请的证书"
+        ]
+      ]
+    },
+    {
+      "id": "https-08",
+      "video": "https",
+      "category": "unanswerable",
+      "question": "视频中网站在升级HTTPS后，真实付费转化率提升了百分之多少？仅依据视频，没有数据就明确说明。",
+      "reference_answer": "视频没有提供付费转化率提升数据。",
+      "answer_groups": [
+        [
+          "未(?:提及|提供|给出|说明|透露|公布|涉及|出现|找到)",
+          "没有.{0,12}(?:提|给|说明|提供|公布|透露|涉及|出现|找到)",
+          "无法.{0,12}(?:确定|得知|回答|确认|判断)",
+          "不(?:清楚|知道|能确定|能确认|能得知)",
+          "没有.{0,45}(?:数据|实测|实现)",
+          "并未.{0,20}(?:涉及|实现|说明|给出|提及)"
+        ]
+      ],
+      "evidence_groups": [],
+      "forbidden_patterns": [
+        "(?:提升|提高|增长)(?:了|约|为)?\\d+(?:[.]\\d+)?[%％]"
+      ]
+    }
+  ],
+  "scoring_revision_notes": [
+    "Questions, corpus, reference facts and timing tolerances are unchanged. Version 1.0 and original scores are preserved.",
+    "After inspecting the original run, fix rubric false negatives symmetrically for every configuration; this is scoring calibration, not a held-out evaluation.",
+    "Timestamp questions ask only for the source time, not for repeating numerals or names from the quoted target.",
+    "Accept equivalent wording for running an ASGI server, unchanged interface behavior, and the Lets Encrypt certificate.",
+    "Accept explicit no-data statements even when the wording is not exactly 未提供 or 没有提及."
+  ]
+}

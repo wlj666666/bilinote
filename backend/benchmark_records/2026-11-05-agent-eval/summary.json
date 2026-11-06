@@ -1,0 +1,406 @@
+{
+  "modes": {
+    "agent_fixed": {
+      "total": 40,
+      "passed": 37,
+      "pass_rate": 0.925,
+      "errors": 2,
+      "truncated": 0,
+      "evidence_total": 35,
+      "evidence_available": 32,
+      "latency_mean_seconds": 12.5951,
+      "latency_p50_seconds": 10.5971,
+      "latency_p95_seconds": 25.6057,
+      "completion_requests": 86,
+      "usage_missing_requests": 2,
+      "prompt_tokens": 230716,
+      "completion_tokens": 17238,
+      "total_tokens": 247954,
+      "tool_calls": 87,
+      "tool_calls_successful": 87,
+      "questions_using_tools": 30,
+      "categories": {
+        "cross_segment": {
+          "total": 5,
+          "passed": 4
+        },
+        "fact": {
+          "total": 10,
+          "passed": 9
+        },
+        "metadata": {
+          "total": 5,
+          "passed": 5
+        },
+        "quote": {
+          "total": 5,
+          "passed": 5
+        },
+        "summary": {
+          "total": 5,
+          "passed": 4
+        },
+        "timestamp": {
+          "total": 5,
+          "passed": 5
+        },
+        "unanswerable": {
+          "total": 5,
+          "passed": 5
+        }
+      }
+    },
+    "agent_original": {
+      "total": 40,
+      "passed": 38,
+      "pass_rate": 0.95,
+      "errors": 0,
+      "truncated": 0,
+      "evidence_total": 35,
+      "evidence_available": 33,
+      "latency_mean_seconds": 13.8571,
+      "latency_p50_seconds": 13.4343,
+      "latency_p95_seconds": 21.9367,
+      "completion_requests": 92,
+      "usage_missing_requests": 0,
+      "prompt_tokens": 258302,
+      "completion_tokens": 17383,
+      "total_tokens": 275685,
+      "tool_calls": 92,
+      "tool_calls_successful": 92,
+      "questions_using_tools": 33,
+      "categories": {
+        "cross_segment": {
+          "total": 5,
+          "passed": 5
+        },
+        "fact": {
+          "total": 10,
+          "passed": 10
+        },
+        "metadata": {
+          "total": 5,
+          "passed": 5
+        },
+        "quote": {
+          "total": 5,
+          "passed": 5
+        },
+        "summary": {
+          "total": 5,
+          "passed": 4
+        },
+        "timestamp": {
+          "total": 5,
+          "passed": 5
+        },
+        "unanswerable": {
+          "total": 5,
+          "passed": 4
+        }
+      }
+    },
+    "rag": {
+      "total": 40,
+      "passed": 29,
+      "pass_rate": 0.725,
+      "errors": 0,
+      "truncated": 0,
+      "evidence_total": 35,
+      "evidence_available": 16,
+      "latency_mean_seconds": 7.5409,
+      "latency_p50_seconds": 6.1569,
+      "latency_p95_seconds": 14.6735,
+      "completion_requests": 40,
+      "usage_missing_requests": 0,
+      "prompt_tokens": 44466,
+      "completion_tokens": 9497,
+      "total_tokens": 53963,
+      "tool_calls": 0,
+      "tool_calls_successful": 0,
+      "questions_using_tools": 0,
+      "categories": {
+        "cross_segment": {
+          "total": 5,
+          "passed": 4
+        },
+        "fact": {
+          "total": 10,
+          "passed": 7
+        },
+        "metadata": {
+          "total": 5,
+          "passed": 5
+        },
+        "quote": {
+          "total": 5,
+          "passed": 3
+        },
+        "summary": {
+          "total": 5,
+          "passed": 3
+        },
+        "timestamp": {
+          "total": 5,
+          "passed": 2
+        },
+        "unanswerable": {
+          "total": 5,
+          "passed": 5
+        }
+      }
+    }
+  },
+  "paired": {
+    "agent_fixed": {
+      "pairs": 40,
+      "agent_only_pass": 9,
+      "rag_only_pass": 1
+    },
+    "agent_original": {
+      "pairs": 40,
+      "agent_only_pass": 10,
+      "rag_only_pass": 1
+    }
+  },
+  "rubric_version": "1.1",
+  "sources": [
+    {
+      "configuration": "rag",
+      "run": "2026-11-05-main",
+      "metadata": {
+        "started_at": "2026-11-05T16:34:25.909331+08:00",
+        "dataset_sha256": "d64d22f545603073042108e32cdc69deaa5049dde30fde529d5d3d2883802ba7",
+        "runner_sha256": "c2e84831c01b9cf25446c9ca6a808708f3c2326c8dd39957da00551a450c7da4",
+        "chat_service_sha256": "8493c0cb975e581987f9d8f672c91f6edcc76e5111cbbfc1a5ad622ef68e32cf",
+        "model_requested": "deepseek-v4-pro",
+        "provider_id": "qwen",
+        "temperature": 0,
+        "max_tokens": 8192,
+        "timeout_seconds": 180,
+        "workers": 2,
+        "repeats": 1,
+        "case_count": 40,
+        "sample_order_seed": 20261105,
+        "python": "3.11.16 (main, Aug 27 2026, 14:44:21) [GCC 14.3.0]",
+        "warm_index": true,
+        "empty_history": true,
+        "pricing": null,
+        "cost_note": "No verified tariff; report tokens, not invented currency costs."
+      },
+      "corpus_manifest": [
+        {
+          "video": "resume",
+          "task_id": "e6118091-66ff-4cb8-800f-95db526e65ce",
+          "title": "时隔六年，曝光一下我的最新简历！",
+          "url": "https://www.bilibili.com/video/BV1DCDjBRExV",
+          "duration_seconds": 1302.033,
+          "segments": 854,
+          "source_sha256": "58787934cd6f2114acb80e61cd94a10adf48eab49da927e2b1d1714ec57843f2",
+          "snapshot_sha256": "206409d4c8a7e3ef2c1b190f581ae65a9d6c36fa08d371a248c657be01e806c6"
+        },
+        {
+          "video": "fastapi",
+          "task_id": "b45c9027-67b9-4a9b-88bc-da605a1a2e0b",
+          "title": "【零到全栈】5.4-FastAPI入门",
+          "url": "https://www.bilibili.com/video/BV1LW3K63ExS",
+          "duration_seconds": 2171.344,
+          "segments": 877,
+          "source_sha256": "ec065923cae9a6e13cb0f2f721ac2b132f79e88ba037defb512ab53d1ed183e0",
+          "snapshot_sha256": "385f6707f82855cff4f39d1c0ab181044321763a7744e07accfc8fa247b20cb5"
+        },
+        {
+          "video": "sqlite",
+          "task_id": "7523fd27-bba2-4383-956e-cb3024f7676e",
+          "title": "【零到全栈】6.5-重构, 在项目中使用SQLite",
+          "url": "https://www.bilibili.com/video/BV1s94X6cEvx",
+          "duration_seconds": 2750.914,
+          "segments": 1065,
+          "source_sha256": "e6124453963e44fb890fbddaa76d260afa594497b2decbaef24e4b60b7fef561",
+          "snapshot_sha256": "466320b8473522c3cf845a82b89f2c19360bba42e63e8aead54cfc091a7c34a6"
+        },
+        {
+          "video": "session",
+          "task_id": "a6afbfb1-e8d1-4fb8-932e-ec45c1d8b736",
+          "title": "【零到全栈】6.6-状态与会话",
+          "url": "https://www.bilibili.com/video/BV1Q6bH6xEZS",
+          "duration_seconds": 3055.095,
+          "segments": 1221,
+          "source_sha256": "2bc30ba5c11e2e72e927d2427aa270fc69d0bea4bcfed010d4a070465aeecb5b",
+          "snapshot_sha256": "7ca87278f6ffc74b24f7867464823594488373e99cba90e6e2e68de9b60ba59e"
+        },
+        {
+          "video": "https",
+          "task_id": "89f4bf7d-6730-478d-8b66-aaf8beb9f344",
+          "title": "【零到全栈】7.3-域名与HTTPS",
+          "url": "https://www.bilibili.com/video/BV178n46FEdw",
+          "duration_seconds": 5865.685,
+          "segments": 2324,
+          "source_sha256": "231d56d7c1343a76bf129b6927f4988784d86bf9fffb25fa6c26fa19fbac889a",
+          "snapshot_sha256": "0b745a6876322e2932590f56d5a8b4bfe2ba9f1cac29ec5767080842f5e31daa"
+        }
+      ],
+      "results_sha256": "e473997f349fd6f7755d71e390e6a8228f8ac6d57f8747d2f39023c315a5cbc0"
+    },
+    {
+      "configuration": "agent_original",
+      "run": "2026-11-05-main",
+      "metadata": {
+        "started_at": "2026-11-05T16:34:25.909331+08:00",
+        "dataset_sha256": "d64d22f545603073042108e32cdc69deaa5049dde30fde529d5d3d2883802ba7",
+        "runner_sha256": "c2e84831c01b9cf25446c9ca6a808708f3c2326c8dd39957da00551a450c7da4",
+        "chat_service_sha256": "8493c0cb975e581987f9d8f672c91f6edcc76e5111cbbfc1a5ad622ef68e32cf",
+        "model_requested": "deepseek-v4-pro",
+        "provider_id": "qwen",
+        "temperature": 0,
+        "max_tokens": 8192,
+        "timeout_seconds": 180,
+        "workers": 2,
+        "repeats": 1,
+        "case_count": 40,
+        "sample_order_seed": 20261105,
+        "python": "3.11.16 (main, Aug 27 2026, 14:44:21) [GCC 14.3.0]",
+        "warm_index": true,
+        "empty_history": true,
+        "pricing": null,
+        "cost_note": "No verified tariff; report tokens, not invented currency costs."
+      },
+      "corpus_manifest": [
+        {
+          "video": "resume",
+          "task_id": "e6118091-66ff-4cb8-800f-95db526e65ce",
+          "title": "时隔六年，曝光一下我的最新简历！",
+          "url": "https://www.bilibili.com/video/BV1DCDjBRExV",
+          "duration_seconds": 1302.033,
+          "segments": 854,
+          "source_sha256": "58787934cd6f2114acb80e61cd94a10adf48eab49da927e2b1d1714ec57843f2",
+          "snapshot_sha256": "206409d4c8a7e3ef2c1b190f581ae65a9d6c36fa08d371a248c657be01e806c6"
+        },
+        {
+          "video": "fastapi",
+          "task_id": "b45c9027-67b9-4a9b-88bc-da605a1a2e0b",
+          "title": "【零到全栈】5.4-FastAPI入门",
+          "url": "https://www.bilibili.com/video/BV1LW3K63ExS",
+          "duration_seconds": 2171.344,
+          "segments": 877,
+          "source_sha256": "ec065923cae9a6e13cb0f2f721ac2b132f79e88ba037defb512ab53d1ed183e0",
+          "snapshot_sha256": "385f6707f82855cff4f39d1c0ab181044321763a7744e07accfc8fa247b20cb5"
+        },
+        {
+          "video": "sqlite",
+          "task_id": "7523fd27-bba2-4383-956e-cb3024f7676e",
+          "title": "【零到全栈】6.5-重构, 在项目中使用SQLite",
+          "url": "https://www.bilibili.com/video/BV1s94X6cEvx",
+          "duration_seconds": 2750.914,
+          "segments": 1065,
+          "source_sha256": "e6124453963e44fb890fbddaa76d260afa594497b2decbaef24e4b60b7fef561",
+          "snapshot_sha256": "466320b8473522c3cf845a82b89f2c19360bba42e63e8aead54cfc091a7c34a6"
+        },
+        {
+          "video": "session",
+          "task_id": "a6afbfb1-e8d1-4fb8-932e-ec45c1d8b736",
+          "title": "【零到全栈】6.6-状态与会话",
+          "url": "https://www.bilibili.com/video/BV1Q6bH6xEZS",
+          "duration_seconds": 3055.095,
+          "segments": 1221,
+          "source_sha256": "2bc30ba5c11e2e72e927d2427aa270fc69d0bea4bcfed010d4a070465aeecb5b",
+          "snapshot_sha256": "7ca87278f6ffc74b24f7867464823594488373e99cba90e6e2e68de9b60ba59e"
+        },
+        {
+          "video": "https",
+          "task_id": "89f4bf7d-6730-478d-8b66-aaf8beb9f344",
+          "title": "【零到全栈】7.3-域名与HTTPS",
+          "url": "https://www.bilibili.com/video/BV178n46FEdw",
+          "duration_seconds": 5865.685,
+          "segments": 2324,
+          "source_sha256": "231d56d7c1343a76bf129b6927f4988784d86bf9fffb25fa6c26fa19fbac889a",
+          "snapshot_sha256": "0b745a6876322e2932590f56d5a8b4bfe2ba9f1cac29ec5767080842f5e31daa"
+        }
+      ],
+      "results_sha256": "e473997f349fd6f7755d71e390e6a8228f8ac6d57f8747d2f39023c315a5cbc0"
+    },
+    {
+      "configuration": "agent_fixed",
+      "run": "2026-11-05-fixed",
+      "metadata": {
+        "started_at": "2026-11-05T16:42:36.887756+08:00",
+        "dataset_sha256": "d64d22f545603073042108e32cdc69deaa5049dde30fde529d5d3d2883802ba7",
+        "runner_sha256": "8be21275fd3147f357f1a42bf041876393666a7614df0ff9361fcc1fc141ba22",
+        "chat_service_sha256": "280365c9fdfe912220438480bba11bef0ef225cffc387b69f555a43e5c0398dd",
+        "model_requested": "deepseek-v4-pro",
+        "provider_id": "qwen",
+        "temperature": 0,
+        "max_tokens": 8192,
+        "timeout_seconds": 180,
+        "workers": 2,
+        "repeats": 1,
+        "case_count": 40,
+        "modes": [
+          "agent"
+        ],
+        "sample_order_seed": 20261105,
+        "python": "3.11.16 (main, Aug 27 2026, 14:44:21) [GCC 14.3.0]",
+        "warm_index": true,
+        "empty_history": true,
+        "pricing": null,
+        "cost_note": "No verified tariff; report tokens, not invented currency costs."
+      },
+      "corpus_manifest": [
+        {
+          "video": "resume",
+          "task_id": "e6118091-66ff-4cb8-800f-95db526e65ce",
+          "title": "时隔六年，曝光一下我的最新简历！",
+          "url": "https://www.bilibili.com/video/BV1DCDjBRExV",
+          "duration_seconds": 1302.033,
+          "segments": 854,
+          "source_sha256": "58787934cd6f2114acb80e61cd94a10adf48eab49da927e2b1d1714ec57843f2",
+          "snapshot_sha256": "206409d4c8a7e3ef2c1b190f581ae65a9d6c36fa08d371a248c657be01e806c6"
+        },
+        {
+          "video": "fastapi",
+          "task_id": "b45c9027-67b9-4a9b-88bc-da605a1a2e0b",
+          "title": "【零到全栈】5.4-FastAPI入门",
+          "url": "https://www.bilibili.com/video/BV1LW3K63ExS",
+          "duration_seconds": 2171.344,
+          "segments": 877,
+          "source_sha256": "ec065923cae9a6e13cb0f2f721ac2b132f79e88ba037defb512ab53d1ed183e0",
+          "snapshot_sha256": "385f6707f82855cff4f39d1c0ab181044321763a7744e07accfc8fa247b20cb5"
+        },
+        {
+          "video": "sqlite",
+          "task_id": "7523fd27-bba2-4383-956e-cb3024f7676e",
+          "title": "【零到全栈】6.5-重构, 在项目中使用SQLite",
+          "url": "https://www.bilibili.com/video/BV1s94X6cEvx",
+          "duration_seconds": 2750.914,
+          "segments": 1065,
+          "source_sha256": "e6124453963e44fb890fbddaa76d260afa594497b2decbaef24e4b60b7fef561",
+          "snapshot_sha256": "466320b8473522c3cf845a82b89f2c19360bba42e63e8aead54cfc091a7c34a6"
+        },
+        {
+          "video": "session",
+          "task_id": "a6afbfb1-e8d1-4fb8-932e-ec45c1d8b736",
+          "title": "【零到全栈】6.6-状态与会话",
+          "url": "https://www.bilibili.com/video/BV1Q6bH6xEZS",
+          "duration_seconds": 3055.095,
+          "segments": 1221,
+          "source_sha256": "2bc30ba5c11e2e72e927d2427aa270fc69d0bea4bcfed010d4a070465aeecb5b",
+          "snapshot_sha256": "7ca87278f6ffc74b24f7867464823594488373e99cba90e6e2e68de9b60ba59e"
+        },
+        {
+          "video": "https",
+          "task_id": "89f4bf7d-6730-478d-8b66-aaf8beb9f344",
+          "title": "【零到全栈】7.3-域名与HTTPS",
+          "url": "https://www.bilibili.com/video/BV178n46FEdw",
+          "duration_seconds": 5865.685,
+          "segments": 2324,
+          "source_sha256": "231d56d7c1343a76bf129b6927f4988784d86bf9fffb25fa6c26fa19fbac889a",
+          "snapshot_sha256": "0b745a6876322e2932590f56d5a8b4bfe2ba9f1cac29ec5767080842f5e31daa"
+        }
+      ],
+      "results_sha256": "c4e62e7efba659731aa908e3ada82cec2c5d40210a6edc19ffcd98e571448298"
+    }
+  ],
+  "identical_initial_retrieval": true,
+  "reference_scoring": "Fixed fact groups plus explicit timestamp checks; not a general semantic accuracy metric",
+  "rubric_sha256": "d3669e546d0a93f9e4389fc7bf18f61e5d45a01e3eeddf3282c2cc0d500e76db"
+}

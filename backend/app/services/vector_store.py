@@ -177,7 +177,7 @@ class VectorStoreManager:
             identity = f'{VECTOR_DB_DIR}:{self.user_id}:{task_id}'.encode()
             key = hashlib.sha256(identity).hexdigest()
             lock = FileLock(runtime_dir() / f'index-{key}.lock')
-            deadline = time.monotonic() + positive_env('CHAT_TIMEOUT_SECONDS', 180)
+            deadline = time.monotonic() + positive_env('CHAT_TIMEOUT_SECONDS', 480)
             try:
                 while not lock.acquire():
                     if time.monotonic() >= deadline:

@@ -111,7 +111,7 @@ class ChatJobs:
                 if user is None or not user.enabled:
                     raise ValueError('账号不可用')
                 user_id, task_id, admin = user.id, job.task_id, user.role == 'admin'
-                remaining = positive_env('CHAT_TIMEOUT_SECONDS', 180) - (time.time() - job.created_at)
+                remaining = positive_env('CHAT_TIMEOUT_SECONDS', 480) - (time.time() - job.created_at)
                 if remaining <= 0:
                     raise TimeoutError('排队等待超时')
                 payload = json.loads(job.payload)

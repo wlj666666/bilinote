@@ -52,7 +52,6 @@ class DeepSeekGPT(GPT):
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
-            temperature=0.7
         )
         return response.choices[0].message.content.strip()
 

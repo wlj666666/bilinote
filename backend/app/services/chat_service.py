@@ -86,7 +86,7 @@ def chat(
     4. 循环直到 LLM 给出最终回答
     """
     started = time.monotonic()
-    deadline = started + (timeout_seconds if timeout_seconds is not None else positive_env('CHAT_TIMEOUT_SECONDS', 180))
+    deadline = started + (timeout_seconds if timeout_seconds is not None else positive_env('CHAT_TIMEOUT_SECONDS', 480))
     vector_store = VectorStoreManager(user_id=user_id)
 
     # 1. 检索初始上下文
@@ -142,7 +142,6 @@ def chat(
             model=gpt.model,
             messages=messages,
             tools=TOOLS,
-            temperature=0.7,
         )
 
         msg = response.choices[0].message
@@ -185,7 +184,6 @@ def chat(
         messages=messages,
         tools=TOOLS,
         tool_choice="none",
-        temperature=0.7,
     )
     msg = response.choices[0].message
     if msg.tool_calls or not msg.content or not msg.content.strip():

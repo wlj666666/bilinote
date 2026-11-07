@@ -8,6 +8,7 @@ from app.gpt.gpt_factory import GPTFactory
 from app.gpt.provider.OpenAI_compatible_provider import OpenAICompatibleProvider
 from app.models.model_config import ModelConfig
 from app.services.provider import ProviderService
+from app.services.model_speed import MEASURED_COMPLETION_SECONDS
 from app.services.model_capabilities import (
     RECOMMENDED_CAPABILITIES, RECOMMENDED_QWEN_MODELS,
     is_text_only_model, qwen_catalog_image_capability,
@@ -79,12 +80,20 @@ class ModelService:
                 "created_at": model.get("created_at", None),  # 如果有created_at字段
             })
         recommended_order = {name: index for index, (name, _) in enumerate(RECOMMENDED_QWEN_MODELS)}
-        formatted.sort(key=lambda model: (
-            0 if model["provider_id"] == "qwen" and model["model_name"] == "qwen-plus" else
-            1 if model["provider_id"] == "qwen" and model["model_name"] in recommended_order else 2,
-            recommended_order.get(model["model_name"], -1),
-            model["provider_id"], model["model_name"],
-        ))
+
+        def sort_key(model):
+            seconds = (MEASURED_COMPLETION_SECONDS.get(model["model_name"])
+                       if model["provider_id"] == "qwen" else None)
+            return (
+                0 if seconds is not None else 1,
+                seconds if seconds is not None else 0,
+                0 if model["provider_id"] == "qwen" and model["model_name"] == "qwen-plus" else
+                1 if model["provider_id"] == "qwen" and model["model_name"] in recommended_order else 2,
+                recommended_order.get(model["model_name"], -1),
+                model["provider_id"], model["model_name"],
+            )
+
+        formatted.sort(key=sort_key)
         return formatted
     @staticmethod
     def get_enabled_models_by_provider( provider_id: str|int,):

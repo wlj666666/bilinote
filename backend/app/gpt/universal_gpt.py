@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class UniversalGPT(GPT):
-    def __init__(self, client, model: str, temperature: float = 0.7):
+    def __init__(self, client, model: str, temperature: float | None = None):
         self.client = client
         self.model = model
         self.temperature = temperature
@@ -209,7 +209,9 @@ class UniversalGPT(GPT):
         raw = str(exc).lower()
         return "temperature" in raw and (
             "does not support" in raw
+            or "not supported" in raw
             or "unsupported_value" in raw
+            or "unsupported_parameter" in raw
             or "only the default" in raw
         )
 
@@ -250,21 +252,21 @@ class UniversalGPT(GPT):
                     raise
 
     def _do_create_unlimited(self, messages: list):
-        """单次调用。如果模型拒绝自定义 temperature，就地去掉该参数再试一次
-        （不消耗外层的重试次数预算），仍失败则把异常抛给外层重试逻辑。"""
+        """Use provider sampling defaults unless the caller explicitly opts in.
+
+        An explicitly supplied temperature may be removed once if the provider
+        rejects that parameter. Other validation errors keep their normal path.
+        """
+        kwargs = {"model": self.model, "messages": messages}
+        if self.temperature is not None:
+            kwargs["temperature"] = self.temperature
         try:
-            return self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=self.temperature,
-            )
+            return self.client.chat.completions.create(**kwargs)
         except Exception as exc:
-            if self._is_temperature_unsupported_error(exc):
-                print(f"[universal_gpt] 模型 {self.model} 不支持自定义 temperature，改用默认值重试")
-                return self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                )
+            if "temperature" in kwargs and self._is_temperature_unsupported_error(exc):
+                logger.info("模型 %s 不支持指定的 temperature，省略该参数重试", self.model)
+                kwargs.pop("temperature")
+                return self.client.chat.completions.create(**kwargs)
             raise
 
     def _chat_completion_create(self, messages: list):

@@ -22,7 +22,8 @@ class OpenAICompatibleProvider:
           - 部分代理 / 自建供应商不实现 /v1/models（如某些 OpenAI 兼容网关）
           - 部分供应商 key 在没有 inference 权限时 /v1/models 仍返回 200
         最终用户跑的就是 chat.completions.create，所以直接测它最忠实。
-        max_tokens=1 + temperature=0 让请求开销 < 0.0001 美元、延迟 < 2s。
+        最多输出 1 Token，并使用供应商默认采样参数。
+        该测试只验证接口接收请求，不能代表完整笔记生成的耗时和稳定性。
         """
         try:
             client = build_openai_client(
@@ -32,7 +33,6 @@ class OpenAICompatibleProvider:
                 model=model,
                 messages=[{"role": "user", "content": "ping"}],
                 max_tokens=1,
-                temperature=0,
             )
             logging.info(f"连通性测试成功（model={model}）")
             return True
